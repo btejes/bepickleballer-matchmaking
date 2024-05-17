@@ -1,29 +1,17 @@
+// app/homepage/page.jsx
 import React from 'react';
 
+export const metadata = {
+  title: 'Matchmaking - Pickleball Matchmaking',
+  description: 'Find your Pickleball match',
+};
 
-// Fetch initial data for the page.
-export async function getStaticProps() {
+const Homepage = async () => {
   // Fetch data here (e.g., from an API or database)
   // const data = await fetch('https://api.example.com/matches').then(res => res.json());
 
-  // Return the data as props
-  return {
-    props: {
-      // data,
-    },
-    revalidate: 10, // Revalidate every 10 seconds
-  };
-}
-
-// Homepage component to render the matchmaking page.
-const Homepage = (props) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-lightGreen">
-      <Head>
-        <title>Matchmaking - Pickleball Matchmaking</title>
-        <meta name="description" content="Find your Pickleball match" />
-      </Head>
-      
       <h1 className="text-4xl font-bold mb-12 text-center text-black">Find Your Pickleball Match</h1>
       
       <div className="p-6 max-w-md w-full bg-white rounded-lg shadow-md">
