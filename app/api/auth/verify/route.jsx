@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/library/connectToDatabase';
 import Token from '@/library/Token';
+import User from '@/library/User';
 const jwt = require('jsonwebtoken');
 
 // Define the API route for verifying a magic login link
@@ -15,14 +16,35 @@ export async function GET(request) {
     return NextResponse.redirect(`${process.env.BASE_URL}/login`);
   }
 
-  // Create a JSON Web Token for the user
-  const jwtToken = jwt.sign({ email: tokenDoc.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  // Retrieve the user's ID based on the email in the token
+  const user = await User.findOne({ email: tokenDoc.email });
+  if (!user) {
+    return NextResponse.redirect(`${process.env.BASE_URL}/login`);
+  }
 
+  // Create a JSON Web Token for the user, storing the user's ID
+  const jwtToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
+  console.log("\njwtToken: ", jwtToken, "\n");
   // Delete the token after verification
   await Token.deleteOne({ token });
 
-  // Redirect to the homepage after successful verification
+  // Update the user's emailVerified and lastVerifiedLogin fields
+  if (!user.emailVerified) {
+    user.emailVerified = true;
+  }
+  user.lastVerifiedLogin = new Date();
+  await user.save();
+
+  // Store the JSON Web Token in cookies (HTTP-only) for Next.js 14
   const response = NextResponse.redirect(`${process.env.BASE_URL}/homepage`);
-  response.cookies.set('token', jwtToken, { httpOnly: true });
+  
+  // Set cookie options
+  const cookieOptions = { httpOnly: true };
+  if (process.env.NODE_ENV === 'production') {
+    cookieOptions.secure = true;
+  }
+  response.cookies.set('token', jwtToken, cookieOptions);
+  console.log("\n response.cookies:  ", response.cookies, "\n");
+
   return response;
 }
