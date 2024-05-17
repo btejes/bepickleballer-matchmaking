@@ -17,7 +17,8 @@ export async function POST(request) {
   let user = await User.findOne({ email: lowercasedEmail });
   if (!user) {
     console.log(`User not found. Creating new user for ${lowercasedEmail}`);
-    user = new User({ email: lowercasedEmail });
+    // let currentDate = new Date().getTime();
+    user = new User({ email: lowercasedEmail,  emailVerified: false, lastVerifiedLogin: "" });
     await user.save();
   } else {
     console.log(`User found for ${lowercasedEmail}`);
@@ -25,7 +26,7 @@ export async function POST(request) {
 
   // Check if a token exists for this email
   let tokenEntry = await Token.findOne({ email: lowercasedEmail });
-
+  let token;
   if (tokenEntry) {
     // If the token entry exists, check if it has expired
     if (tokenEntry.expires > new Date()) {
@@ -40,7 +41,7 @@ export async function POST(request) {
     }
   } else {
     // If no token entry exists, create a new one
-    const token = nanoid();
+    token = nanoid();
     const expires = new Date(Date.now() + 15 * 60 * 1000);
     await Token.create({ email: lowercasedEmail, token, expires });
     console.log(`Created new token for ${lowercasedEmail}`);
