@@ -15,7 +15,7 @@ const EmailForm = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: email.toLowerCase() }),
       });
 
       if (response.ok) {
@@ -35,7 +35,7 @@ const EmailForm = () => {
           <input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value.toLowerCase())}
             placeholder="Enter your email"
             required
             className="input input-bordered w-full border border-gray-400 focus:border-blue focus:ring-2 focus:ring-blue text-black bg-white rounded-lg shadow-sm px-3 text-center"

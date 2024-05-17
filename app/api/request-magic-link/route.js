@@ -1,33 +1,62 @@
-// Import necessary modules
 import { NextResponse } from 'next/server';
-import { sendLoginEmail } from '../../../library/mailgunService';
+import { sendLoginEmail } from '@/library/mailgunService';
 import { nanoid } from 'nanoid';
-import path from 'path';
-import dotenv from 'dotenv';
+import connectToDatabase from '@/library/connectToDatabase';
+import Token from '@/library/Token';
+import User from '@/library/User';
 
-// Load environment variables
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
-
-// POST handler for /api/request-magic-link
 export async function POST(request) {
-  try {
-    const { email } = await request.json();
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+  await connectToDatabase();
+
+  const { email } = await request.json();
+  const lowercasedEmail = email.toLowerCase();
+
+  console.log(`Received request to send magic link to ${lowercasedEmail}`);
+
+  // Check if user exists, if not, create one
+  let user = await User.findOne({ email: lowercasedEmail });
+  if (!user) {
+    console.log(`User not found. Creating new user for ${lowercasedEmail}`);
+    user = new User({ email: lowercasedEmail });
+    await user.save();
+  } else {
+    console.log(`User found for ${lowercasedEmail}`);
+  }
+
+  // Check if a token exists for this email
+  let tokenEntry = await Token.findOne({ email: lowercasedEmail });
+
+  if (tokenEntry) {
+    // If the token entry exists, check if it has expired
+    if (tokenEntry.expires > new Date()) {
+      console.log(`Token for ${lowercasedEmail} is still valid. Not sending email.`);
+      return NextResponse.json({ message: 'A valid login link has already been sent. Please check your email.' });
+    } else {
+      // If the token has expired, update it with a new token and expiry time
+      tokenEntry.token = nanoid();
+      tokenEntry.expires = new Date(Date.now() + 15 * 60 * 1000);
+      await tokenEntry.save();
+      console.log(`Updated expired token for ${lowercasedEmail}`);
     }
-
-    // Generate a unique login link (token-based)
+  } else {
+    // If no token entry exists, create a new one
     const token = nanoid();
-    const loginLink = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/verify?token=${token}`;
+    const expires = new Date(Date.now() + 15 * 60 * 1000);
+    await Token.create({ email: lowercasedEmail, token, expires });
+    console.log(`Created new token for ${lowercasedEmail}`);
+  }
 
-    // Send the login email using Mailgun
-    await sendLoginEmail(email, loginLink);
+  // Construct the URL for the magic link
+  const baseUrl = process.env.BASE_URL;
+  const verifyUrl = `${baseUrl}/api/auth/verify?token=${tokenEntry ? tokenEntry.token : token}`;
 
-    // Optionally, store the token in a database with an expiration time
-
-    return NextResponse.json({ message: 'Login link sent successfully' }, { status: 200 });
+  try {
+    // Send the login email using the Mailgun service
+    await sendLoginEmail(lowercasedEmail, verifyUrl);
+    console.log(`Sent login email to ${lowercasedEmail} with link ${verifyUrl}`);
+    return NextResponse.json({ message: 'Check your email for the secure login link.' });
   } catch (error) {
-    console.error('Error sending login link:', error);
-    return NextResponse.json({ error: 'Failed to send login link' }, { status: 500 });
+    console.error(`Error sending login link to ${lowercasedEmail}:`, error);
+    return NextResponse.json({ message: 'Error sending login link.' }, { status: 500 });
   }
 }

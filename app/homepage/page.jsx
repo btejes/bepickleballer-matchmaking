@@ -1,5 +1,5 @@
 import React from 'react';
-import Head from 'next/head';
+
 
 // Fetch initial data for the page.
 export async function getStaticProps() {
