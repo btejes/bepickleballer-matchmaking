@@ -55,4 +55,9 @@ body {
   .text-darkGray {
     color: var(--text-color);
   }
+
+  .icon {
+    background-color: transparent;
+  }
+  
 }
