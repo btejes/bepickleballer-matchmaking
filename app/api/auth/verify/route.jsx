@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/library/connectToDatabase';
 import Token from '@/library/Token';
 import User from '@/library/User';
+import Profile from '@/library/Profile';
 const jwt = require('jsonwebtoken');
 
 // Define the API route for verifying a magic login link
@@ -22,9 +23,18 @@ export async function GET(request) {
     return NextResponse.redirect(`${process.env.BASE_URL}/login`);
   }
 
+  // Check if a profile exists for this user, and create one if it does not exist
+  let profile = await Profile.findOne({ userId: user._id });
+  if (!profile) {
+    console.log(`Profile not found for user ${tokenDoc.email}. Creating default profile.`);
+    profile = new Profile({ userId: user._id });
+    await profile.save();
+  }
+
   // Create a JSON Web Token for the user, storing the user's ID
   const jwtToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
   console.log("\njwtToken: ", jwtToken, "\n");
+
   // Delete the token after verification
   await Token.deleteOne({ token });
 

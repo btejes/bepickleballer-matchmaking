@@ -5,7 +5,7 @@ export const GET = async (req, { params }) => {
   await connectToDatabase();
 
   try {
-    const profile = await Profile.findById(params.id);
+    const profile = await Profile.findOne({ userId: params.id });
     if (!profile) {
       return new Response('Profile not found', { status: 404 });
     }
@@ -20,7 +20,11 @@ export const PUT = async (req, { params }) => {
   const updatedData = await req.json();
 
   try {
-    const profile = await Profile.findByIdAndUpdate(params.id, updatedData, { new: true });
+    const profile = await Profile.findOneAndUpdate(
+      { userId: params.id },
+      updatedData,
+      { new: true }
+    );
     if (!profile) {
       return new Response('Profile not found', { status: 404 });
     }

@@ -18,7 +18,7 @@ const ProfileCard = ({ profile }) => {
 
   return (
     <div className="w-full max-w-sm bg-white border border-gray-300 p-4 rounded-md shadow-md">
-      <div className="flex flex-col h-96"> {/* Ensuring equal height for top and bottom sections */}
+      <div className="flex flex-col h-96">
         <div className="relative w-full h-1/2 border border-gray-300 rounded-md overflow-hidden">
           <img
             src={image || "/blank-profile-picture.svg"}
@@ -32,22 +32,22 @@ const ProfileCard = ({ profile }) => {
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
         </div>
-        <div className="border-t border-gray-300 h-px my-4"></div> {/* Divider line */}
-        <div className="h-1/2 pt-4"> {/* Bottom half */}
-          <p className="text-sm font-medium text-gray-700">
-            DUPR: <span className="font-normal">{profile?.duprRating || ''}</span>
-          </p>
-          <p className="text-sm font-medium text-gray-700">
-            Age: <span className="font-normal">{profile?.ageRange || ''}</span>
-          </p>
-          <p className="text-sm font-medium text-gray-700">
-            Level: <span className="font-normal">{profile?.skillLevel || ''}</span>
-          </p>
-          <p className="text-sm font-medium text-gray-700">
-            About:
-            <span className="block mt-1 font-normal">
-              {profile?.about || 'No information provided.'}
-            </span>
+        <div className="border-t border-gray-300 h-px my-2"></div> {/* Adjusted margin */}
+        <div className="h-1/2 pt-4">
+          <div className="flex justify-center">
+            <p className="text-sm font-bold text-gray-700">{profile.firstName}</p> 
+            <p className="mx-2 text-sm font-bold text-gray-700">{profile.lastName}</p>
+          </div>
+          <div className="flex justify-between mt-2">
+            <p className="text-sm font-medium text-gray-700">{profile.gender}</p>
+            <p className="text-sm font-medium text-gray-700">Age: {profile.ageRange}</p>
+          </div>
+          <div className="flex justify-between mt-2">
+            <p className="text-sm font-medium text-gray-700">DUPR: {profile.duprRating}</p>
+            <p className="text-sm font-medium text-gray-700">Level: {profile.skillLevel}</p>
+          </div>
+          <p className="text-sm font-medium text-gray-700 mt-2">
+            About: <span className="font-normal" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>{profile.about}</span>
           </p>
         </div>
       </div>
