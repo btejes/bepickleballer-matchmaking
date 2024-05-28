@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "cookies-next": "^4.2.1",
     "daisyui": "^4.11.1",
     "dotenv": "^16.4.5",
     "form-data": "^4.0.0",

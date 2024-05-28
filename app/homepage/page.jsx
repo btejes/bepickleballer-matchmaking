@@ -9,7 +9,7 @@ export const metadata = {
 const Homepage = () => {
   return (
     <div className="min-h-screen bg-lightGreen flex flex-col">
-      <Navbar />
+       <Navbar />
       <div className="flex-grow flex flex-col items-center justify-center">
         <h1 className="text-2xl font-bold mb-8 text-center text-black">
           What Do You Need A Partner Pickle Baller For?

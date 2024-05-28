@@ -1,9 +1,16 @@
+// ProfileCard.jsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const ProfileCard = ({ profile }) => {
   const [image, setImage] = useState(null);
+
+  useEffect(() => {
+    if (profile.profileImage) {
+      setImage(profile.profileImage);
+    }
+  }, [profile]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -32,10 +39,10 @@ const ProfileCard = ({ profile }) => {
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
         </div>
-        <div className="border-t border-gray-300 h-px my-2"></div> {/* Adjusted margin */}
+        <div className="border-t border-gray-300 h-px my-2"></div>
         <div className="h-1/2 pt-4">
           <div className="flex justify-center">
-            <p className="text-sm font-bold text-gray-700">{profile.firstName}</p> 
+            <p className="text-sm font-bold text-gray-700">{profile.firstName}</p>
             <p className="mx-2 text-sm font-bold text-gray-700">{profile.lastName}</p>
           </div>
           <div className="flex justify-between mt-2">
@@ -47,7 +54,7 @@ const ProfileCard = ({ profile }) => {
             <p className="text-sm font-medium text-gray-700">Level: {profile.skillLevel}</p>
           </div>
           <p className="text-sm font-medium text-gray-700 mt-2">
-            About: <span className="font-normal" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>{profile.about}</span>
+            About: <span className="font-normal" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>{profile.aboutYou}</span>
           </p>
         </div>
       </div>

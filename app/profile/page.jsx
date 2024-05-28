@@ -1,10 +1,9 @@
-'use client';
+"use client";
 
-// ProfilePage.jsx
-import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
+import React, { useState, useEffect } from 'react';
 import ProfileCard from '@/library/ProfileCard';
 import ProfileForm from '@/library/ProfileForm';
+import Navbar from '@/components/Navbar';
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState({
@@ -25,6 +24,45 @@ const ProfilePage = () => {
     setProfile(newProfile);
   };
 
+  const handleProfileSave = async (updatedProfile) => {
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedProfile),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error updating profile');
+      }
+
+      const data = await response.json();
+      setProfile(data);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch('/api/profile');
+        if (!response.ok) {
+          throw new Error('Error fetching profile');
+        }
+
+        const data = await response.json();
+        setProfile(data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -35,7 +73,7 @@ const ProfilePage = () => {
               <ProfileCard profile={profile} />
             </div>
             <div className="lg:flex-1 px-2 py-2">
-              <ProfileForm profile={profile} onProfileChange={handleProfileChange} />
+              <ProfileForm profile={profile} onProfileChange={handleProfileChange} onProfileSave={handleProfileSave} />
             </div>
           </div>
         </div>

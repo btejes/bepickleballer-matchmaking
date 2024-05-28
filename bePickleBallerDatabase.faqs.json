@@ -1,0 +1,22 @@
+[{
+  "_id": {
+    "$oid": "664a6608855e5c3d4ae3146a"
+  },
+  "question": "How long does it take to find a pickpleballer match?",
+  "answer": "It can take up to 72 hours to find a match depending on your area.",
+  "createdAt": {
+    "$date": "2024-05-19T02:41:59.302Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "664a6a52855e5c3d4ae3146c"
+  },
+  "question": "Can I unmatch with someone once I've matched with them?",
+  "answer": "Yes, you can always unmatch with someone for any reason.",
+  "createdAt": {
+    "$date": "2024-05-19T02:41:59.302Z"
+  },
+  "__v": 0
+}]
