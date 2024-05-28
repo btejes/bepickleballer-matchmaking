@@ -1,4 +1,4 @@
-// ProfileCard.jsx
+// library/ProfileCard.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -24,7 +24,7 @@ const ProfileCard = ({ profile }) => {
   };
 
   return (
-    <div className="w-full max-w-sm bg-white border border-gray-300 p-4 rounded-md shadow-md">
+    <div className="w-full max-w-xs bg-white border border-gray-300 p-4 rounded-md shadow-md mx-auto">
       <div className="flex flex-col h-96">
         <div className="relative w-full h-1/2 border border-gray-300 rounded-md overflow-hidden">
           <img
