@@ -15,7 +15,7 @@ const ProfilePage = () => {
     skillLevel: '',
     zipCode: '',
     openForMatches: '',
-    about: '',
+    aboutYou: '',
     phone: '',
     email: '',
   });
