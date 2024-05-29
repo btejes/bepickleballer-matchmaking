@@ -22,39 +22,32 @@ export const GET = async (req) => {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }
 
-    // Find potential matches in the same zip code
     const potentialMatches = await Profile.find({
       zipCode: currentUserProfile.zipCode,
       userId: { $ne: decoded._id }, // Exclude current user
     });
 
-    if (potentialMatches.length === 0) {
-      return NextResponse.json({ error: 'No matches found' }, { status: 404 });
-    }
+    const validMatches = [];
+    for (const match of potentialMatches) {
+      const existingEntry = await Matchmaking.findOne({
+        $or: [
+          { user1Id: decoded._id, user2Id: match.userId },
+          { user1Id: match.userId, user2Id: decoded._id }
+        ]
+      });
 
-    // Filter out profiles that have already been decided on
-    const matchEntries = await Matchmaking.find({
-      user1Id: decoded._id,
-    });
-
-    const filteredMatches = potentialMatches.filter((match) => {
-      const entry = matchEntries.find(
-        (entry) => entry.user2Id.toString() === match.userId.toString()
-      );
-
-      if (!entry) {
-        return true; // No entry found, include the profile
+      if (!existingEntry || 
+          (existingEntry.user1Id.equals(decoded._id) && existingEntry.user1Decision === 'pending' && existingEntry.user2Decision !== 'no') ||
+          (existingEntry.user2Id.equals(decoded._id) && existingEntry.user2Decision === 'pending' && existingEntry.user1Decision !== 'no')) {
+        validMatches.push(match);
       }
+    }
 
-      // Include profiles where user1 is pending and user2 is either pending or yes
-      return entry.user1Decision === 'pending' && ['pending', 'yes'].includes(entry.user2Decision);
-    });
-
-    if (filteredMatches.length === 0) {
+    if (validMatches.length === 0) {
       return NextResponse.json({ error: 'No matches found' }, { status: 404 });
     }
 
-    const randomMatch = filteredMatches[Math.floor(Math.random() * filteredMatches.length)];
+    const randomMatch = validMatches[Math.floor(Math.random() * validMatches.length)];
     return NextResponse.json(randomMatch, { status: 200 });
   } catch (error) {
     console.error('Internal Server Error:', error);
@@ -75,29 +68,39 @@ export const PUT = async (req) => {
     const { potentialMatchId, userDecision } = await req.json();
 
     let matchmakingEntry = await Matchmaking.findOne({
-      user1Id: decoded._id,
-      user2Id: potentialMatchId,
+      $or: [
+        { user1Id: decoded._id, user2Id: potentialMatchId },
+        { user1Id: potentialMatchId, user2Id: decoded._id }
+      ]
     });
 
     if (!matchmakingEntry) {
+      // No existing entry, create a new one with current user as user1
       matchmakingEntry = new Matchmaking({
         user1Id: decoded._id,
         user2Id: potentialMatchId,
         user1Decision: userDecision,
         user2Decision: 'pending',
-        matchStatus: 'pending',
         user1DecisionTimestamp: new Date(),
+        user2DecisionTimestamp: null,
+        matchStatus: 'pending',
       });
     } else {
-      matchmakingEntry.user1Decision = userDecision;
-      matchmakingEntry.user1DecisionTimestamp = new Date();
+      // Existing entry found, update based on who the current user is
+      if (matchmakingEntry.user1Id.equals(decoded._id)) {
+        matchmakingEntry.user1Decision = userDecision;
+        matchmakingEntry.user1DecisionTimestamp = new Date();
+      } else {
+        matchmakingEntry.user2Decision = userDecision;
+        matchmakingEntry.user2DecisionTimestamp = new Date();
+      }
     }
 
-    await matchmakingEntry.save();
-
-    // Check if there is a match
-    if (matchmakingEntry.user2Decision === 'yes' && userDecision === 'yes') {
+    // Check if there is a match or rejection
+    if (matchmakingEntry.user1Decision === 'yes' && matchmakingEntry.user2Decision === 'yes') {
       matchmakingEntry.matchStatus = 'matched';
+    } else if (matchmakingEntry.user1Decision === 'no' || matchmakingEntry.user2Decision === 'no') {
+      matchmakingEntry.matchStatus = 'rejected';
     }
 
     await matchmakingEntry.save();
