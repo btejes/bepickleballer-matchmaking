@@ -8,7 +8,7 @@ const MatchmakingSchema = new mongoose.Schema({
   user2Decision: { type: String, enum: ['yes', 'no', 'pending'], default: 'pending' },
   user1DecisionTimestamp: { type: Date },
   user2DecisionTimestamp: { type: Date },
-  matchStatus: { type: String, enum: ['pending', 'matched', 'rejected'], default: 'pending' },
+  matchStatus: { type: String, enum: ['pending', 'matched', 'rejected', 'unmatched'], default: 'pending' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
