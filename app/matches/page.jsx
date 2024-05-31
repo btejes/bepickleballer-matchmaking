@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import MatchCard from './MatchCard';
 import Modal from './Modal';
+import RatingModal from './RatingModal';
 
 const MatchesPage = () => {
   const [matches, setMatches] = useState([]);
   const [error, setError] = useState(null);
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const [showRatingModal, setShowRatingModal] = useState(false);
 
   useEffect(() => {
     console.log('\nUSE EFFECT CALLED\n');
@@ -40,11 +42,20 @@ const MatchesPage = () => {
   const handleModalClose = () => {
     console.log('Modal closed'); // Debug log
     setSelectedMatch(null);
+    setShowRatingModal(false);
   };
 
   const handleUnmatch = (matchId) => {
     console.log('Removing match from state:', matchId); // Debug log
     setMatches((prevMatches) => prevMatches.filter(match => match.matchId !== matchId));
+  };
+
+  const openRatingModal = () => {
+    setShowRatingModal(true);
+  };
+
+  const closeRatingModal = () => {
+    setShowRatingModal(false);
   };
 
   return (
@@ -63,11 +74,16 @@ const MatchesPage = () => {
         )}
       </div>
       {selectedMatch && (
-        <Modal
-          match={selectedMatch}
-          onClose={handleModalClose}
-          onUnmatch={handleUnmatch}
-        />
+        showRatingModal ? (
+          <RatingModal match={selectedMatch} onClose={closeRatingModal} />
+        ) : (
+          <Modal
+            match={selectedMatch}
+            onClose={handleModalClose}
+            onUnmatch={handleUnmatch}
+            onRate={openRatingModal}
+          />
+        )
       )}
     </div>
   );
