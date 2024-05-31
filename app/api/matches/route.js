@@ -5,6 +5,8 @@ import Profile from '@/library/Profile';
 import { getCookie } from 'cookies-next';
 import jwt from 'jsonwebtoken';
 
+export const dynamic = 'force-dynamic';
+
 export const GET = async (req) => {
   await connectToDatabase();
 

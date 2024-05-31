@@ -1,16 +1,17 @@
-// src/app/api/matchmaking/route.js
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/library/connectToDatabase';
 import Matchmaking from '@/library/Matchmaking';
 import Profile from '@/library/Profile';
-import { getCookie } from 'cookies-next';
+import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 
-export const GET = async (req) => {
+export const dynamic = 'force-dynamic';
+
+export async function GET(request) {
   await connectToDatabase();
 
   try {
-    const jwtToken = getCookie('token', { req });
+    const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -24,7 +25,7 @@ export const GET = async (req) => {
 
     const potentialMatches = await Profile.find({
       zipCode: currentUserProfile.zipCode,
-      userId: { $ne: decoded._id }, // Exclude current user
+      userId: { $ne: decoded._id },
     });
 
     const validMatches = [];
@@ -32,11 +33,11 @@ export const GET = async (req) => {
       const existingEntry = await Matchmaking.findOne({
         $or: [
           { user1Id: decoded._id, user2Id: match.userId },
-          { user1Id: match.userId, user2Id: decoded._id }
-        ]
+          { user1Id: match.userId, user2Id: decoded._id },
+        ],
       });
 
-      if (!existingEntry || 
+      if (!existingEntry ||
           (existingEntry.user1Id.equals(decoded._id) && existingEntry.user1Decision === 'pending' && existingEntry.user2Decision !== 'no') ||
           (existingEntry.user2Id.equals(decoded._id) && existingEntry.user2Decision === 'pending' && existingEntry.user1Decision !== 'no')) {
         validMatches.push(match);
@@ -53,29 +54,28 @@ export const GET = async (req) => {
     console.error('Internal Server Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-};
+}
 
-export const PUT = async (req) => {
+export async function PUT(request) {
   await connectToDatabase();
 
   try {
-    const jwtToken = getCookie('token', { req });
+    const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
-    const { potentialMatchId, userDecision } = await req.json();
+    const { potentialMatchId, userDecision } = await request.json();
 
     let matchmakingEntry = await Matchmaking.findOne({
       $or: [
         { user1Id: decoded._id, user2Id: potentialMatchId },
-        { user1Id: potentialMatchId, user2Id: decoded._id }
-      ]
+        { user1Id: potentialMatchId, user2Id: decoded._id },
+      ],
     });
 
     if (!matchmakingEntry) {
-      // No existing entry, create a new one with current user as user1
       matchmakingEntry = new Matchmaking({
         user1Id: decoded._id,
         user2Id: potentialMatchId,
@@ -86,7 +86,6 @@ export const PUT = async (req) => {
         matchStatus: 'pending',
       });
     } else {
-      // Existing entry found, update based on who the current user is
       if (matchmakingEntry.user1Id.equals(decoded._id)) {
         matchmakingEntry.user1Decision = userDecision;
         matchmakingEntry.user1DecisionTimestamp = new Date();
@@ -96,7 +95,6 @@ export const PUT = async (req) => {
       }
     }
 
-    // Check if there is a match or rejection
     if (matchmakingEntry.user1Decision === 'yes' && matchmakingEntry.user2Decision === 'yes') {
       matchmakingEntry.matchStatus = 'matched';
     } else if (matchmakingEntry.user1Decision === 'no' || matchmakingEntry.user2Decision === 'no') {
@@ -110,4 +108,4 @@ export const PUT = async (req) => {
     console.error('Internal Server Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-};
+}

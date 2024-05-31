@@ -12,12 +12,16 @@ const ProfileCard = ({ profile }) => {
       setImage(profile.profileImage);
     }
 
-    // Fetch the average rating
-    fetchAverageRating();
+    // Only fetch the average rating if profile.userId is defined
+    if (profile.userId) {
+      fetchAverageRating(profile.userId);
+    }
+    
   }, [profile]);
 
   const fetchAverageRating = async () => {
     try {
+      console.log("\nprofile.userId for average", profile.userId, "\n");
       const response = await fetch(`/api/ratings/average?rateeUserId=${profile.userId}`);
       if (response.ok) {
         const data = await response.json();

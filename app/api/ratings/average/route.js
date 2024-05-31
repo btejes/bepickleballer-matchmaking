@@ -1,29 +1,34 @@
+import { NextResponse } from 'next/server';
 import connectToDatabase from '@/library/connectToDatabase';
 import Rating from '@/library/Rating';
 
-export async function GET(req) {
+export const dynamic = 'force-dynamic';
+
+export async function GET(request) {
   try {
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(request.url);
     const rateeUserId = searchParams.get('rateeUserId');
 
-    // Connect to the database
-    await connectToDatabase();
-
-    // Fetch all ratings for the user
-    const ratings = await Rating.find({ rateeUserId });
-
-    // Return 0.0 if there are fewer than 3 ratings
-    if (ratings.length < 3) {
-      return new Response(JSON.stringify({ averageRating: 0.0 }), { status: 200 });
+    console.log("\nrateeUserId inside average route", rateeUserId, "\n");
+    
+    if (!rateeUserId) {
+      throw new Error('Invalid rateeUserId');
     }
 
-    // Calculate the average rating
+    await connectToDatabase();
+
+    const ratings = await Rating.find({ rateeUserId });
+
+    if (ratings.length < 3) {
+      return NextResponse.json({ averageRating: 0.0 }, { status: 200 });
+    }
+
     const totalStars = ratings.reduce((acc, rating) => acc + rating.totalStars, 0);
     const averageRating = totalStars / ratings.length;
 
-    return new Response(JSON.stringify({ averageRating }), { status: 200 });
+    return NextResponse.json({ averageRating }, { status: 200 });
   } catch (error) {
     console.error('Error fetching average rating:', error);
-    return new Response(JSON.stringify({ message: 'Failed to fetch average rating' }), { status: 500 });
+    return NextResponse.json({ message: 'Failed to fetch average rating' }, { status: 500 });
   }
 }

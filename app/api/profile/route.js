@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/library/connectToDatabase';
 import Profile from '@/library/Profile';
-import { getCookie } from 'cookies-next';
+import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 
-export const GET = async (req) => {
+export const dynamic = 'force-dynamic';
+
+export async function GET(request) {
   await connectToDatabase();
 
   try {
-    const jwtToken = getCookie('token', { req });
+    const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -25,19 +27,19 @@ export const GET = async (req) => {
     console.error('Internal Server Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-};
+}
 
-export const PUT = async (req) => {
+export async function PUT(request) {
   await connectToDatabase();
 
   try {
-    const jwtToken = getCookie('token', { req });
+    const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
-    const updatedData = await req.json();
+    const updatedData = await request.json();
 
     const profile = await Profile.findOneAndUpdate(
       { userId: decoded._id },
@@ -54,4 +56,4 @@ export const PUT = async (req) => {
     console.error('Internal Server Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-};
+}
