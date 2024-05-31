@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import ProfileCard from '@/library/ProfileCard';
 import ProfileForm from '@/library/ProfileForm';
-import Navbar from '@/components/Navbar';
+import Navbar from '@/library/Navbar';
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState({

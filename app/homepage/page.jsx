@@ -1,4 +1,4 @@
-import Navbar from '@/components/Navbar';
+import Navbar from '@/library/Navbar';
 import ClientButtons from './ClientButtons';
 
 export const metadata = {

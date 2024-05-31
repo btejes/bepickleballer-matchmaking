@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
+import Navbar from '@/library/Navbar';
 import MatchCard from './MatchCard';
 import Modal from './Modal';
 import RatingModal from './RatingModal';
