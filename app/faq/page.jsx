@@ -1,5 +1,5 @@
 import { fetchFaqs } from '@/library/fetchFaqs';
-import Navbar from '@/library/Navbar';
+import Navbar from '@/components/Navbar';
 import FaqComponent from './faqComponent';
 
 export const metadata = {

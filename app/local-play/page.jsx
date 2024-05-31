@@ -1,7 +1,7 @@
 // src/app/local-play/page.js
 'use client';
 
-import Navbar from '@/library/Navbar';
+import Navbar from '@/components/Navbar';
 import { useState, useEffect } from 'react';
 import ProfileCard from '@/library/ProfileCard';
 
