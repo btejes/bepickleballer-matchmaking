@@ -8,6 +8,10 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "engines": {
+    "node": "20",
+    "npm": "10.5.2"
+  },
   "dependencies": {
     "cookies-next": "^4.2.1",
     "daisyui": "^4.11.1",
@@ -18,6 +22,7 @@
     "mongoose": "^8.3.5",
     "nanoid": "^5.0.7",
     "next": "14.2.3",
+    "node": "^20.14.0",
     "react": "^18",
     "react-dom": "^18"
   },
