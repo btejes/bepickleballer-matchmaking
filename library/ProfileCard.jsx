@@ -5,12 +5,31 @@ import React, { useState, useEffect } from 'react';
 
 const ProfileCard = ({ profile }) => {
   const [image, setImage] = useState(null);
+  const [averageRating, setAverageRating] = useState(null);
 
   useEffect(() => {
     if (profile.profileImage) {
       setImage(profile.profileImage);
     }
+
+    // Fetch the average rating
+    fetchAverageRating();
   }, [profile]);
+
+  const fetchAverageRating = async () => {
+    try {
+      const response = await fetch(`/api/ratings/average?rateeUserId=${profile.userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setAverageRating(data.averageRating);
+      } else {
+        setAverageRating('N/A');
+      }
+    } catch (error) {
+      console.error('Error fetching average rating:', error);
+      setAverageRating('N/A');
+    }
+  };
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -52,6 +71,24 @@ const ProfileCard = ({ profile }) => {
           <div className="flex justify-between mt-2">
             <p className="text-sm font-medium text-gray-700">DUPR: {profile.duprRating}</p>
             <p className="text-sm font-medium text-gray-700">Level: {profile.skillLevel}</p>
+          </div>
+          <div className="flex justify-between items-center mt-2">
+            <p className="text-sm font-medium text-gray-700">Rating:</p>
+            <div className="flex items-center">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="#ffc107"
+                xmlns="http://www.w3.org/2000/svg"
+                className="mr-1"
+              >
+                <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.907 1.432 8.184L12 18.896l-7.368 3.901 1.432-8.184-6.064-5.907 8.332-1.151L12 .587z" />
+              </svg>
+              <p className="text-sm font-medium text-gray-700">
+                {typeof averageRating === 'number' ? averageRating.toFixed(1) : 'N/A'}
+              </p>
+            </div>
           </div>
           <p className="text-sm font-medium text-gray-700 mt-2">
             About: <span className="font-normal" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>{profile.aboutYou}</span>
