@@ -58,6 +58,10 @@ const Modal = ({ match, onClose, onUnmatch }) => {
     }
   };
 
+  const handleBack = () => {
+    setShowRating(false);
+  };
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-75">
       <div className="bg-white rounded-lg p-4 w-96 relative">
@@ -79,7 +83,7 @@ const Modal = ({ match, onClose, onUnmatch }) => {
             </div>
           </>
         ) : (
-          <RatingModal match={match} onClose={onClose} existingRating={existingRating} />
+          <RatingModal match={match} onClose={onClose} onBack={handleBack} existingRating={existingRating} />
         )}
       </div>
     </div>

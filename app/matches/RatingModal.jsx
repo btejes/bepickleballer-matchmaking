@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const RatingModal = ({ match, onClose }) => {
+const RatingModal = ({ match, onClose, onBack }) => {
   const [rating, setRating] = useState({ honesty: 0, communication: 0, sportsmanship: 0 });
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -35,7 +35,7 @@ const RatingModal = ({ match, onClose }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          raterUserId: match.loggedInUserId, // Include raterUserId
+          raterUserId: match.loggedInUserId,
           rateeUserId: match.userId,
           honesty: rating.honesty,
           communication: rating.communication,
@@ -109,9 +109,9 @@ const RatingModal = ({ match, onClose }) => {
                 {renderStars('sportsmanship', rating.sportsmanship, false)}
               </div>
             </div>
-            <div className="flex justify-center mt-4">
-              <button className="bg-gray-500 text-white py-2 px-4 rounded" onClick={onClose}>
-                Close
+            <div className="flex justify-between mt-4">
+              <button className="bg-gray-500 text-white py-2 px-4 rounded" onClick={onBack}>
+                Back
               </button>
             </div>
           </div>
@@ -140,7 +140,7 @@ const RatingModal = ({ match, onClose }) => {
               </div>
             </div>
             <div className="flex justify-between mt-4">
-              <button className="bg-gray-500 text-white py-2 px-4 rounded" onClick={onClose}>
+              <button className="bg-gray-500 text-white py-2 px-4 rounded" onClick={onBack}>
                 Back
               </button>
               <button className="bg-green-500 text-white py-2 px-4 rounded" onClick={handleSubmit}>
