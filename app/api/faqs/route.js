@@ -1,12 +1,12 @@
-import 'server-only';
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/library/connectToDatabase';
 import mongoose from 'mongoose';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req) {
-
+export async function GET() {
+  console.log('BASE_URL:', process.env.BASE_URL);
+  console.log('MONGODB_URI:', process.env.MONGODB_URI);
   await connectToDatabase();
 
   try {
