@@ -1,4 +1,3 @@
-import { fetchFaqs } from '@/library/fetchFaqs';
 import Navbar from '@/components/Navbar';
 import FaqComponent from './faqComponent';
 
@@ -9,8 +8,27 @@ export const metadata = {
 
 export const revalidate = 60; // revalidate the page every 60 seconds
 
-const FaqPage = async () => {
-  const faqs = await fetchFaqs();
+async function FaqPage() {
+  let faqs = [];
+
+  try {
+    console.log("\nFetching api faqs!\n");
+    const res = await fetch(`${process.env.BASE_URL}/api/faqs`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store' // Ensures data fetching happens at runtime and not during build
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch FAQs');
+    }
+
+    faqs = await res.json();
+  } catch (error) {
+    console.error('Failed to fetch FAQs:', error);
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -25,6 +43,6 @@ const FaqPage = async () => {
       </div>
     </div>
   );
-};
+}
 
 export default FaqPage;
