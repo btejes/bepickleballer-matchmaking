@@ -20,7 +20,7 @@ const client = mailgun.client({ username: 'api', key: API_KEY });
  */
 function sendLoginEmail(email, link) {
   const data = {
-    from: `bepickleballer <mailgun@${DOMAIN}>`, // Use the sandbox domain
+    from: `Be Pickle Baller <noreply@${DOMAIN}>`, // Use the sandbox domain
     to: email,
     subject: 'Login to Your Account',
     html: `Click <a href="${link}">here</a> to log in. This link will expire in 15 minutes.`
