@@ -125,8 +125,8 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           >
             <option value="">Unselected</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
           </select>
         </div>
         <div className="col-span-1 flex flex-col">
@@ -175,9 +175,9 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           >
             <option value="">Unselected</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
           </select>
         </div>
         <div className="col-span-1 flex flex-col">
@@ -221,7 +221,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           </small>
         </div>
         <div className="col-span-1 flex flex-col">
-          <label htmlFor="phone">Phone</label>
+          <label htmlFor="phone">Contact Phone</label>
           <input
             type="text"
             id="phone"
@@ -235,7 +235,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           {errors.phone && <span className="text-red-500 text-sm">{errors.phone}</span>}
         </div>
         <div className="col-span-1 flex flex-col">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">Contact Email</label>
           <input
             type="text"
             id="email"
