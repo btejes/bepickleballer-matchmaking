@@ -8,7 +8,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    console.log('ProfileForm useEffect - profile:', profile);
     setFormData(profile);
   }, [profile]);
 
@@ -19,17 +18,15 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
         setTimeout(() => {
           setMessage('');
           setFadeOut(false);
-          setIsSaving(false); // Enable the button after the message disappears
-        }, 1000); // Adjusted to match your desired fade-out duration
-      }, 3000); // Adjusted to match your desired display duration
+          setIsSaving(false);
+        }, 1000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [message]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log('Form change - name:', name, 'value:', value);
-
     let updatedValue = value;
     let error = '';
 
@@ -56,6 +53,12 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
       if (!/\S+@\S+\.\S+/.test(value)) {
         error = 'Must be a valid email.';
       }
+    } else if (name === 'aboutYou') {
+      if (value.length <= 140) {
+        updatedValue = value;
+      } else {
+        error = 'About You must be 140 characters or less.';
+      }
     }
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
@@ -80,8 +83,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSaving(true); // Disable the button when the form is submitted
-    console.log('Form submitted:', formData);
+    setIsSaving(true);
     const result = await onProfileSave(formData);
     if (result.status !== 200) {
       setMessage(`Error code: ${result.status}, message: ${result.statusText}`);
@@ -92,8 +94,8 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="col-span-1 flex flex-col">
+      <div className="flex flex-row">
+        <div className="w-1/2 p-2">
           <label htmlFor="firstName">First Name</label>
           <input
             type="text"
@@ -103,19 +105,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             onChange={handleChange}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           />
-        </div>
-        <div className="col-span-1 flex flex-col">
-          <label htmlFor="lastName">Last Name</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          />
-        </div>
-        <div className="col-span-1 flex flex-col">
           <label htmlFor="gender">Gender</label>
           <select
             id="gender"
@@ -128,8 +117,43 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="Male">Male</option>
             <option value="Female">Female</option>
           </select>
+          <label htmlFor="duprRating">DUPR Rating</label>
+          <input
+            type="number"
+            id="duprRating"
+            name="duprRating"
+            value={formData.duprRating || ''}
+            onChange={handleChange}
+            onKeyPress={(e) => handleKeyPress(e, 'duprRating')}
+            min="2.0"
+            max="8.0"
+            step="0.01"
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+          />
+          {errors.duprRating && <span className="text-red-500 text-sm">{errors.duprRating}</span>}
+          <label htmlFor="zipCode">Zip Code</label>
+          <input
+            type="text"
+            id="zipCode"
+            name="zipCode"
+            value={formData.zipCode || ''}
+            onChange={handleChange}
+            onKeyPress={(e) => handleKeyPress(e, 'zipCode')}
+            maxLength="5"
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+          />
+          {errors.zipCode && <span className="text-red-500 text-sm">{errors.zipCode}</span>}
         </div>
-        <div className="col-span-1 flex flex-col">
+        <div className="w-1/2 p-2">
+          <label htmlFor="lastName">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={formData.lastName || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+          />
           <label htmlFor="ageRange">Age Range</label>
           <select
             id="ageRange"
@@ -148,24 +172,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="80-89">80-89</option>
             <option value="90-99+">90-99+</option>
           </select>
-        </div>
-        <div className="col-span-1 flex flex-col">
-          <label htmlFor="duprRating">DUPR Rating</label>
-          <input
-            type="number"
-            id="duprRating"
-            name="duprRating"
-            value={formData.duprRating || ''}
-            onChange={handleChange}
-            onKeyPress={(e) => handleKeyPress(e, 'duprRating')}
-            min="2.0"
-            max="8.0"
-            step="0.01"
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          />
-          {errors.duprRating && <span className="text-red-500 text-sm">{errors.duprRating}</span>}
-        </div>
-        <div className="col-span-1 flex flex-col">
           <label htmlFor="skillLevel">Skill Level</label>
           <select
             id="skillLevel"
@@ -179,22 +185,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="Intermediate">Intermediate</option>
             <option value="Advanced">Advanced</option>
           </select>
-        </div>
-        <div className="col-span-1 flex flex-col">
-          <label htmlFor="zipCode">Zip Code</label>
-          <input
-            type="text"
-            id="zipCode"
-            name="zipCode"
-            value={formData.zipCode || ''}
-            onChange={handleChange}
-            onKeyPress={(e) => handleKeyPress(e, 'zipCode')}
-            maxLength="5"
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          />
-          {errors.zipCode && <span className="text-red-500 text-sm">{errors.zipCode}</span>}
-        </div>
-        <div className="col-span-1 flex flex-col">
           <label htmlFor="openForMatches">Open For Matches</label>
           <select
             id="openForMatches"
@@ -207,26 +197,32 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="yes">Yes</option>
           </select>
         </div>
-        <div className="col-span-2 flex flex-col">
-          <label htmlFor="aboutYou">About You</label>
-          <textarea
-            id="aboutYou"
-            name="aboutYou"
-            value={formData.aboutYou || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          />
-          <small className={`text-sm ${formData.aboutYou?.length >= 140 ? 'text-red-500' : 'text-gray-500'}`}>
-            {formData.aboutYou?.length}/140
-          </small>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="col-span-2 flex flex-col relative">
+          <div className="relative">
+            <textarea
+              id="aboutYou"
+              name="aboutYou"
+              value={formData.aboutYou || ''}
+              onChange={handleChange}
+              placeholder="About You"
+              rows="3"
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+              maxLength="140"
+            />
+            <small className={`text-sm ${formData.aboutYou?.length > 140 ? 'text-red-500' : 'text-gray-500'} absolute bottom-2 right-2`}>
+              {formData.aboutYou?.length || 0}/140
+            </small>
+          </div>
         </div>
-        <div className="col-span-2 flex  justify-center">
+        <div className="col-span-2 flex justify-left">
           <small className="text-gray-500">
-            Future matches will see this contact info
+            Only your matches will see this contact info
           </small>
         </div>
-        <div className="col-span-1 flex flex-col">
-          <label htmlFor="phone">Contact Phone</label>
+        <div className="col-span-1 flex flex-row items-center space-x-4">
+          <label htmlFor="phone" className="w-1/3">Phone</label>
           <input
             type="text"
             id="phone"
@@ -235,23 +231,38 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             onChange={handleChange}
             onKeyPress={(e) => handleKeyPress(e, 'phone')}
             maxLength="10"
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+            className="mt-1 block border border-gray-300 rounded-md shadow-sm p-1 text-center"
+            style={{ width: '12ch' }}
           />
           {errors.phone && <span className="text-red-500 text-sm">{errors.phone}</span>}
         </div>
-        <div className="col-span-1 flex flex-col">
-          <label htmlFor="email">Contact Email</label>
+        <div className="col-span-1 flex flex-row items-center space-x-4">
+          <label htmlFor="email" className="w-1/3">Email</label>
           <input
             type="text"
             id="email"
             name="email"
             value={formData.email || ''}
             onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 mb-4"
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 mb-4 text-center"
+            style={{ width: '30ch' }}
           />
           {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
         </div>
       </div>
+
+      {message && (
+        <div
+          className={`text-center p-2 rounded ${fadeOut ? 'opacity-0 transition-opacity duration-1000' : 'opacity-100'}`}
+          style={{
+            color: message.startsWith('Error') ? 'red' : 'green',
+            transition: 'opacity 1s ease-in-out',
+          }}
+        >
+          {message}
+        </div>
+      )}
+
       <div className="mt-6 flex justify-center">
         <button
           type="submit"
@@ -268,17 +279,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           Save Profile
         </button>
       </div>
-      {message && (
-        <div
-          className={`mt-4 text-center p-2 rounded ${fadeOut ? 'opacity-0 transition-opacity duration-1000' : 'opacity-100'}`}
-          style={{
-            color: message.startsWith('Error') ? 'red' : 'green',
-            transition: 'opacity 1s ease-in-out',
-          }}
-        >
-          {message}
-        </div>
-      )}
     </form>
   );
 };
