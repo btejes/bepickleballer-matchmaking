@@ -220,6 +220,11 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             {formData.aboutYou?.length}/140
           </small>
         </div>
+        <div className="col-span-2 flex  justify-center">
+          <small className="text-gray-500">
+            Future matches will see this contact info
+          </small>
+        </div>
         <div className="col-span-1 flex flex-col">
           <label htmlFor="phone">Contact Phone</label>
           <input
