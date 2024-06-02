@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const [formData, setFormData] = useState(profile);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     console.log('ProfileForm useEffect - profile:', profile);
@@ -11,8 +12,53 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     console.log('Form change - name:', name, 'value:', value);
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-    onProfileChange({ ...formData, [name]: value });
+
+    let updatedValue = value;
+    let error = '';
+
+    if (name === 'zipCode') {
+      if (/^\d{0,5}$/.test(value)) {
+        updatedValue = value;
+      } else {
+        error = 'Zip Code must be 5 digits.';
+      }
+    } else if (name === 'duprRating') {
+      if (value === '' || (/^(2(\.\d{1,2})?|[3-7](\.\d{1,2})?|8(\.0{0,2})?)$/.test(value))) {
+        updatedValue = value;
+      } else {
+        error = 'DUPR Rating must be a number between 2.0 and 8.0 with up to 2 decimal places.';
+      }
+    } else if (name === 'phone') {
+      if (/^\d{0,10}$/.test(value)) {
+        updatedValue = value;
+      } else {
+        error = 'Phone number must be 10 digits.';
+      }
+    } else if (name === 'email') {
+      updatedValue = value;
+      if (!/\S+@\S+\.\S+/.test(value)) {
+        error = 'Email must be valid.';
+      }
+    }
+
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
+    setFormData((prevData) => ({ ...prevData, [name]: updatedValue }));
+    onProfileChange({ ...formData, [name]: updatedValue });
+  };
+
+  const handleKeyPress = (e, name) => {
+    const charCode = e.which ? e.which : e.keyCode;
+    const charStr = String.fromCharCode(charCode);
+    
+    if (name === 'zipCode' || name === 'phone') {
+      if (!/^\d$/.test(charStr)) {
+        e.preventDefault();
+      }
+    } else if (name === 'duprRating') {
+      if (!/^\d$/.test(charStr) && charStr !== '.') {
+        e.preventDefault();
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -70,23 +116,31 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           >
             <option value="">Unselected</option>
-            <option value="18-25">18-25</option>
-            <option value="26-35">26-35</option>
-            <option value="36-45">36-45</option>
-            <option value="46-60">46-60</option>
-            <option value="60+">60+</option>
+            <option value="18-29">18-29</option>
+            <option value="30-39">30-39</option>
+            <option value="40-49">40-49</option>
+            <option value="50-59">50-59</option>
+            <option value="60-69">60-69</option>
+            <option value="70-79">70-79</option>
+            <option value="80-89">80-89</option>
+            <option value="90-99+">90-99+</option>
           </select>
         </div>
         <div className="col-span-1 flex flex-col">
           <label htmlFor="duprRating">DUPR Rating</label>
           <input
-            type="text"
+            type="number"
             id="duprRating"
             name="duprRating"
             value={formData.duprRating || ''}
             onChange={handleChange}
+            onKeyPress={(e) => handleKeyPress(e, 'duprRating')}
+            min="2.0"
+            max="8.0"
+            step="0.01"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           />
+          {errors.duprRating && <span className="text-red-500 text-sm">{errors.duprRating}</span>}
         </div>
         <div className="col-span-1 flex flex-col">
           <label htmlFor="skillLevel">Skill Level</label>
@@ -111,8 +165,11 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             name="zipCode"
             value={formData.zipCode || ''}
             onChange={handleChange}
+            onKeyPress={(e) => handleKeyPress(e, 'zipCode')}
+            maxLength="5"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           />
+          {errors.zipCode && <span className="text-red-500 text-sm">{errors.zipCode}</span>}
         </div>
         <div className="col-span-1 flex flex-col">
           <label htmlFor="openForMatches">Open For Matches</label>
@@ -148,8 +205,11 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             name="phone"
             value={formData.phone || ''}
             onChange={handleChange}
+            onKeyPress={(e) => handleKeyPress(e, 'phone')}
+            maxLength="10"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           />
+          {errors.phone && <span className="text-red-500 text-sm">{errors.phone}</span>}
         </div>
         <div className="col-span-1 flex flex-col">
           <label htmlFor="email">Email</label>
@@ -161,6 +221,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             onChange={handleChange}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           />
+          {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
         </div>
       </div>
       <div className="mt-6">
