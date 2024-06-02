@@ -80,14 +80,14 @@ const ClientButtons = () => {
     <div className="flex flex-col items-center justify-center space-y-4">
       <button
         onClick={handleLocalPlayClick}
-        className="w-48 bg-blue-500 text-white font-bold py-2 px-4 rounded-full shadow-md text-center hover:bg-blue-700"
+        className="w-48 bg-blue-500 text-white font-bold py-4 px-8 rounded-full shadow-full hover:bg-blue-600 transform hover:-translate-y-1 transition-all"
       >
         Local Play
       </button>
 
       <button
         onClick={handleTournamentClick}
-        className="w-48 bg-yellow-400 text-black font-bold py-2 px-4 rounded-full shadow-md text-center hover:bg-yellow-500"
+        className="w-48 bg-yellow-500 text-black font-bold py-4 px-8 rounded-full shadow-full hover:bg-yellow-600 transform hover:-translate-y-1 transition-all"
       >
         Tournaments
       </button>
@@ -107,7 +107,7 @@ const ClientButtons = () => {
             <a href="/profile" className="text-blue-500 underline block mb-4">Go to Profile</a>
             <button
               onClick={closeLocalPlayModal}
-              className="bg-blue-500 text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-blue-700"
+              className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-600 transform hover:-translate-y-1 transition-all"
             >
               Close
             </button>
@@ -124,7 +124,7 @@ const ClientButtons = () => {
             </p>
             <button
               onClick={closeTournamentModal}
-              className="bg-blue-500 text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-blue-700 mt-4"
+              className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-600 transform hover:-translate-y-1 transition-all mt-4"
             >
               Close
             </button>

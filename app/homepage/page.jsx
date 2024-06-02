@@ -9,10 +9,10 @@ export const metadata = {
 const Homepage = () => {
   return (
     <div className="min-h-screen bg-lightGreen flex flex-col">
-       <Navbar />
-      <div className="flex-grow flex flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold mb-8 text-center text-black">
-          What Do You Need A Partner Pickle Baller For?
+      <Navbar />
+      <div className="flex-grow flex flex-col items-center justify-center px-4">
+        <h1 className="text-2xl md:text-4xl font-bold mb-8 text-center text-black">
+          Looking for a Pickleball Partner?
         </h1>
         <ClientButtons />
       </div>
