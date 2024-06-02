@@ -19,6 +19,7 @@ const ProfilePage = () => {
     phone: '',
     email: '',
   });
+  const [message, setMessage] = useState('');
 
   const handleProfileChange = (newProfile) => {
     setProfile(newProfile);
@@ -35,13 +36,25 @@ const ProfilePage = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Error updating profile');
+        const errorData = await response.json();
+        return {
+          status: response.status,
+          statusText: errorData.error || response.statusText,
+        };
       }
 
       const data = await response.json();
       setProfile(data);
+      return {
+        status: 200,
+        message: 'Profile saved successfully!',
+      };
     } catch (error) {
       console.error('Error saving profile:', error);
+      return {
+        status: 500,
+        statusText: 'Internal Server Error',
+      };
     }
   };
 
@@ -74,6 +87,17 @@ const ProfilePage = () => {
             </div>
             <div className="lg:flex-1 px-2 py-2">
               <ProfileForm profile={profile} onProfileChange={handleProfileChange} onProfileSave={handleProfileSave} />
+              {message && (
+                <div
+                  className={`mt-4 text-center p-2 rounded ${fadeOut ? 'opacity-0 transition-opacity duration-300' : 'opacity-100'}`}
+                  style={{
+                    color: message.startsWith('Error') ? 'red' : 'green',
+                    transition: 'opacity 0.3s ease-in-out',
+                  }}
+                >
+                  {message}
+                </div>
+              )}
             </div>
           </div>
         </div>

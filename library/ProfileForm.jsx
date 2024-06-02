@@ -3,11 +3,28 @@ import React, { useState, useEffect } from 'react';
 const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const [formData, setFormData] = useState(profile);
   const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState('');
+  const [fadeOut, setFadeOut] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     console.log('ProfileForm useEffect - profile:', profile);
     setFormData(profile);
   }, [profile]);
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setFadeOut(true);
+        setTimeout(() => {
+          setMessage('');
+          setFadeOut(false);
+          setIsSaving(false); // Enable the button after the message disappears
+        }, 1000); // Adjusted to match your desired fade-out duration
+      }, 3000); // Adjusted to match your desired display duration
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,7 +54,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     } else if (name === 'email') {
       updatedValue = value;
       if (!/\S+@\S+\.\S+/.test(value)) {
-        error = 'Email must be valid.';
+        error = 'Must be a valid email.';
       }
     }
 
@@ -63,8 +80,14 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true); // Disable the button when the form is submitted
     console.log('Form submitted:', formData);
-    onProfileSave(formData);
+    const result = await onProfileSave(formData);
+    if (result.status !== 200) {
+      setMessage(`Error code: ${result.status}, message: ${result.statusText}`);
+    } else {
+      setMessage(result.message);
+    }
   };
 
   return (
@@ -219,16 +242,38 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             name="email"
             value={formData.email || ''}
             onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 mb-4"
           />
           {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
         </div>
       </div>
-      <div className="mt-6">
-        <button type="submit" className="w-full" style={{ backgroundColor: 'blue', color: 'white', padding: '10px', borderRadius: '4px', display: 'block' }}>
+      <div className="mt-6 flex justify-center">
+        <button
+          type="submit"
+          disabled={isSaving}
+          style={{
+            width: '50%',
+            backgroundColor: isSaving ? 'grey' : 'blue',
+            color: 'white',
+            padding: '10px',
+            borderRadius: '25px',
+            textAlign: 'center',
+          }}
+        >
           Save Profile
         </button>
       </div>
+      {message && (
+        <div
+          className={`mt-4 text-center p-2 rounded ${fadeOut ? 'opacity-0 transition-opacity duration-1000' : 'opacity-100'}`}
+          style={{
+            color: message.startsWith('Error') ? 'red' : 'green',
+            transition: 'opacity 1s ease-in-out',
+          }}
+        >
+          {message}
+        </div>
+      )}
     </form>
   );
 };
