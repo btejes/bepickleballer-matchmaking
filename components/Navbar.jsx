@@ -4,13 +4,13 @@ const Navbar = () => {
   return (
     <nav className="navbar bg-white px-4 py-2 shadow-md flex justify-between items-center">
       <div className="flex items-center">
-        <Link href="/">
+        <a href="https://bepickleballer.com">
           <img
             src="/logo.png"
             alt="Logo"
             className="h-12 w-auto sm:h-16 sm:w-auto lg:h-20 lg:w-auto cursor-pointer"
           />
-        </Link>
+        </a>
       </div>
       <div className="flex items-center space-x-4">
         <Link href="/homepage" className="text-black hover:underline">
