@@ -1,44 +1,44 @@
 import React, { useState } from 'react';
 import ProfileCard from '@/library/ProfileCard';
 import RatingModal from './RatingModal';
+import ConfirmationDialog from './ConfirmationDialog';
 
 const Modal = ({ match, onClose, onUnmatch }) => {
   const [showRating, setShowRating] = useState(false);
   const [existingRating, setExistingRating] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const handleUnmatchClick = async () => {
-    const confirmed = confirm('Are you sure? Unmatching is permanent and cannot be undone.');
-    if (confirmed) {
-      try {
-        console.log('Preparing to send unmatch request with data:', {
+  const handleUnmatchClick = () => {
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmUnmatch = async () => {
+    setShowConfirmation(false);
+    try {
+      const response = await fetch('/api/matches/unmatch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           matchId: match.matchId,
-        });
+        }),
+      });
 
-        const response = await fetch('/api/matches/unmatch', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            matchId: match.matchId,
-          }),
-        });
-
-        console.log('Response status:', response.status);
-
-        if (!response.ok) {
-          throw new Error('Failed to unmatch');
-        }
-
-        const result = await response.json();
-        console.log('Unmatch response:', result);
-
-        onUnmatch(match.matchId);
-        onClose();
-      } catch (error) {
-        console.error('Error unmatching:', error);
+      if (!response.ok) {
+        throw new Error('Failed to unmatch');
       }
+
+      const result = await response.json();
+      onUnmatch(match.matchId);
+      onClose();
+    } catch (error) {
+      console.error('Error unmatching:', error);
     }
+  };
+
+  const handleCancelUnmatch = () => {
+    setShowConfirmation(false);
   };
 
   const handleRateClick = async () => {
@@ -86,6 +86,13 @@ const Modal = ({ match, onClose, onUnmatch }) => {
           </>
         ) : (
           <RatingModal match={match} onClose={onClose} onBack={handleBack} existingRating={existingRating} />
+        )}
+        {showConfirmation && (
+          <ConfirmationDialog
+            message="Are you sure? Unmatching is permanent and cannot be undone."
+            onConfirm={handleConfirmUnmatch}
+            onCancel={handleCancelUnmatch}
+          />
         )}
       </div>
     </div>
