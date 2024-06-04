@@ -83,7 +83,7 @@ const ProfilePage = () => {
         <div className="max-w-4xl mx-auto p-4 rounded-md">
           <div className="flex flex-col lg:flex-row justify-between items-stretch">
             <div className="order-2 lg:order-1 lg:flex-1 px-2 py-2">
-              <ProfileCard profile={profile} />
+              <ProfileCard profile={profile} isProfilePage={true} />
             </div>
             <div className="order-1 lg:order-2 lg:flex-1 px-2 py-2">
               <ProfileForm profile={profile} onProfileChange={handleProfileChange} onProfileSave={handleProfileSave} />

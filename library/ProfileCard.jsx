@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-const ProfileCard = ({ profile }) => {
+const ProfileCard = ({ profile, isProfilePage }) => {
   const [image, setImage] = useState(null);
   const [averageRating, setAverageRating] = useState(null);
 
@@ -52,14 +52,18 @@ const ProfileCard = ({ profile }) => {
         <img
           src={image || "/blank-profile-picture.svg"}
           alt="Profile"
-          className={`w-full h-full object-cover ${!image && 'blur-sm grayscale'}`}
+          className={`w-full h-full object-cover ${!image && 'blur-sm grayscale'} ${isProfilePage ? 'cursor-pointer' : ''}`}
           onError={(e) => { e.target.src = '/blank-profile-picture.svg'; }}
+          onClick={isProfilePage ? () => document.getElementById('imageUpload').click() : null}
         />
-        <input
-          type="file"
-          onChange={handleImageUpload}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
+        {isProfilePage && (
+          <input
+            id="imageUpload"
+            type="file"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+        )}
       </div>
       <div className="p-4">
         <div className="flex flex-col h-full">
