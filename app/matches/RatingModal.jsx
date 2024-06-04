@@ -1,28 +1,18 @@
 import React, { useState, useEffect } from 'react';
 
-const RatingModal = ({ match, onClose, onBack }) => {
+const RatingModal = ({ match, onClose, onBack, existingRating }) => {
   const [rating, setRating] = useState({ honesty: 0, communication: 0, sportsmanship: 0 });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    fetchExistingRating();
-  }, []);
-
-  const fetchExistingRating = async () => {
-    try {
-      const response = await fetch(`/api/ratings?rateeUserId=${match.userId}&raterUserId=${match.loggedInUserId}`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data) {
-          setRating(data);
-          setIsSubmitted(true);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching existing rating:', error);
+    if (existingRating) {
+      setRating(existingRating);
+      setIsSubmitted(true);
     }
-  };
+  }, [existingRating]);
+
+ 
 
   const handleRatingChange = (category, value) => {
     setRating((prevRating) => ({ ...prevRating, [category]: value }));
@@ -113,7 +103,7 @@ const RatingModal = ({ match, onClose, onBack }) => {
         <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>
           ×
         </button>
-        {isSubmitted ? (
+        {isSubmitted || existingRating ? (
           <div className="text-center">
             <h2 className="text-xl font-bold">Thank You!</h2>
             <p className="text-sm text-gray-500 text-center mt-2 mb-4">

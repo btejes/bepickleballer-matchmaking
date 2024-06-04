@@ -43,18 +43,23 @@ const Modal = ({ match, onClose, onUnmatch }) => {
 
   const handleRateClick = async () => {
     try {
-      const response = await fetch(`/api/ratings?rateeUserId=${match.userId}`);
+      const response = await fetch(`/api/ratings?rateeUserId=${match.userId}&raterUserId=${match.loggedInUserId}`);
       if (response.ok) {
         const rating = await response.json();
         setExistingRating(rating);
+        if (rating) {
+          setShowRating('thankyou');
+        } else {
+          setShowRating('rating');
+        }
       } else {
         setExistingRating(null);
+        setShowRating('rating');
       }
-      setShowRating(true);
     } catch (error) {
       console.error('Error fetching rating:', error);
       setExistingRating(null);
-      setShowRating(true);
+      setShowRating('rating');
     }
   };
 
@@ -85,7 +90,11 @@ const Modal = ({ match, onClose, onUnmatch }) => {
             </div>
           </>
         ) : (
-          <RatingModal match={match} onClose={onClose} onBack={handleBack} existingRating={existingRating} />
+          showRating === 'rating' ? (
+            <RatingModal match={match} onClose={onClose} onBack={handleBack} />
+          ) : (
+            <RatingModal match={match} onClose={onClose} onBack={handleBack} existingRating={existingRating} />
+          )
         )}
         {showConfirmation && (
           <ConfirmationDialog
