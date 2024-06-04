@@ -118,11 +118,14 @@ const LocalPlay = () => {
           <option value="" disabled>
             Preferred Age Range
           </option>
-          <option value="18-25">18-25</option>
-          <option value="26-35">26-35</option>
-          <option value="36-45">36-45</option>
-          <option value="46-55">46-55</option>
-          <option value="56+">56+</option>
+          <option value="18-29">18-29</option>
+          <option value="30-39">30-39</option>
+          <option value="40-49">40-49</option>
+          <option value="50-59">50-59</option>
+          <option value="60-69">60-69</option>
+          <option value="70-79">70-79</option>
+          <option value="80-89">80-89</option>
+          <option value="90-99+">90-99+</option>
         </select>
         <select
           name="preferredSkillLevel"
@@ -151,6 +154,9 @@ const LocalPlay = () => {
           <option value="3.0">3.0</option>
           <option value="4.0">4.0</option>
           <option value="5.0">5.0</option>
+          <option value="6.0">6.0</option>
+          <option value="7.0">7.0</option>
+          <option value="8.0">8.0</option>
         </select>
       </div>
     </div>
