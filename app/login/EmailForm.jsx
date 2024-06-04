@@ -44,16 +44,17 @@ const EmailForm = () => {
     <div>
       {emailSent ? (
         <div className="text-center">
-          <h2 className="text-3xl font-bold mb-4 text-center text-darkGray">Check Email For Your Secure Magic Link!</h2>
+          <h2 className="text-3xl font-bold mb-4 text-center text-darkGray">Check Email For Your Magic Link!</h2>
           <p className="mt-4 text-center text-black">
-            A secure login link, expiring in 15 minutes, has been sent to <strong>{email}</strong> Click the link in the email to log in to your account.
+            A secure signin link has been sent to <big><strong>{email}</strong></big> <br></br> Click the link in the email to signin in to Matchmaking.
           </p>
         </div>
       ) : (
         <>
-          <h2 className="text-3xl font-bold mb-4 text-center text-darkGray">Login</h2>
+          <br></br>
+          <h2 className="text-3xl font-bold mb-4 text-center text-darkGray">Signin</h2>
           <p className="mb-6 text-center text-darkGray">
-            Enter your email to get a secure login link. This magic link lets you sign in/up without needing a password.
+            Enter your email to get a secure sign-in link. This magic link signs you in without needing a password no signup step required!
           </p>
           <form onSubmit={handleSubmit} className="flex flex-col items-center">
             <div className="mb-4 w-full">
@@ -68,10 +69,10 @@ const EmailForm = () => {
             </div>
             <button
               type="submit"
-              className="btn bg-blue-500 text-white px-4 py-2 hover:bg-blue-700 rounded-lg shadow-sm"
+              className="btn bg-[#FF5C36] text-white px-4 py-2 hover:bg-[#3555A2] rounded-lg shadow-sm"
               disabled={emailSent}
             >
-              Get Login Link
+              Get Magic Link
             </button>
           </form>
         </>
