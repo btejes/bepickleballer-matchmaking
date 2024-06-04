@@ -6,10 +6,19 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const [message, setMessage] = useState('');
   const [fadeOut, setFadeOut] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isFormReady, setIsFormReady] = useState(false);
 
   useEffect(() => {
     setFormData(profile);
   }, [profile]);
+
+  useEffect(() => {
+    if (Object.values(formData).some(value => value !== undefined && value !== '')) {
+      setIsFormReady(true);
+    } else {
+      setIsFormReady(false);
+    }
+  }, [formData]);
 
   useEffect(() => {
     if (message) {
@@ -266,10 +275,10 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
       <div className="mt-6 flex justify-center">
         <button
           type="submit"
-          disabled={isSaving}
+          disabled={!isFormReady || isSaving}
           style={{
             width: '50%',
-            backgroundColor: isSaving ? 'grey' : 'blue',
+            backgroundColor: !isFormReady || isSaving ? 'grey' : 'blue',
             color: 'white',
             padding: '10px',
             borderRadius: '25px',
