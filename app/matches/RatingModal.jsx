@@ -4,6 +4,7 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
   const [rating, setRating] = useState({ honesty: 0, communication: 0, sportsmanship: 0 });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [hoverValue, setHoverValue] = useState({ honesty: 0, communication: 0, sportsmanship: 0 });
 
   useEffect(() => {
     if (existingRating) {
@@ -12,10 +13,16 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
     }
   }, [existingRating]);
 
- 
-
   const handleRatingChange = (category, value) => {
     setRating((prevRating) => ({ ...prevRating, [category]: value }));
+  };
+
+  const handleMouseEnter = (category, value) => {
+    setHoverValue((prevHover) => ({ ...prevHover, [category]: value }));
+  };
+
+  const handleMouseLeave = (category) => {
+    setHoverValue((prevHover) => ({ ...prevHover, [category]: 0 }));
   };
 
   const handleSubmit = async () => {
@@ -52,28 +59,14 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
   };
 
   const renderStars = (category, value, isEditable = true) => {
-    const [hoverValue, setHoverValue] = useState(0);
-
-    const handleMouseEnter = (ratingValue) => {
-      if (isEditable) {
-        setHoverValue(ratingValue);
-      }
-    };
-
-    const handleMouseLeave = () => {
-      if (isEditable) {
-        setHoverValue(0);
-      }
-    };
-
     return [...Array(5)].map((_, index) => {
       const ratingValue = index + 1;
       return (
         <label
           key={index}
           className="cursor-pointer"
-          onMouseEnter={() => handleMouseEnter(ratingValue)}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={() => handleMouseEnter(category, ratingValue)}
+          onMouseLeave={() => handleMouseLeave(category)}
         >
           <input
             type="radio"
@@ -86,7 +79,7 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
             width="30"
             height="30"
             viewBox="0 0 24 24"
-            fill={ratingValue <= (hoverValue || value) ? '#ffc107' : '#e4e5e9'}
+            fill={ratingValue <= (hoverValue[category] || value) ? '#ffc107' : '#e4e5e9'}
             xmlns="http://www.w3.org/2000/svg"
             className="star-icon"
           >
