@@ -23,32 +23,36 @@ export async function POST(request) {
     console.log(`User found for ${lowercasedEmail}`);
   }
 
-  // Check if a token exists for this email
+  // Check if a valid token exists for this email
   let tokenEntry = await Token.findOne({ email: lowercasedEmail });
-  let token;
-  if (tokenEntry) {
-    if (tokenEntry.expires > new Date()) {
-      console.log(`Token for ${lowercasedEmail} is still valid. Not sending email.`);
-      return NextResponse.json({ message: 'A valid login link has already been sent. Please check your email.' });
-    } else {
-      tokenEntry.token = nanoid();
-      tokenEntry.expires = new Date(Date.now() + 15 * 60 * 1000);
-      await tokenEntry.save();
-      console.log(`Updated expired token for ${lowercasedEmail}`);
-    }
-  } else {
-    token = nanoid();
-    const expires = new Date(Date.now() + 15 * 60 * 1000);
-    await Token.create({ email: lowercasedEmail, token, expires });
-    console.log(`Created new token for ${lowercasedEmail}`);
+  if (tokenEntry && tokenEntry.expires > new Date()) {
+    console.log(`Token for ${lowercasedEmail} is still valid. Not sending email.`);
+    return NextResponse.json({ message: 'A valid login link has already been sent. Please check your email.' });
   }
 
-  const baseUrl = process.env.BASE_URL;
-  const verifyUrl = `${baseUrl}/api/auth/verify?token=${tokenEntry ? tokenEntry.token : token}`;
+  // Create a new token
+  const token = nanoid();
+  const expires = new Date(Date.now() + 15 * 60 * 1000);
 
   try {
+    const baseUrl = process.env.BASE_URL;
+    const verifyUrl = `${baseUrl}/api/auth/verify?token=${token}`;
+
+    // Send the email
     await sendLoginEmail(lowercasedEmail, verifyUrl);
     console.log(`Sent login email to ${lowercasedEmail} with link ${verifyUrl}`);
+
+    // Save the new token after email is sent
+    if (tokenEntry) {
+      tokenEntry.token = token;
+      tokenEntry.expires = expires;
+      await tokenEntry.save();
+      console.log(`Updated token for ${lowercasedEmail}`);
+    } else {
+      await Token.create({ email: lowercasedEmail, token, expires });
+      console.log(`Created new token for ${lowercasedEmail}`);
+    }
+
     return NextResponse.json({ message: 'Check your email for the secure login link.' });
   } catch (error) {
     console.error(`Error sending login link to ${lowercasedEmail}:`, error);

@@ -38,23 +38,21 @@ const EmailForm = () => {
     }
   }, [emailSent, timeLeft]);
 
-
-
   return (
     <div>
       {emailSent ? (
         <div className="text-center">
           <h2 className="text-3xl font-bold mb-4 text-center text-darkGray">Check Email For Your Magic Link!</h2>
           <p className="mt-4 text-center text-black">
-            A secure signin link has been sent to <big><strong>{email}</strong></big> <br></br> Click the link in the email to signin in to Matchmaking.
+            A secure sign-in link has been sent to <big><strong>{email}</strong></big> <br></br> Click the link in the email to sign in to Matchmaking.
           </p>
         </div>
       ) : (
         <>
           <br></br>
-          <h2 className="text-3xl font-bold mb-4 text-center text-darkGray">Signin</h2>
+          <h2 className="text-3xl font-bold mb-4 text-center text-darkGray">Sign In</h2>
           <p className="mb-6 text-center text-darkGray">
-            Enter your email to get a secure sign-in link. This magic link signs you in without needing a password no signup step required!
+            Enter your email to get a secure sign-in link. This magic link signs you in without needing a password, no signup step required!
           </p>
           <form onSubmit={handleSubmit} className="flex flex-col items-center">
             <div className="mb-4 w-full">
