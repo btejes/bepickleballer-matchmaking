@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 const RatingModal = ({ match, onClose, onBack }) => {
   const [rating, setRating] = useState({ honesty: 0, communication: 0, sportsmanship: 0 });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     fetchExistingRating();
@@ -28,6 +29,12 @@ const RatingModal = ({ match, onClose, onBack }) => {
   };
 
   const handleSubmit = async () => {
+    if (rating.honesty === 0 || rating.communication === 0 || rating.sportsmanship === 0) {
+      setErrorMessage('Minimum One Star per category');
+      setTimeout(() => setErrorMessage(''), 3000); // Clear error message after 3 seconds
+      return;
+    }
+
     try {
       const response = await fetch('/api/ratings', {
         method: 'POST',
@@ -48,16 +55,36 @@ const RatingModal = ({ match, onClose, onBack }) => {
       }
 
       setIsSubmitted(true);
+      setErrorMessage('');
     } catch (error) {
       console.error('Error submitting rating:', error);
     }
   };
 
   const renderStars = (category, value, isEditable = true) => {
+    const [hoverValue, setHoverValue] = useState(0);
+
+    const handleMouseEnter = (ratingValue) => {
+      if (isEditable) {
+        setHoverValue(ratingValue);
+      }
+    };
+
+    const handleMouseLeave = () => {
+      if (isEditable) {
+        setHoverValue(0);
+      }
+    };
+
     return [...Array(5)].map((_, index) => {
       const ratingValue = index + 1;
       return (
-        <label key={index} className="cursor-pointer">
+        <label
+          key={index}
+          className="cursor-pointer"
+          onMouseEnter={() => handleMouseEnter(ratingValue)}
+          onMouseLeave={handleMouseLeave}
+        >
           <input
             type="radio"
             name={category}
@@ -69,8 +96,9 @@ const RatingModal = ({ match, onClose, onBack }) => {
             width="30"
             height="30"
             viewBox="0 0 24 24"
-            fill={ratingValue <= value ? '#ffc107' : '#e4e5e9'}
+            fill={ratingValue <= (hoverValue || value) ? '#ffc107' : '#e4e5e9'}
             xmlns="http://www.w3.org/2000/svg"
+            className="star-icon"
           >
             <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.907 1.432 8.184L12 18.896l-7.368 3.901 1.432-8.184-6.064-5.907 8.332-1.151L12 .587z" />
           </svg>
@@ -143,10 +171,16 @@ const RatingModal = ({ match, onClose, onBack }) => {
               <button className="bg-gray-500 text-white py-2 px-4 rounded" onClick={onBack}>
                 Back
               </button>
+              <p className="text-sm text-gray-500 text-center mt-2 mb-4">
+                Ratings Are Final!
+              </p>
               <button className="bg-green-500 text-white py-2 px-4 rounded" onClick={handleSubmit}>
                 Submit
               </button>
             </div>
+            {errorMessage && (
+              <p className="text-red-500 text-sm mt-2 text-center">{errorMessage}</p>
+            )}
           </>
         )}
       </div>
