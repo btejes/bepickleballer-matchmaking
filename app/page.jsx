@@ -1,5 +1,5 @@
 import EmailForm from "./login/EmailForm";
-import NavbarBasicLogo from "@/components/NavbarBasicLogo";
+import NavbarBasicLogo from "@/components/NavbarLogin";
 
 const LoginPage = () => {
   return (

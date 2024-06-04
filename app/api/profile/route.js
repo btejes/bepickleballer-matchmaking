@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request) {
+export async function GET() {
   await connectToDatabase();
 
   try {
