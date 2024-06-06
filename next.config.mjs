@@ -1,14 +1,13 @@
-const nextConfig = {
+module.exports = {
     basePath: '/matchmaking',
-    assetPrefix: '/matchmaking',
-  
-    webpack: (config, { isServer }) => {
-      if (!isServer) {
-        config.resolve.alias['@sentry/node'] = '@sentry/browser';
-      }
-      return config;
+    assetPrefix: '/matchmaking/',
+    async rewrites() {
+      return [
+        {
+          source: '/matchmaking/:path*',
+          destination: '/:path*',
+        },
+      ];
     },
   };
-  
-  export default nextConfig;
   
