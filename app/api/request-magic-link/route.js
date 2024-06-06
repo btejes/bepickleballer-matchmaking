@@ -36,10 +36,6 @@ export async function POST(request) {
 
   try {
     const baseUrl = process.env.BASE_URL;
-    
-    // const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-
-
     const verifyUrl = `${baseUrl}/api/auth/verify?token=${token}`;
 
     // Send the email
