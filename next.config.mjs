@@ -1,4 +1,4 @@
-// next.config.js
+// next.config.mjs
 const nextConfig = {
   basePath: '/matchmaking',
   assetPrefix: '/matchmaking/',
@@ -12,4 +12,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
