@@ -1,12 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-    webpack: (config, { isServer }) => {
-      if (!isServer) {
-        config.resolve.alias['@sentry/node'] = '@sentry/browser';
-      }
-      return config;
-    },
-  };
-  
-  module.exports = nextConfig;
-  
+const nextConfig = {};
+
+export default nextConfig;
