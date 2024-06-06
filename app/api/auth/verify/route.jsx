@@ -12,16 +12,17 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get('token');
   const tokenDoc = await Token.findOne({ token });
+  const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   
 
   if (!tokenDoc || tokenDoc.expires < Date.now()) {
-    return NextResponse.redirect(`${process.env.BASE_URL}/login`);
+    return NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}`);
   }
 
   // Retrieve the user's ID based on the email in the token
   const user = await User.findOne({ email: tokenDoc.email });
   if (!user) {
-    return NextResponse.redirect(`${process.env.BASE_URL}/login`);
+    return NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}`);
   }
 
   // Check if a profile exists for this user, and create one if it does not exist
@@ -47,7 +48,7 @@ export async function GET(request) {
   await user.save();
 
   // Store the JSON Web Token in cookies (HTTP-only) for Next.js 14
-  const response = NextResponse.redirect(`${process.env.BASE_URL}/homepage`);
+  const response = NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/homepage`);
   
   // Set cookie options
   const cookieOptions = { httpOnly: true };
