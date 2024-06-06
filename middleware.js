@@ -1,4 +1,3 @@
-// middleware.js
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
@@ -11,7 +10,13 @@ export async function middleware(request) {
   // Allow all /api/ routes without JWT authentication
   if (pathname.startsWith('/api/')) {
     console.log('Path is an API route. Proceeding without authentication.');
-    return NextResponse.next();
+    
+    // Handle CORS for API routes
+    const response = NextResponse.next();
+    response.headers.set('Access-Control-Allow-Origin', 'https://bepickleballer.com');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Authorization');
+    return response;
   }
 
   // Read JWT token from cookies for protected routes
@@ -36,5 +41,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/profile', '/homepage', '/matches', '/local-play'],
+  matcher: ['/profile', '/homepage', '/matches', '/local-play', '/api/(.*)'],
 };
