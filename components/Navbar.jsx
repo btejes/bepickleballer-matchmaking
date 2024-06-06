@@ -1,12 +1,15 @@
 import Link from 'next/link';
 
 const Navbar = () => {
+  // Assuming your environment variable is named NEXT_PUBLIC_BASE_PATH
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
   return (
     <nav className="navbar bg-white px-4 py-2 shadow-md flex justify-between items-center">
       <div className="flex items-center">
         <Link href="https://bepickleballer.com">
           <img
-            src="/logo.png"
+            src={`${basePath}/logo.png`} // Update the src to use the basePath
             alt="Logo"
             className="h-12 w-auto sm:h-16 sm:w-auto lg:h-20 lg:w-auto cursor-pointer"
           />
