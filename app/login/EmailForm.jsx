@@ -11,7 +11,7 @@ const EmailForm = () => {
     e.preventDefault();
     const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
     try {
-        fetch(`${apiBasePath}/api/request-magic-link`, {
+      const response = await fetch(`${apiBasePath}/api/request-magic-link`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -22,10 +22,10 @@ const EmailForm = () => {
       if (response.ok) {
         setEmailSent(true);
       } else {
-        console.error("Error sending login link.");
+        console.error("Error sending login link. Response not OK.");
       }
     } catch (error) {
-      console.error("Error sending login link.");
+      console.error("Error sending login link.", error);
     }
   };
 
