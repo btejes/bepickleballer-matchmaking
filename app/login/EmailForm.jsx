@@ -9,9 +9,9 @@ const EmailForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+    
     try {
-      const response = await fetch(`${apiBasePath}/api/request-magic-link`, {
+      const response = await fetch(`/api/request-magic-link`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
