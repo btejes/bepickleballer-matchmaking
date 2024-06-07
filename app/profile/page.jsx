@@ -5,6 +5,7 @@ import ProfileCard from '@/library/ProfileCard';
 import ProfileForm from '@/library/ProfileForm';
 import Navbar from '@/components/Navbar';
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState({
@@ -28,8 +29,8 @@ const ProfilePage = () => {
 
   const handleProfileSave = async (updatedProfile) => {
     try {
-      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-      const response = await fetch('${basePath}/api/profile', {
+      
+      const response = await fetch(`${basePath}/api/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -63,8 +64,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-        const response = await fetch('${basePath}/api/profile');
+        const response = await fetch(`${basePath}/api/profile`);
         if (!response.ok) {
           throw new Error('Error fetching profile');
         }
