@@ -53,7 +53,7 @@ export async function GET(request) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     path: '/',
-    domain: '.bepickleballer.com'  // Ensure cookie is available across all subdomains
+    domain: 'bepickleballer.com'  // Ensure cookie is available across all subdomains
   });
 
   return response;
