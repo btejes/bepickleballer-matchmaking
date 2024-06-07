@@ -26,7 +26,7 @@ export async function middleware(request) {
   const token = cookies().get('token')?.value;
   
   console.log(`JWT Token: ${token}`);
-
+  NextResponse.next();
   if (!token) {
     console.log('No JWT Token found. Redirecting to root.');
     // return NextResponse.redirect(new URL('/', request.url));
