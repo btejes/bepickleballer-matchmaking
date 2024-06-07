@@ -15,7 +15,7 @@ export async function middleware(request) {
   }
 
   // Extract JWT token from cookies
-  const token = request.cookies.get('token');
+  const token = request.cookies.get('token')?.value;
 
   console.log(`JWT Token: ${token}`);
 
@@ -41,9 +41,11 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/matchmaking/profile', '/matchmaking/homepage', '/matchmaking/matches', '/matchmaking/local-play'],
+  matcher: [
+    '/matchmaking/profile',
+    '/matchmaking/homepage',
+    '/matchmaking/matches',
+    '/matchmaking/local-play',
+    '/matchmaking/api/(.*)'
+  ],
 };
-
-// Update your auth/verify route handler as needed:
-// Assuming that your JWT setting logic and redirect after setting the JWT is correct as posted,
-// make sure the domain and path settings are correct as shown in your provided script.
