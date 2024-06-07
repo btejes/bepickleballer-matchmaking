@@ -1,45 +1,49 @@
+// middleware.js
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
 
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
-  
+
+  // Log for debugging
   console.log(`Middleware activated. Request Path: ${pathname}`);
 
-  // Allow all /api/ routes without JWT authentication
-  if (pathname.startsWith('/api/')) {
-    console.log('Path is an API route. Proceeding without authentication.');
-    
-    // Handle CORS for API routes
-    const response = NextResponse.next();
-    response.headers.set('Access-Control-Allow-Origin', 'https://bepickleballer.com');
-    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    response.headers.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Authorization');
-    return response;
+  // Skip middleware for non-protected routes (e.g., the initial sign-in page)
+  if (pathname.startsWith('/matchmaking/api/') || pathname === '/matchmaking') {
+    console.log('Path is an API route or sign-in page. Proceeding without authentication.');
+    return NextResponse.next();
   }
 
-  // Read JWT token from cookies for protected routes
-  const token = cookies().get('token')?.value;
-  
+  // Extract JWT token from cookies
+  const token = request.cookies.get('token');
+
   console.log(`JWT Token: ${token}`);
 
   if (!token) {
-    console.log('No JWT Token found. Redirecting to root.');
-    return NextResponse.redirect(new URL('/', request.url));
+    console.log('No JWT Token found. Redirecting to sign-in page.');
+    return NextResponse.redirect(new URL('/matchmaking', request.url));
   }
 
   try {
+    // Verify the token
     const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
-    request.user = payload;
     console.log('Token Verified:', payload);
+
+    // Attach user information to the request for downstream use (if needed)
+    request.user = payload;
+
+    // Continue with the request
     return NextResponse.next();
   } catch (error) {
     console.log('JWT Verification Error:', error);
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/matchmaking', request.url));
   }
 }
 
 export const config = {
-  matcher: ['/profile', '/homepage', '/matches', '/local-play', '/api/(.*)'],
+  matcher: ['/matchmaking/profile', '/matchmaking/homepage', '/matchmaking/matches', '/matchmaking/local-play'],
 };
+
+// Update your auth/verify route handler as needed:
+// Assuming that your JWT setting logic and redirect after setting the JWT is correct as posted,
+// make sure the domain and path settings are correct as shown in your provided script.
