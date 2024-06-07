@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 const ProfileCard = ({ profile, isProfilePage }) => {
   const [image, setImage] = useState(null);
   const [averageRating, setAverageRating] = useState(null);
+  const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   useEffect(() => {
     if (profile.profileImage) {
@@ -16,13 +17,12 @@ const ProfileCard = ({ profile, isProfilePage }) => {
     if (profile.userId) {
       fetchAverageRating(profile.userId);
     }
-    
   }, [profile]);
 
-  const fetchAverageRating = async () => {
+  const fetchAverageRating = async (userId) => {
     try {
       console.log("\nprofile.userId for average", profile.userId, "\n");
-      const response = await fetch(`/api/ratings/average?rateeUserId=${profile.userId}`);
+      const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`);
       if (response.ok) {
         const data = await response.json();
         setAverageRating(data.averageRating);
@@ -50,10 +50,10 @@ const ProfileCard = ({ profile, isProfilePage }) => {
     <div className="w-full max-w-xs bg-white border border-gray-300 rounded-3xl shadow-md mx-auto overflow-hidden">
       <div className="relative w-full h-48 rounded-t-3xl overflow-hidden">
         <img
-          src={image || "/blank-profile-picture.svg"}
+          src={image || `${apiBasePath}/blank-profile-picture.svg`}
           alt="Profile"
           className={`w-full h-full object-cover ${!image && 'blur-sm grayscale'} ${isProfilePage ? 'cursor-pointer' : ''}`}
-          onError={(e) => { e.target.src = '/blank-profile-picture.svg'; }}
+          onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
           onClick={isProfilePage ? () => document.getElementById('imageUpload').click() : null}
         />
         {isProfilePage && (
