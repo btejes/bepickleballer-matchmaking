@@ -47,16 +47,14 @@ export async function GET(request) {
   user.lastVerifiedLogin = new Date();
   await user.save();
 
-  // Store the JSON Web Token in cookies (HTTP-only) for Next.js 14
+  // Redirect user to the homepage with the JWT set in a secure, HttpOnly cookie
   const response = NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/homepage`);
-  
-  // Set cookie options
-  const cookieOptions = { httpOnly: true };
-  if (process.env.NODE_ENV === 'production') {
-    cookieOptions.secure = true;
-  }
-  response.cookies.set('token', jwtToken, cookieOptions);
-  console.log("\n response.cookies:  ", response.cookies, "\n");
+  response.cookies.set('token', jwtToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    domain: '.bepickleballer.com'  // Ensure cookie is available across all subdomains
+  });
 
   return response;
 }
