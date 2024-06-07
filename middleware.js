@@ -19,6 +19,9 @@ export async function middleware(request) {
     return response;
   }
 
+  // Log all cookies
+  console.log('All cookies:', cookies().getAll());
+
   // Read JWT token from cookies for protected routes
   const token = cookies().get('token')?.value;
   
