@@ -64,7 +64,9 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${basePath}/api/profile`);
+        const response = await fetch(`${basePath}/api/profile`, {
+          credentials: 'include',
+        });
         if (!response.ok) {
           throw new Error('Error fetching profile');
         }
