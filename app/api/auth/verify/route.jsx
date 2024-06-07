@@ -52,8 +52,8 @@ export async function GET(request) {
   response.cookies.set('token', jwtToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    domain: 'bepickleballer.com'  // Ensure cookie is available across all subdomains
+    sameSite: 'None', // Important for cross-site access
+    path: '/'
   });
 
   return response;
