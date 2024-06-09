@@ -1,4 +1,3 @@
-// src/app/local-play/page.js
 'use client';
 
 import Navbar from '@/components/Navbar';
@@ -45,7 +44,7 @@ const LocalPlay = () => {
         setError(null);
       }
     } catch (error) {
-      console.error('Error fetching next match:', error);
+      console.error('Error fetching next match:', error.message, error.stack);
       setError('No matches found');
       setCurrentMatch(null);
     } finally {
@@ -81,7 +80,7 @@ const LocalPlay = () => {
 
       await fetchNextMatch(); // Fetch next match after decision
     } catch (error) {
-      console.error('Error updating matchmaking decision:', error);
+      console.error('Error updating matchmaking decision:', error.message, error.stack);
     }
   };
 
