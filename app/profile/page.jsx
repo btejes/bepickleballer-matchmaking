@@ -70,7 +70,7 @@ const ProfilePage = () => {
         if (!response.ok) {
           throw new Error('Error fetching profile');
         }
-
+        coneosle.log("\Before set profile after fetchprofile\n");
         const data = await response.json();
         setProfile(data);
       } catch (error) {
