@@ -65,7 +65,8 @@ const ProfilePage = () => {
     const fetchProfile = async () => {
       try {
         const response = await fetch(`${basePath}/api/profile`, {
-          credentials: 'include',
+          method: 'GET',
+          credentials: 'include'
         });
         if (!response.ok) {
           throw new Error('Error fetching profile');
