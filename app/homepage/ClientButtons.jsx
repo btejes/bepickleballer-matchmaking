@@ -107,7 +107,7 @@ const ClientButtons = () => {
                 <li key={field} className="text-red-500">{field}</li>
               ))}
             </ul>
-            <a href="/profile" className="text-blue-500 underline block mb-4">Go to Profile</a>
+            <a href={`${basePath}/profile`} className="text-blue-500 underline block mb-4">Go to Profile</a>
             <button
               onClick={closeLocalPlayModal}
               className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-600 transform hover:-translate-y-1 transition-all"
