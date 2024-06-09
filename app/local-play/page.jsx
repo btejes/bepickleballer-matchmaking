@@ -23,6 +23,7 @@ const LocalPlay = () => {
   }, []);
 
   const fetchNextMatch = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(`${basePath}/api/matchmaking`, {
         method: 'GET',
