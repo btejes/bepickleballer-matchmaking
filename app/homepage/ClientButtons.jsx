@@ -63,7 +63,7 @@ const ClientButtons = () => {
       setMissingFields(missing);
       setIsLocalPlayModalOpen(true);
     } else {
-      router.push(`${basePath}/local-play`);
+      router.push(`/local-play`);
     }
   };
 

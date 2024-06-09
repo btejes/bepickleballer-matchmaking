@@ -45,6 +45,7 @@ export async function GET(request) {
     }
 
     if (validMatches.length === 0) {
+      console.log("\nNo validMatches found\n");
       return NextResponse.json({ error: 'No matches found' }, { status: 404 });
     }
 
