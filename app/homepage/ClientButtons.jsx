@@ -9,17 +9,20 @@ const ClientButtons = () => {
   const [isLocalPlayModalOpen, setIsLocalPlayModalOpen] = useState(false);
   const [isTournamentModalOpen, setIsTournamentModalOpen] = useState(false);
   const router = useRouter();
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   useEffect(() => {
     // Fetch the user's profile data
     const fetchProfile = async () => {
       try {
-        const response = await fetch('/api/profile');
+        const response = await fetch(`${basePath}/api/profile`, {
+          method: 'GET',
+          credentials: 'include', // Include credentials
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch profile');
         }
         const profileData = await response.json();
-
         setProfile(profileData);
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -28,7 +31,7 @@ const ClientButtons = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [basePath]);
 
   const handleLocalPlayClick = (e) => {
     if (!profile) {
@@ -60,7 +63,7 @@ const ClientButtons = () => {
       setMissingFields(missing);
       setIsLocalPlayModalOpen(true);
     } else {
-      router.push('/local-play');
+      router.push(`${basePath}/local-play`);
     }
   };
 
