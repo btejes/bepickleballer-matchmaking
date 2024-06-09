@@ -36,8 +36,13 @@ const LocalPlay = () => {
       const data = await response.json();
       console.log('Fetched match:', data);
 
-      setCurrentMatch(data);
-      setError(null);
+      if (data.error) {
+        setError(data.error);
+        setCurrentMatch(null);
+      } else {
+        setCurrentMatch(data);
+        setError(null);
+      }
     } catch (error) {
       console.error('Error fetching next match:', error);
       setError('No matches found');
