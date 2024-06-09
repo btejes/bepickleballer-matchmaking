@@ -5,6 +5,7 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [hoverValue, setHoverValue] = useState({ honesty: 0, communication: 0, sportsmanship: 0 });
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   useEffect(() => {
     if (existingRating) {
@@ -33,7 +34,7 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
     }
 
     try {
-      const response = await fetch('/api/ratings', {
+      const response = await fetch(`${basePath}/api/ratings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

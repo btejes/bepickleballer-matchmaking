@@ -7,6 +7,7 @@ const Modal = ({ match, onClose, onUnmatch }) => {
   const [showRating, setShowRating] = useState(false);
   const [existingRating, setExistingRating] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   const handleUnmatchClick = () => {
     setShowConfirmation(true);
@@ -15,7 +16,7 @@ const Modal = ({ match, onClose, onUnmatch }) => {
   const handleConfirmUnmatch = async () => {
     setShowConfirmation(false);
     try {
-      const response = await fetch('/api/matches/unmatch', {
+      const response = await fetch(`${basePath}/api/matches/unmatch`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,7 +44,7 @@ const Modal = ({ match, onClose, onUnmatch }) => {
 
   const handleRateClick = async () => {
     try {
-      const response = await fetch(`/api/ratings?rateeUserId=${match.userId}&raterUserId=${match.loggedInUserId}`);
+      const response = await fetch(`${basePath}/api/ratings?rateeUserId=${match.userId}&raterUserId=${match.loggedInUserId}`);
       if (response.ok) {
         const rating = await response.json();
         setExistingRating(rating);
