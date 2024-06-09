@@ -10,10 +10,10 @@ export const revalidate = 60; // revalidate the page every 60 seconds
 
 async function FaqPage() {
   let faqs = [];
-
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   try {
     console.log("\nFetching api faqs!\n");
-    const res = await fetch(`${process.env.BASE_URL}/api/faqs`, {
+    const res = await fetch(`${process.env.BASE_URL}${basePath}/api/faqs`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
