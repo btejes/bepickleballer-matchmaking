@@ -23,19 +23,16 @@ const LocalPlay = () => {
   }, []);
 
   const fetchNextMatch = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(`${basePath}/api/matchmaking`, {
         method: 'GET',
-        credentials: 'include', // Include credentials
+        credentials: 'include',
       });
-
       if (!response.ok) {
         throw new Error('Failed to fetch matchmaking data');
       }
-
       const data = await response.json();
-      console.log('Fetched match:', data);
-
       setCurrentMatch(data);
       setError(null);
     } catch (error) {
@@ -62,7 +59,6 @@ const LocalPlay = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Include credentials
         body: JSON.stringify({
           potentialMatchId: currentMatch.userId,
           userDecision: decision,
@@ -87,26 +83,28 @@ const LocalPlay = () => {
       <div className="flex-grow w-full bg-gray-200 flex flex-col items-center justify-center overflow-hidden">
         {isLoading ? (
           <p>Loading...</p>
-        ) : currentMatch ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="flex items-center justify-center space-x-4">
-              <button
-                onClick={() => handleDecision('no')}
-                className="bg-red-500 text-white py-3 px-6 rounded-full"
-              >
-                No
-              </button>
-              <ProfileCard profile={currentMatch} />
-              <button
-                onClick={() => handleDecision('yes')}
-                className="bg-green-500 text-white py-3 px-6 rounded-full"
-              >
-                Yes
-              </button>
-            </div>
-          </div>
-        ) : (
+        ) : error ? (
           <p>{error}</p>
+        ) : (
+          currentMatch && (
+            <div className="flex flex-col items-center justify-center h-full">
+              <div className="flex items-center justify-center space-x-4">
+                <button
+                  onClick={() => handleDecision('no')}
+                  className="bg-red-500 text-white py-3 px-6 rounded-full"
+                >
+                  No
+                </button>
+                <ProfileCard profile={currentMatch} />
+                <button
+                  onClick={() => handleDecision('yes')}
+                  className="bg-green-500 text-white py-3 px-6 rounded-full"
+                >
+                  Yes
+                </button>
+              </div>
+            </div>
+          )
         )}
       </div>
       <div className="w-full h-auto bg-white p-2 flex justify-between">
