@@ -16,6 +16,7 @@ const LocalPlay = () => {
 
   const [currentMatch, setCurrentMatch] = useState(null);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchNextMatch();
@@ -23,17 +24,26 @@ const LocalPlay = () => {
 
   const fetchNextMatch = async () => {
     try {
-      const response = await fetch(`${basePath}/api/matchmaking`);
+      const response = await fetch(`${basePath}/api/matchmaking`, {
+        method: 'GET',
+        credentials: 'include', // Include credentials
+      });
+
       if (!response.ok) {
         throw new Error('Failed to fetch matchmaking data');
       }
+
       const data = await response.json();
+      console.log('Fetched match:', data);
+
       setCurrentMatch(data);
       setError(null);
     } catch (error) {
       console.error('Error fetching next match:', error);
       setError('No matches found');
       setCurrentMatch(null);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -52,6 +62,7 @@ const LocalPlay = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Include credentials
         body: JSON.stringify({
           potentialMatchId: currentMatch.userId,
           userDecision: decision,
@@ -74,7 +85,9 @@ const LocalPlay = () => {
         <Navbar />
       </div>
       <div className="flex-grow w-full bg-gray-200 flex flex-col items-center justify-center overflow-hidden">
-        {currentMatch ? (
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : currentMatch ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="flex items-center justify-center space-x-4">
               <button
