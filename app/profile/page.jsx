@@ -20,6 +20,7 @@ const ProfilePage = () => {
     aboutYou: '',
     phone: '',
     email: '',
+    profileImage: '',
   });
   const [message, setMessage] = useState('');
 
@@ -29,12 +30,12 @@ const ProfilePage = () => {
 
   const handleProfileSave = async (updatedProfile) => {
     try {
-      
       const response = await fetch(`${basePath}/api/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Include credentials
         body: JSON.stringify(updatedProfile),
       });
 
@@ -66,12 +67,12 @@ const ProfilePage = () => {
       try {
         const response = await fetch(`${basePath}/api/profile`, {
           method: 'GET',
-          credentials: 'include'
+          credentials: 'include' // Include credentials
         });
         if (!response.ok) {
           throw new Error('Error fetching profile');
         }
-        coneosle.log("\Before set profile after fetchprofile\n");
+        console.log("\n Before set profile after fetchprofile \n");
         const data = await response.json();
         setProfile(data);
       } catch (error) {
@@ -95,7 +96,7 @@ const ProfilePage = () => {
               <ProfileForm profile={profile} onProfileChange={handleProfileChange} onProfileSave={handleProfileSave} />
               {message && (
                 <div
-                  className={`mt-4 text-center p-2 rounded ${fadeOut ? 'opacity-0 transition-opacity duration-300' : 'opacity-100'}`}
+                  className="mt-4 text-center p-2 rounded"
                   style={{
                     color: message.startsWith('Error') ? 'red' : 'green',
                     transition: 'opacity 0.3s ease-in-out',
