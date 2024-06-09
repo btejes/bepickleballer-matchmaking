@@ -12,6 +12,7 @@ const LocalPlay = () => {
     preferredSkillLevel: '',
     preferredDUPRRating: '',
   });
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   const [currentMatch, setCurrentMatch] = useState(null);
   const [error, setError] = useState(null);
@@ -22,7 +23,7 @@ const LocalPlay = () => {
 
   const fetchNextMatch = async () => {
     try {
-      const response = await fetch('/api/matchmaking');
+      const response = await fetch(`${basePath}/api/matchmaking`);
       if (!response.ok) {
         throw new Error('Failed to fetch matchmaking data');
       }
@@ -46,7 +47,7 @@ const LocalPlay = () => {
 
   const handleDecision = async (decision) => {
     try {
-      const response = await fetch('/api/matchmaking', {
+      const response = await fetch(`${basePath}/api/matchmaking`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +126,7 @@ const LocalPlay = () => {
           <option value="60-69">60-69</option>
           <option value="70-79">70-79</option>
           <option value="80-89">80-89</option>
-          <option value="90-99+">90-99+</option>
+          <option value="90+">90+</option>
         </select>
         <select
           name="preferredSkillLevel"

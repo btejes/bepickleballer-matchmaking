@@ -179,7 +179,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="60-69">60-69</option>
             <option value="70-79">70-79</option>
             <option value="80-89">80-89</option>
-            <option value="90-99+">90-99+</option>
+            <option value="99+">99+</option>
           </select>
           <label htmlFor="skillLevel">Skill Level</label>
           <select
