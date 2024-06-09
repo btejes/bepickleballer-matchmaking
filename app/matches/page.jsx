@@ -11,6 +11,7 @@ const MatchesPage = () => {
   const [error, setError] = useState(null);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [showRatingModal, setShowRatingModal] = useState(false);
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   useEffect(() => {
     console.log('\nUSE EFFECT CALLED\n');
@@ -19,7 +20,7 @@ const MatchesPage = () => {
 
   const fetchMatches = async () => {
     try {
-      const response = await fetch('/api/matches');
+      const response = await fetch(`${basePath}/api/matches`);
       if (!response.ok) {
         throw new Error('Failed to fetch matches');
       }
