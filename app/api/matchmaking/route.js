@@ -13,7 +13,6 @@ export async function GET(request) {
   try {
     const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
-      console.error('No JWT token found in cookies');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -21,7 +20,6 @@ export async function GET(request) {
     const currentUserProfile = await Profile.findOne({ userId: decoded._id });
 
     if (!currentUserProfile) {
-      console.error('Profile not found for user ID:', decoded._id);
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }
 
@@ -47,14 +45,14 @@ export async function GET(request) {
     }
 
     if (validMatches.length === 0) {
-      console.log("\nNo validMatches found\n");
+      console.log("\nNo validMatches found\n")
       return NextResponse.json({ error: 'No matches found' }, { status: 404 });
     }
 
     const randomMatch = validMatches[Math.floor(Math.random() * validMatches.length)];
     return NextResponse.json(randomMatch, { status: 200 });
   } catch (error) {
-    console.error('Internal Server Error:', error.message, error.stack);
+    console.error('Internal Server Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -65,7 +63,6 @@ export async function PUT(request) {
   try {
     const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
-      console.error('No JWT token found in cookies');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -109,7 +106,7 @@ export async function PUT(request) {
 
     return NextResponse.json(matchmakingEntry, { status: 200 });
   } catch (error) {
-    console.error('Internal Server Error:', error.message, error.stack);
+    console.error('Internal Server Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+// src/app/local-play/page.js
 'use client';
 
 import Navbar from '@/components/Navbar';
@@ -22,7 +23,6 @@ const LocalPlay = () => {
   }, []);
 
   const fetchNextMatch = async () => {
-    setIsLoading(true);
     try {
       const response = await fetch(`${basePath}/api/matchmaking`, {
         method: 'GET',
@@ -36,15 +36,10 @@ const LocalPlay = () => {
       const data = await response.json();
       console.log('Fetched match:', data);
 
-      if (data.error) {
-        setError(data.error);
-        setCurrentMatch(null);
-      } else {
-        setCurrentMatch(data);
-        setError(null);
-      }
+      setCurrentMatch(data);
+      setError(null);
     } catch (error) {
-      console.error('Error fetching next match:', error.message, error.stack);
+      console.error('Error fetching next match:', error);
       setError('No matches found');
       setCurrentMatch(null);
     } finally {
@@ -80,7 +75,7 @@ const LocalPlay = () => {
 
       await fetchNextMatch(); // Fetch next match after decision
     } catch (error) {
-      console.error('Error updating matchmaking decision:', error.message, error.stack);
+      console.error('Error updating matchmaking decision:', error);
     }
   };
 
@@ -92,8 +87,6 @@ const LocalPlay = () => {
       <div className="flex-grow w-full bg-gray-200 flex flex-col items-center justify-center overflow-hidden">
         {isLoading ? (
           <p>Loading...</p>
-        ) : error ? (
-          <p>{error}</p>
         ) : currentMatch ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="flex items-center justify-center space-x-4">
@@ -113,7 +106,7 @@ const LocalPlay = () => {
             </div>
           </div>
         ) : (
-          <p>No matches available</p>
+          <p>{error}</p>
         )}
       </div>
       <div className="w-full h-auto bg-white p-2 flex justify-between">
