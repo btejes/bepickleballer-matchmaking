@@ -33,9 +33,9 @@ export async function POST(req) {
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
+    const userId = decoded._id;
 
-    const form = formidable({ uploadDir: '/tmp', keepExtensions: true });
-
+    const form = formidable({ multiples: true, keepExtensions: true });
     const formData = await new Promise((resolve, reject) => {
       form.parse(req, (err, fields, files) => {
         if (err) {
@@ -47,8 +47,6 @@ export async function POST(req) {
     });
 
     const file = formData.files.file;
-    const userId = decoded._id;
-
     const fileStream = await fs.readFile(file.filepath);
 
     const uploadParams = {
@@ -60,9 +58,13 @@ export async function POST(req) {
     };
 
     const command = new PutObjectCommand(uploadParams);
-    const data = await s3Client.send(command);
+    await s3Client.send(command);
 
-    return NextResponse.json({ Location: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}` }, { status: 200 });
+    const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}`;
+    
+    // Optional: Save fileUrl to user profile in database here
+
+    return NextResponse.json({ Location: fileUrl }, { status: 200 });
   } catch (error) {
     console.error('Error uploading to S3:', error);
     return NextResponse.json({ error: 'Error uploading to S3' }, { status: 500 });

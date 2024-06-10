@@ -40,13 +40,15 @@ const ProfileCard = ({ profile, isProfilePage }) => {
         const response = await fetch(`${apiBasePath}/api/upload`, {
           method: 'POST',
           body: formData,
+          credentials: 'include',
         });
 
         if (response.ok) {
           const data = await response.json();
           setImage(data.Location);
+
           // Update the profile image URL in the user's profile
-          await fetch(`${apiBasePath}/api/profile`, {
+          const profileResponse = await fetch(`${apiBasePath}/api/profile`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -54,6 +56,10 @@ const ProfileCard = ({ profile, isProfilePage }) => {
             credentials: 'include',
             body: JSON.stringify({ profileImage: data.Location }),
           });
+
+          if (!profileResponse.ok) {
+            console.error('Error updating profile image:', await profileResponse.json());
+          }
         } else {
           console.error('Error uploading image:', await response.json());
         }
