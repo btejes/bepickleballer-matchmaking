@@ -1,4 +1,4 @@
-import { connectToDatabase } from '../../../library/connectToDatabase';
+import connectToDatabase from '@/library/connectToDatabase';
 import { getCookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';

@@ -1,6 +1,6 @@
 import aws from 'aws-sdk';
 import { NextResponse } from 'next/server';
-import { getCookies } from 'next/headers';
+import { cookies } from 'next/headers';
 
 aws.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -11,8 +11,8 @@ aws.config.update({
 const s3 = new aws.S3();
 
 export async function POST(req) {
-  const cookies = getCookies();
-  const token = cookies.jwt;
+  const cookie = cookies();
+  const token = cookie.get('jwt');
 
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -39,5 +39,8 @@ export async function POST(req) {
   }
 }
 
-// Ensure compatibility with Next.js 14+ app router
-export const dynamic = 'force-dynamic';
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};

@@ -2,13 +2,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useCookies } from 'react-cookie';
 
 const ProfileCard = ({ profile, isProfilePage }) => {
   const [image, setImage] = useState(profile.profileImage || null);
   const [averageRating, setAverageRating] = useState(null);
   const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-  const [cookies] = useCookies(['jwt']);
 
   useEffect(() => {
     if (profile.profileImage) {
@@ -23,9 +21,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
   const fetchAverageRating = async (userId) => {
     try {
       const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`, {
-        headers: {
-          Authorization: `Bearer ${cookies.jwt}`,
-        },
+        credentials: 'include',
       });
       if (response.ok) {
         const data = await response.json();
@@ -50,9 +46,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
         const response = await fetch(`${apiBasePath}/api/upload`, {
           method: 'POST',
           body: formData,
-          headers: {
-            Authorization: `Bearer ${cookies.jwt}`,
-          },
+          credentials: 'include',
         });
 
         if (response.ok) {
