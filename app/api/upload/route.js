@@ -38,16 +38,16 @@ export async function POST(req) {
     console.log('Upload directory ensured:', uploadDir);
 
     // Create Busboy instance
-    const busboy = new Busboy({ headers: req.headers });
+    const bb = new Busboy({ headers: req.headers });
     console.log('Busboy instance created');
 
     let filePath;
     const fileWritePromises = [];
 
-    busboy.on('file', (fieldname, file, info) => {
+    bb.on('file', (name, file, info) => {
       const { filename, encoding, mimeType } = info;
       console.log('File event received');
-      console.log(`Fieldname: ${fieldname}`);
+      console.log(`Fieldname: ${name}`);
       console.log(`Filename: ${filename}`);
       console.log(`Encoding: ${encoding}`);
       console.log(`Mimetype: ${mimeType}`);
@@ -70,7 +70,11 @@ export async function POST(req) {
       fileWritePromises.push(filePromise);
     });
 
-    busboy.on('finish', async () => {
+    bb.on('field', (name, value, info) => {
+      console.log(`Field event received: ${name}=${value}`);
+    });
+
+    bb.on('close', async () => {
       console.log('Busboy finish event triggered');
       try {
         await Promise.all(fileWritePromises);
@@ -87,7 +91,7 @@ export async function POST(req) {
       }
     });
 
-    req.pipe(busboy);
+    req.pipe(bb);
   } catch (error) {
     console.error('Error processing request:', error);
     return NextResponse.json({ error: 'Error processing request' }, { status: 500 });
