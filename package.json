@@ -13,6 +13,7 @@
     "npm": "10.8.1"
   },
   "dependencies": {
+    "aws-sdk": "^2.1637.0",
     "cookies-next": "^4.2.1",
     "daisyui": "^4.11.1",
     "dotenv": "^16.4.5",

@@ -1,28 +1,28 @@
-// library/ProfileCard.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const ProfileCard = ({ profile, isProfilePage }) => {
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(profile.profileImage || null);
   const [averageRating, setAverageRating] = useState(null);
   const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   useEffect(() => {
-    if (profile.profileImage) {
-      setImage(profile.profileImage);
-    }
-
-    // Only fetch the average rating if profile.userId is defined
     if (profile.userId) {
       fetchAverageRating(profile.userId);
     }
   }, [profile]);
 
   const fetchAverageRating = async (userId) => {
+    const token = Cookies.get('jwt');
     try {
-      console.log("\nprofile.userId for average", profile.userId, "\n");
-      const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`);
+      const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setAverageRating(data.averageRating);
@@ -35,14 +35,37 @@ const ProfileCard = ({ profile, isProfilePage }) => {
     }
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
+    const token = Cookies.get('jwt');
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('userId', profile.userId);
+
+      try {
+        const response = await axios.post('/api/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`
+          },
+        });
+        const imageUrl = response.data.Location;
+
+        // Update the user's profile with the new image URL
+        await axios.post('/api/profile/updateImage', {
+          userId: profile.userId,
+          profileImage: imageUrl,
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        setImage(imageUrl);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
     }
   };
 
