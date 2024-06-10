@@ -46,6 +46,12 @@ export async function POST(req) {
     const uploadDir = path.join(process.cwd(), 'tmp');
     await fs.mkdir(uploadDir, { recursive: true });
 
+    console.log('Upload directory ensured:', uploadDir);
+
+    // Check if Formidable is correctly imported and used
+    console.log('Formidable:', formidable);
+    console.log('Formidable IncomingForm:', formidable.IncomingForm);
+
     // Create and configure Formidable form
     const form = new formidable.IncomingForm();
     form.uploadDir = uploadDir;
@@ -53,63 +59,51 @@ export async function POST(req) {
 
     console.log('Formidable form created with uploadDir:', form.uploadDir);
 
-    // Add request data logging before parsing
-    const chunks = [];
-    req.on('data', (chunk) => {
-      chunks.push(chunk);
-    });
-
-    req.on('end', async () => {
-      const rawData = Buffer.concat(chunks);
-      console.log('Raw request data:', rawData.toString()); // This will log the raw request data as a string
-
-      const formData = await new Promise((resolve, reject) => {
-        form.parse(req, (err, fields, files) => {
-          if (err) {
-            console.error('Error parsing form:', err);
-            reject(err);
-          } else {
-            console.log('Form parsed successfully. Fields:', fields, 'Files:', files);
-            resolve({ fields, files });
-          }
-        });
+    const formData = await new Promise((resolve, reject) => {
+      form.parse(req, (err, fields, files) => {
+        if (err) {
+          console.error('Error parsing form:', err);
+          reject(err);
+        } else {
+          console.log('Form parsed successfully. Fields:', fields, 'Files:', files);
+          resolve({ fields, files });
+        }
       });
-
-      console.log('FormData:', formData);
-
-      const file = formData.files.file[0];
-      if (!file) {
-        console.log('No file uploaded');
-        return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
-      }
-
-      console.log('File uploaded:', file);
-
-      const fileStream = await fs.readFile(file.filepath);
-      console.log('File read successfully from temp path:', file.filepath);
-
-      const uploadParams = {
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: `${userId}/${file.originalFilename}`,
-        Body: fileStream,
-        ContentType: file.mimetype,
-        ACL: 'public-read',
-      };
-
-      console.log('Upload params:', uploadParams);
-
-      const command = new PutObjectCommand(uploadParams);
-      const data = await s3Client.send(command);
-      console.log('File uploaded to S3. Response data:', data);
-
-      const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}`;
-      console.log('File URL:', fileUrl);
-
-      // Optional: Save fileUrl to user profile in database here
-
-      return NextResponse.json({ Location: fileUrl }, { status: 200 });
     });
 
+    console.log('FormData:', formData);
+
+    const file = formData.files.file[0];
+    if (!file) {
+      console.log('No file uploaded');
+      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    }
+
+    console.log('File uploaded:', file);
+
+    const fileStream = await fs.readFile(file.filepath);
+    console.log('File read successfully from temp path:', file.filepath);
+
+    const uploadParams = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: `${userId}/${file.originalFilename}`,
+      Body: fileStream,
+      ContentType: file.mimetype,
+      ACL: 'public-read',
+    };
+
+    console.log('Upload params:', uploadParams);
+
+    const command = new PutObjectCommand(uploadParams);
+    const data = await s3Client.send(command);
+    console.log('File uploaded to S3. Response data:', data);
+
+    const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}`;
+    console.log('File URL:', fileUrl);
+
+    // Optional: Save fileUrl to user profile in database here
+
+    return NextResponse.json({ Location: fileUrl }, { status: 200 });
   } catch (error) {
     console.error('Error uploading to S3:', error);
     return NextResponse.json({ error: 'Error uploading to S3' }, { status: 500 });
