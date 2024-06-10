@@ -1,3 +1,6 @@
+// src/app/local-play/page.js
+'use client';
+
 import Navbar from '@/components/Navbar';
 import { useState, useEffect } from 'react';
 import ProfileCard from '@/library/ProfileCard';
@@ -13,7 +16,6 @@ const LocalPlay = () => {
 
   const [currentMatch, setCurrentMatch] = useState(null);
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchNextMatch();
@@ -21,35 +23,21 @@ const LocalPlay = () => {
 
   const fetchNextMatch = async () => {
     try {
-      console.log('Fetching next match from API');
-      const response = await fetch(`${basePath}/api/matchmaking`, {
-        method: 'GET',
-        credentials: 'include', // Include credentials
-      });
-
+      const response = await fetch(`${basePath}/api/matchmaking`);
       if (!response.ok) {
         throw new Error('Failed to fetch matchmaking data');
       }
-
       const data = await response.json();
-      console.log('Fetched match:', data);
-
-      if (data.error) {
-        setError(data.error);
-        setCurrentMatch(null);
-      } else {
-        setCurrentMatch(data);
-        setError(null);
-      }
+      setCurrentMatch(data);
+      setError(null);
     } catch (error) {
       console.error('Error fetching next match:', error);
       setError('No matches found');
+      console.log("No Matches Found");
       setCurrentMatch(null);
-    } finally {
-      setIsLoading(false);
     }
   };
-
+ 
   const handlePreferenceChange = (e) => {
     const { name, value } = e.target;
     setPreferences((prevPreferences) => ({
@@ -65,7 +53,6 @@ const LocalPlay = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Include credentials
         body: JSON.stringify({
           potentialMatchId: currentMatch.userId,
           userDecision: decision,
@@ -88,9 +75,7 @@ const LocalPlay = () => {
         <Navbar />
       </div>
       <div className="flex-grow w-full bg-gray-200 flex flex-col items-center justify-center overflow-hidden">
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : currentMatch ? (
+        {currentMatch ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="flex items-center justify-center space-x-4">
               <button
@@ -110,6 +95,7 @@ const LocalPlay = () => {
           </div>
         ) : (
           <p>{error}</p>
+
         )}
       </div>
       <div className="w-full h-auto bg-white p-2 flex justify-between">
