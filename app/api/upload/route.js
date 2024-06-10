@@ -2,7 +2,7 @@ import aws from 'aws-sdk';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
-import formidable from 'formidable';
+import { IncomingForm } from 'formidable';
 import fs from 'fs';
 
 aws.config.update({
@@ -26,7 +26,7 @@ export async function POST(req) {
 
       const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
 
-      const form = new formidable.IncomingForm();
+      const form = new IncomingForm();
       form.parse(req, async (err, fields, files) => {
         if (err) {
           console.error('Error parsing form data:', err);
@@ -39,9 +39,9 @@ export async function POST(req) {
 
         const params = {
           Bucket: process.env.S3_BUCKET_NAME,
-          Key: `${userId}/${file.name}`,
-          Body: fs.createReadStream(file.path),
-          ContentType: file.type,
+          Key: `${userId}/${file.originalFilename}`,
+          Body: fs.createReadStream(file.filepath),
+          ContentType: file.mimetype,
           ACL: 'public-read',
         };
 
@@ -59,3 +59,10 @@ export async function POST(req) {
     }
   });
 }
+
+// We need to export the config for this route to ensure it can handle the file upload properly
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
