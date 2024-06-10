@@ -2,8 +2,6 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
-import formidable from 'formidable';
-import fs from 'fs/promises';
 import path from 'path';
 
 // Create the S3 client
@@ -42,52 +40,46 @@ export async function POST(req) {
     const userId = decoded._id;
     console.log('Token verified. User ID:', userId);
 
-    const form = new formidable.IncomingForm();
-    form.uploadDir = path.join(process.cwd(), 'tmp'); // Ensure this directory exists
-    form.keepExtensions = true;
-
-    console.log('Formidable form created with uploadDir:', form.uploadDir);
-
-    const formData = await new Promise((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        if (err) {
-          console.error('Error parsing form:', err);
-          reject(err);
-        } else {
-          console.log('Form parsed successfully. Fields:', fields, 'Files:', files);
-          resolve({ fields, files });
-        }
-      });
+    const data = await new Promise((resolve, reject) => {
+      const chunks = [];
+      req.on('data', (chunk) => chunks.push(chunk));
+      req.on('end', () => resolve(Buffer.concat(chunks)));
+      req.on('error', reject);
     });
 
-    const file = formData.files.file;
-    if (!file) {
-      console.log('No file uploaded');
+    const boundary = req.headers['content-type'].split('boundary=')[1];
+    const parts = data.toString().split(`--${boundary}`);
+    const filePart = parts.find((part) => part.includes('Content-Disposition: form-data; name="file";'));
+
+    if (!filePart) {
+      console.log('No file part found');
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    console.log('File uploaded:', file);
+    const fileContentType = filePart.match(/Content-Type: (.*)/)[1].trim();
+    const fileContent = Buffer.from(filePart.split('\r\n\r\n')[1].split('\r\n--')[0]);
 
-    const fileStream = await fs.readFile(file.filepath);
-    console.log('File read successfully from temp path:', file.filepath);
+    const fileName = `image-${Date.now()}`;
+    const fileExtension = fileContentType.split('/')[1];
+    const s3Key = `${userId}/${fileName}.${fileExtension}`;
 
     const uploadParams = {
       Bucket: process.env.S3_BUCKET_NAME,
-      Key: `${userId}/${file.originalFilename}`,
-      Body: fileStream,
-      ContentType: file.mimetype,
+      Key: s3Key,
+      Body: fileContent,
+      ContentType: fileContentType,
       ACL: 'public-read',
     };
 
     console.log('Upload params:', uploadParams);
 
     const command = new PutObjectCommand(uploadParams);
-    const data = await s3Client.send(command);
-    console.log('File uploaded to S3. Response data:', data);
+    const s3Response = await s3Client.send(command);
+    console.log('File uploaded to S3. Response data:', s3Response);
 
-    const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}`;
+    const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
     console.log('File URL:', fileUrl);
-    
+
     // Optional: Save fileUrl to user profile in database here
 
     return NextResponse.json({ Location: fileUrl }, { status: 200 });
