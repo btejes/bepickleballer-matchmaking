@@ -17,6 +17,7 @@ export async function GET(request) {
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
+    console.log("\nDecoded the jwt!", decoded, "\n");
     const currentUserProfile = await Profile.findOne({ userId: decoded._id });
 
     if (!currentUserProfile) {
@@ -28,6 +29,7 @@ export async function GET(request) {
       userId: { $ne: decoded._id },
     });
 
+    console.log("Correctly found jwt so far ")
     const validMatches = [];
     for (const match of potentialMatches) {
       const existingEntry = await Matchmaking.findOne({
@@ -36,7 +38,7 @@ export async function GET(request) {
           { user1Id: match.userId, user2Id: decoded._id },
         ],
       });
-
+     
       if (!existingEntry ||
           (existingEntry.user1Id.equals(decoded._id) && existingEntry.user1Decision === 'pending' && existingEntry.user2Decision !== 'no') ||
           (existingEntry.user2Id.equals(decoded._id) && existingEntry.user2Decision === 'pending' && existingEntry.user1Decision !== 'no')) {
