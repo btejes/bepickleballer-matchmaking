@@ -42,7 +42,18 @@ export async function POST(req) {
     const userId = decoded._id;
     console.log('Token verified. User ID:', userId);
 
-    // Read the raw request data
+    // Ensure the upload directory exists
+    const uploadDir = path.join(process.cwd(), 'tmp');
+    await fs.mkdir(uploadDir, { recursive: true });
+
+    // Create and configure Formidable form
+    const form = new formidable.IncomingForm();
+    form.uploadDir = uploadDir;
+    form.keepExtensions = true;
+
+    console.log('Formidable form created with uploadDir:', form.uploadDir);
+
+    // Add request data logging before parsing
     const chunks = [];
     req.on('data', (chunk) => {
       chunks.push(chunk);
@@ -51,17 +62,6 @@ export async function POST(req) {
     req.on('end', async () => {
       const rawData = Buffer.concat(chunks);
       console.log('Raw request data:', rawData.toString()); // This will log the raw request data as a string
-
-      // Ensure the upload directory exists
-      const uploadDir = path.join(process.cwd(), 'tmp');
-      await fs.mkdir(uploadDir, { recursive: true });
-
-      // Create and configure Formidable form
-      const form = new formidable.IncomingForm();
-      form.uploadDir = uploadDir;
-      form.keepExtensions = true;
-
-      console.log('Formidable form created with uploadDir:', form.uploadDir);
 
       const formData = await new Promise((resolve, reject) => {
         form.parse(req, (err, fields, files) => {
