@@ -26,6 +26,9 @@ const LocalPlay = () => {
       const response = await fetch(`${basePath}/api/matchmaking`, {
         method: 'GET',
         credentials: 'include',
+        headers: {
+          'Cache-Control': 'no-store', // Ensure the response is not cached
+        },
       });
       if (!response.ok) {
         throw new Error('Failed to fetch matchmaking data');
@@ -54,6 +57,7 @@ const LocalPlay = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-store', // Ensure the response is not cached
         },
         credentials: 'include',
         body: JSON.stringify({
