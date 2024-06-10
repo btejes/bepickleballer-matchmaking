@@ -1,10 +1,7 @@
-// library/ProfileCard.jsx
-'use client';
-
 import React, { useState, useEffect } from 'react';
 
 const ProfileCard = ({ profile, isProfilePage }) => {
-  const [image, setImage] = useState(profile.profileImage || null);
+  const [image, setImage] = useState(null);
   const [averageRating, setAverageRating] = useState(null);
   const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
@@ -20,9 +17,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
   const fetchAverageRating = async (userId) => {
     try {
-      const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`, {
-        credentials: 'include',
-      });
+      const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`);
       if (response.ok) {
         const data = await response.json();
         setAverageRating(data.averageRating);
@@ -40,23 +35,27 @@ const ProfileCard = ({ profile, isProfilePage }) => {
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('userId', profile.userId);
 
       try {
         const response = await fetch(`${apiBasePath}/api/upload`, {
           method: 'POST',
           body: formData,
-          credentials: 'include',
         });
 
         if (response.ok) {
           const data = await response.json();
           setImage(data.Location);
-
-          // Optionally, update the profile image URL in the profile object
-          // to reflect the new image URL
+          // Update the profile image URL in the user's profile
+          await fetch(`${apiBasePath}/api/profile`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ profileImage: data.Location }),
+          });
         } else {
-          console.error('Error uploading image:', response.statusText);
+          console.error('Error uploading image:', await response.json());
         }
       } catch (error) {
         console.error('Error uploading image:', error);
