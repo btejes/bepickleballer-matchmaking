@@ -34,8 +34,13 @@ const LocalPlay = () => {
         throw new Error('Failed to fetch matchmaking data');
       }
       const data = await response.json();
-      setCurrentMatch(data);
-      setError(null);
+      if (data.error) {
+        setError(data.error);
+        setCurrentMatch(null);
+      } else {
+        setCurrentMatch(data);
+        setError(null);
+      }
     } catch (error) {
       console.error('Error fetching next match:', error);
       setError('No matches found');
@@ -101,7 +106,7 @@ const LocalPlay = () => {
             </div>
           </div>
         ) : (
-          <p>{error}</p>
+          <p>{error || 'Loading...'}</p>
         )}
       </div>
       <div className="w-full h-auto bg-white p-2 flex justify-between">
