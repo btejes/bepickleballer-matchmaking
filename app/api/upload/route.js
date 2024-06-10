@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import formidable from 'formidable';
 import fs from 'fs/promises';
 
+// Create the S3 client
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
@@ -13,12 +14,14 @@ const s3Client = new S3Client({
   },
 });
 
+// Ensure that this route runs in the Node.js environment
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export const config = {
+// Update config based on new standards
+export const segmentConfig = {
   api: {
-    bodyParser: false,
+    bodyParser: false, // Disable default body parser
   },
 };
 
@@ -32,8 +35,8 @@ export async function POST(req) {
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
 
     const form = new formidable.IncomingForm();
-    form.uploadDir = '/tmp';
-    form.keepExtensions = true;
+    form.uploadDir = '/tmp'; // Temporary directory for file uploads
+    form.keepExtensions = true; // Keep file extensions
 
     const formData = await new Promise((resolve, reject) => {
       form.parse(req, (err, fields, files) => {
@@ -61,7 +64,7 @@ export async function POST(req) {
     const command = new PutObjectCommand(uploadParams);
     const data = await s3Client.send(command);
 
-    return NextResponse.json({ Location: data.Location }, { status: 200 });
+    return NextResponse.json({ Location: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}` }, { status: 200 });
   } catch (error) {
     console.error('Error uploading to S3:', error);
     return NextResponse.json({ error: 'Error uploading to S3' }, { status: 500 });
