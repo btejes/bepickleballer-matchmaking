@@ -34,9 +34,7 @@ export async function POST(req) {
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
 
-    const form = new formidable.IncomingForm();
-    form.uploadDir = '/tmp'; // Temporary directory for file uploads
-    form.keepExtensions = true; // Keep file extensions
+    const form = formidable({ uploadDir: '/tmp', keepExtensions: true });
 
     const formData = await new Promise((resolve, reject) => {
       form.parse(req, (err, fields, files) => {
