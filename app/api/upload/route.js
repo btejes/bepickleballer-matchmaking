@@ -45,15 +45,15 @@ export async function POST(req) {
     // Ensure the upload directory exists
     const uploadDir = path.join(process.cwd(), 'tmp');
     await fs.mkdir(uploadDir, { recursive: true });
-
     console.log('Upload directory ensured:', uploadDir);
 
     // Check if Formidable is correctly imported and used
+    const IncomingForm = formidable.IncomingForm || formidable;
     console.log('Formidable:', formidable);
-    console.log('Formidable IncomingForm:', formidable.IncomingForm);
+    console.log('Formidable IncomingForm:', IncomingForm);
 
     // Create and configure Formidable form
-    const form = new formidable.IncomingForm();
+    const form = new IncomingForm();
     form.uploadDir = uploadDir;
     form.keepExtensions = true;
 
@@ -73,7 +73,8 @@ export async function POST(req) {
 
     console.log('FormData:', formData);
 
-    const file = formData.files.file[0];
+    // Check if formData.files.file is an array and get the first element if it is
+    const file = Array.isArray(formData.files.file) ? formData.files.file[0] : formData.files.file;
     if (!file) {
       console.log('No file uploaded');
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
