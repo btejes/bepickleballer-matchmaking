@@ -30,18 +30,24 @@ const ProfileCard = ({ profile, isProfilePage }) => {
     }
   };
 
+
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
 
+      console.log("\nprofileCard page, File: ", file, "\n");
       try {
         const response = await fetch(`${apiBasePath}/api/upload`, {
           method: 'POST',
           body: formData,
           credentials: 'include',
         });
+
+
+
 
         if (response.ok) {
           const data = await response.json();
@@ -68,6 +74,9 @@ const ProfileCard = ({ profile, isProfilePage }) => {
       }
     }
   };
+
+
+
 
   return (
     <div className="w-full max-w-xs bg-white border border-gray-300 rounded-3xl shadow-md mx-auto overflow-hidden">

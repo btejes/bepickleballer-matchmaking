@@ -2,6 +2,8 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
+import formidable from 'formidable';
+import fs from 'fs/promises';
 import path from 'path';
 
 // Create the S3 client
@@ -29,60 +31,85 @@ export async function POST(req) {
 
   try {
     const jwtToken = cookies().get('token')?.value;
+    console.log('JWT token:', jwtToken);
+
     if (!jwtToken) {
       console.log('No JWT token found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('JWT token found:', jwtToken);
-
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const userId = decoded._id;
     console.log('Token verified. User ID:', userId);
 
-    const data = await new Promise((resolve, reject) => {
-      const chunks = [];
-      req.on('data', (chunk) => chunks.push(chunk));
-      req.on('end', () => resolve(Buffer.concat(chunks)));
-      req.on('error', reject);
+    // Read the raw request data
+    const chunks = [];
+    req.on('data', (chunk) => {
+      chunks.push(chunk);
     });
 
-    const boundary = req.headers['content-type'].split('boundary=')[1];
-    const parts = data.toString().split(`--${boundary}`);
-    const filePart = parts.find((part) => part.includes('Content-Disposition: form-data; name="file";'));
+    req.on('end', async () => {
+      const rawData = Buffer.concat(chunks);
+      console.log('Raw request data:', rawData.toString()); // This will log the raw request data as a string
 
-    if (!filePart) {
-      console.log('No file part found');
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
-    }
+      // Ensure the upload directory exists
+      const uploadDir = path.join(process.cwd(), 'tmp');
+      await fs.mkdir(uploadDir, { recursive: true });
 
-    const fileContentType = filePart.match(/Content-Type: (.*)/)[1].trim();
-    const fileContent = Buffer.from(filePart.split('\r\n\r\n')[1].split('\r\n--')[0]);
+      // Create and configure Formidable form
+      const form = new formidable.IncomingForm();
+      form.uploadDir = uploadDir;
+      form.keepExtensions = true;
 
-    const fileName = `image-${Date.now()}`;
-    const fileExtension = fileContentType.split('/')[1];
-    const s3Key = `${userId}/${fileName}.${fileExtension}`;
+      console.log('Formidable form created with uploadDir:', form.uploadDir);
 
-    const uploadParams = {
-      Bucket: process.env.S3_BUCKET_NAME,
-      Key: s3Key,
-      Body: fileContent,
-      ContentType: fileContentType,
-      ACL: 'public-read',
-    };
+      const formData = await new Promise((resolve, reject) => {
+        form.parse(req, (err, fields, files) => {
+          if (err) {
+            console.error('Error parsing form:', err);
+            reject(err);
+          } else {
+            console.log('Form parsed successfully. Fields:', fields, 'Files:', files);
+            resolve({ fields, files });
+          }
+        });
+      });
 
-    console.log('Upload params:', uploadParams);
+      console.log('FormData:', formData);
 
-    const command = new PutObjectCommand(uploadParams);
-    const s3Response = await s3Client.send(command);
-    console.log('File uploaded to S3. Response data:', s3Response);
+      const file = formData.files.file[0];
+      if (!file) {
+        console.log('No file uploaded');
+        return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+      }
 
-    const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
-    console.log('File URL:', fileUrl);
+      console.log('File uploaded:', file);
 
-    // Optional: Save fileUrl to user profile in database here
+      const fileStream = await fs.readFile(file.filepath);
+      console.log('File read successfully from temp path:', file.filepath);
 
-    return NextResponse.json({ Location: fileUrl }, { status: 200 });
+      const uploadParams = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: `${userId}/${file.originalFilename}`,
+        Body: fileStream,
+        ContentType: file.mimetype,
+        ACL: 'public-read',
+      };
+
+      console.log('Upload params:', uploadParams);
+
+      const command = new PutObjectCommand(uploadParams);
+      const data = await s3Client.send(command);
+      console.log('File uploaded to S3. Response data:', data);
+
+      const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}`;
+      console.log('File URL:', fileUrl);
+
+      // Optional: Save fileUrl to user profile in database here
+
+      return NextResponse.json({ Location: fileUrl }, { status: 200 });
+    });
+
   } catch (error) {
     console.error('Error uploading to S3:', error);
     return NextResponse.json({ error: 'Error uploading to S3' }, { status: 500 });
