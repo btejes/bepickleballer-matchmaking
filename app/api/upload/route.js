@@ -1,4 +1,4 @@
-import Busboy from 'busboy';
+const Busboy = require('busboy');
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
