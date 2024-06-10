@@ -23,7 +23,10 @@ const LocalPlay = () => {
 
   const fetchNextMatch = async () => {
     try {
-      const response = await fetch(`${basePath}/api/matchmaking`);
+      const response = await fetch(`${basePath}/api/matchmaking`, {
+        method: 'GET',
+        credentials: 'include',
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch matchmaking data');
       }
@@ -33,11 +36,10 @@ const LocalPlay = () => {
     } catch (error) {
       console.error('Error fetching next match:', error);
       setError('No matches found');
-      console.log("No Matches Found");
       setCurrentMatch(null);
     }
   };
- 
+
   const handlePreferenceChange = (e) => {
     const { name, value } = e.target;
     setPreferences((prevPreferences) => ({
@@ -53,6 +55,7 @@ const LocalPlay = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           potentialMatchId: currentMatch.userId,
           userDecision: decision,
@@ -95,7 +98,6 @@ const LocalPlay = () => {
           </div>
         ) : (
           <p>{error}</p>
-
         )}
       </div>
       <div className="w-full h-auto bg-white p-2 flex justify-between">
