@@ -1,7 +1,7 @@
+import formidable from 'formidable';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
-import formidable from 'formidable';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -30,7 +30,7 @@ export async function POST(req) {
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const userId = decoded._id;
-    
+
     console.log('Token verified. User ID:', userId);
 
     // Ensure the upload directory exists
@@ -39,11 +39,9 @@ export async function POST(req) {
     console.log('Upload directory ensured:', uploadDir);
 
     // Create and configure Formidable form
-    const form = new formidable.IncomingForm();
-    form.uploadDir = uploadDir;
-    form.keepExtensions = true;
+    const form = formidable({ uploadDir, keepExtensions: true });
 
-    console.log('Formidable form created with uploadDir:', form.uploadDir);
+    console.log('Formidable form created with uploadDir:', uploadDir);
 
     const formData = await new Promise((resolve, reject) => {
       form.parse(req, (err, fields, files) => {
@@ -59,7 +57,7 @@ export async function POST(req) {
 
     console.log('FormData:', formData);
 
-    const file = Array.isArray(formData.files.file) ? formData.files.file[0] : formData.files.file;
+    const file = formData.files.file;
     if (!file) {
       console.log('No file uploaded');
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
