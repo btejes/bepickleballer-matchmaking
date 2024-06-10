@@ -46,9 +46,6 @@ const ProfileCard = ({ profile, isProfilePage }) => {
           credentials: 'include',
         });
 
-
-
-
         if (response.ok) {
           const data = await response.json();
           setImage(data.Location);
@@ -74,6 +71,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
       }
     }
   };
+
 
 
 
