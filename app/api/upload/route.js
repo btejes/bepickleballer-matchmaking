@@ -1,7 +1,6 @@
 import aws from 'aws-sdk';
-import formidable from 'formidable-serverless';
-import { getCookie } from 'cookies-next';
 import { NextResponse } from 'next/server';
+import { getCookies } from 'next/headers';
 
 aws.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -12,21 +11,16 @@ aws.config.update({
 const s3 = new aws.S3();
 
 export async function POST(req) {
-  const token = getCookie('jwt', { req });
+  const cookies = getCookies();
+  const token = cookies.jwt;
+
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const form = new formidable.IncomingForm();
-  const formData = await new Promise((resolve, reject) => {
-    form.parse(req, (err, fields, files) => {
-      if (err) reject(err);
-      resolve({ fields, files });
-    });
-  });
-
-  const file = formData.files.file;
-  const userId = formData.fields.userId;
+  const formData = await req.formData();
+  const file = formData.get('file');
+  const userId = formData.get('userId');
 
   const params = {
     Bucket: process.env.S3_BUCKET_NAME,
@@ -45,5 +39,5 @@ export async function POST(req) {
   }
 }
 
-// Disable body parsing by Next.js
+// Ensure compatibility with Next.js 14+ app router
 export const dynamic = 'force-dynamic';

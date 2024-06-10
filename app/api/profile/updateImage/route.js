@@ -1,10 +1,12 @@
 import { connectToDatabase } from '../../../library/connectToDatabase';
-import { getCookie } from 'cookies-next';
+import { getCookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export async function POST(req) {
-  const token = getCookie('jwt', { req });
+  const cookies = getCookies();
+  const token = cookies.jwt;
+
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

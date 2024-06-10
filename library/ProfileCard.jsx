@@ -1,27 +1,31 @@
+// library/ProfileCard.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Cookies from 'js-cookie';
+import { useCookies } from 'react-cookie';
 
 const ProfileCard = ({ profile, isProfilePage }) => {
   const [image, setImage] = useState(profile.profileImage || null);
   const [averageRating, setAverageRating] = useState(null);
   const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  const [cookies] = useCookies(['jwt']);
 
   useEffect(() => {
+    if (profile.profileImage) {
+      setImage(profile.profileImage);
+    }
+
     if (profile.userId) {
       fetchAverageRating(profile.userId);
     }
   }, [profile]);
 
   const fetchAverageRating = async (userId) => {
-    const token = Cookies.get('jwt');
     try {
       const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${cookies.jwt}`,
+        },
       });
       if (response.ok) {
         const data = await response.json();
@@ -37,32 +41,29 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    const token = Cookies.get('jwt');
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('userId', profile.userId);
 
       try {
-        const response = await axios.post('/api/upload', formData, {
+        const response = await fetch(`${apiBasePath}/api/upload`, {
+          method: 'POST',
+          body: formData,
           headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${cookies.jwt}`,
           },
         });
-        const imageUrl = response.data.Location;
 
-        // Update the user's profile with the new image URL
-        await axios.post('/api/profile/updateImage', {
-          userId: profile.userId,
-          profileImage: imageUrl,
-        }, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        if (response.ok) {
+          const data = await response.json();
+          setImage(data.Location);
 
-        setImage(imageUrl);
+          // Optionally, update the profile image URL in the profile object
+          // to reflect the new image URL
+        } else {
+          console.error('Error uploading image:', response.statusText);
+        }
       } catch (error) {
         console.error('Error uploading image:', error);
       }
