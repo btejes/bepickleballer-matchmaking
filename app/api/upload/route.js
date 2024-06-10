@@ -3,8 +3,9 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import formidable from 'formidable';
-import fs from 'fs';
+import fs from 'fs/promises';
 
+// Create the S3 client
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
@@ -13,52 +14,52 @@ const s3Client = new S3Client({
   },
 });
 
-export const runtime = 'edge';
+// Specify that this route should run in the Node.js environment
+export const runtime = 'nodejs';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req) {
-  return new Promise((resolve, reject) => {
-    try {
-      const jwtToken = cookies().get('token')?.value;
-      if (!jwtToken) {
-        resolve(NextResponse.json({ error: 'Unauthorized' }, { status: 401 }));
-        return;
-      }
+  try {
+    const jwtToken = cookies().get('token')?.value;
+    if (!jwtToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-      const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
+    const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
 
-      const form = new formidable.IncomingForm();
-      form.parse(req, async (err, fields, files) => {
+    const form = new formidable.IncomingForm();
+    form.uploadDir = '/tmp'; // Temporary directory for file uploads
+    form.keepExtensions = true; // Keep file extensions
+
+    const formData = await new Promise((resolve, reject) => {
+      form.parse(req, (err, fields, files) => {
         if (err) {
-          console.error('Error parsing form data:', err);
-          resolve(NextResponse.json({ error: 'Error parsing form data' }, { status: 500 }));
-          return;
-        }
-
-        const file = files.file;
-        const userId = decoded._id;
-
-        const fileStream = fs.createReadStream(file.filepath);
-
-        const uploadParams = {
-          Bucket: process.env.S3_BUCKET_NAME,
-          Key: `${userId}/${file.originalFilename}`,
-          Body: fileStream,
-          ContentType: file.mimetype,
-          ACL: 'public-read',
-        };
-
-        try {
-          const command = new PutObjectCommand(uploadParams);
-          const data = await s3Client.send(command);
-          resolve(NextResponse.json({ Location: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}` }, { status: 200 }));
-        } catch (error) {
-          console.error('Error uploading to S3:', error);
-          resolve(NextResponse.json({ error: 'Error uploading to S3' }, { status: 500 }));
+          reject(err);
+        } else {
+          resolve({ fields, files });
         }
       });
-    } catch (error) {
-      console.error('Error:', error);
-      resolve(NextResponse.json({ error: 'Error' }, { status: 500 }));
-    }
-  });
+    });
+
+    const file = formData.files.file;
+    const userId = decoded._id;
+
+    const fileStream = await fs.readFile(file.filepath);
+
+    const uploadParams = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: `${userId}/${file.originalFilename}`,
+      Body: fileStream,
+      ContentType: file.mimetype,
+      ACL: 'public-read',
+    };
+
+    const command = new PutObjectCommand(uploadParams);
+    const data = await s3Client.send(command);
+    return NextResponse.json({ Location: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}` }, { status: 200 });
+  } catch (error) {
+    console.error('Error uploading to S3:', error);
+    return NextResponse.json({ error: 'Error uploading to S3' }, { status: 500 });
+  }
 }
