@@ -1,7 +1,7 @@
 import aws from 'aws-sdk';
 import formidable from 'formidable-serverless';
 import { getCookie } from 'cookies-next';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 aws.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -45,9 +45,5 @@ export async function POST(req) {
   }
 }
 
-// Use this to disable body parsing by Next.js
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// Disable body parsing by Next.js
+export const dynamic = 'force-dynamic';
