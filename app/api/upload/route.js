@@ -19,84 +19,77 @@ export const segmentConfig = {
 export async function POST(req) {
   console.log('POST request received');
 
-  return new Promise((resolve, reject) => {
-    try {
-      const jwtToken = cookies().get('token')?.value;
-      console.log('JWT token:', jwtToken);
+  try {
+    const jwtToken = cookies().get('token')?.value;
+    console.log('JWT token:', jwtToken);
 
-      if (!jwtToken) {
-        console.log('No JWT token found');
-        resolve(NextResponse.json({ error: 'Unauthorized' }, { status: 401 }));
-        return;
-      }
-
-      const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
-      const userId = decoded._id;
-      console.log('Token verified. User ID:', userId);
-
-      // Ensure the upload directory exists
-      const uploadDir = path.join(process.cwd(), 'tmp');
-      fs.mkdir(uploadDir, { recursive: true })
-        .then(() => {
-          console.log('Upload directory ensured:', uploadDir);
-          console.log("\nLogging entire req headers,", req.headers, "\n");
-          const busboy = new Busboy({ headers: req.headers });
-          console.log('Busboy instance created');
-
-          let filePath;
-          const fileWritePromises = [];
-
-          busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-            console.log('File event received');
-            console.log(`Fieldname: ${fieldname}`);
-            console.log(`Filename: ${filename}`);
-            console.log(`Encoding: ${encoding}`);
-            console.log(`Mimetype: ${mimetype}`);
-
-            filePath = path.join(uploadDir, filename);
-            const writeStream = fs.createWriteStream(filePath);
-            file.pipe(writeStream);
-
-            const filePromise = new Promise((res, rej) => {
-              file.on('end', () => {
-                console.log('File upload completed');
-                res(filePath);
-              });
-              file.on('error', (error) => {
-                console.error('File upload error:', error);
-                rej(error);
-              });
-            });
-
-            fileWritePromises.push(filePromise);
-          });
-
-          busboy.on('finish', async () => {
-            console.log('Busboy finish event triggered');
-            try {
-              const files = await Promise.all(fileWritePromises);
-              console.log('All files processed:', files);
-
-              const fileStream = await fs.readFile(files[0]);
-              console.log('File read successfully from temp path:', files[0]);
-
-              // For now, return the file details for debugging purposes
-              resolve(NextResponse.json({ filePath: files[0] }, { status: 200 }));
-            } catch (error) {
-              console.error('Error processing files:', error);
-              resolve(NextResponse.json({ error: 'Error processing files' }, { status: 500 }));
-            }
-          });
-
-          req.body.pipe(busboy);
-        })
-        .catch((error) => {
-          console.error('Error ensuring upload directory:', error);
-          reject(NextResponse.json({ error: 'Error ensuring upload directory' }, { status: 500 }));
-        });
-    } catch (error) {
-      console.error('Error processing request:', error);
-      reject(NextResponse.json({ error: 'Error processing request' }, { status: 500 }));
+    if (!jwtToken) {
+      console.log('No JWT token found');
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-  });
+
+    const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
+    const userId = decoded._id;
+    console.log('Token verified. User ID:', userId);
+
+    // Ensure the upload directory exists
+    const uploadDir = path.join(process.cwd(), 'tmp');
+    await fs.mkdir(uploadDir, { recursive: true });
+    console.log('Upload directory ensured:', uploadDir);
+
+    // Create Busboy instance
+    const busboy = new Busboy({ headers: req.headers });
+    console.log('Busboy instance created');
+
+    let filePath;
+    const fileWritePromises = [];
+
+    busboy.on('file', (fieldname, file, info) => {
+      const { filename, encoding, mimeType } = info;
+      console.log('File event received');
+      console.log(`Fieldname: ${fieldname}`);
+      console.log(`Filename: ${filename}`);
+      console.log(`Encoding: ${encoding}`);
+      console.log(`Mimetype: ${mimeType}`);
+
+      filePath = path.join(uploadDir, filename);
+      const writeStream = fs.createWriteStream(filePath);
+      file.pipe(writeStream);
+
+      const filePromise = new Promise((resolve, reject) => {
+        file.on('end', () => {
+          console.log('File upload completed');
+          resolve();
+        });
+        file.on('error', (error) => {
+          console.error('File upload error:', error);
+          reject(error);
+        });
+      });
+
+      fileWritePromises.push(filePromise);
+    });
+
+    busboy.on('finish', async () => {
+      console.log('Busboy finish event triggered');
+      try {
+        await Promise.all(fileWritePromises);
+        console.log('All files processed');
+
+        const fileStream = await fs.readFile(filePath);
+        console.log('File read successfully from temp path:', filePath);
+
+        // For now, return the file details for debugging purposes
+        return NextResponse.json({ filePath }, { status: 200 });
+      } catch (error) {
+        console.error('Error processing files:', error);
+        return NextResponse.json({ error: 'Error processing files' }, { status: 500 });
+      }
+    });
+
+    req.pipe(busboy);
+  } catch (error) {
+    console.error('Error processing request:', error);
+    return NextResponse.json({ error: 'Error processing request' }, { status: 500 });
+  }
 }
