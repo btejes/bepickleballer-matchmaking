@@ -5,10 +5,14 @@ import formidable from 'formidable';
 import fs from 'fs/promises';
 import path from 'path';
 
-// Disable Next.js body parser
-export const config = {
+// Ensure that this route runs in the Node.js environment
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+// Update config based on new standards
+export const segmentConfig = {
   api: {
-    bodyParser: false,
+    bodyParser: false, // Disable default body parser
   },
 };
 
