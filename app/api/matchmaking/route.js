@@ -9,27 +9,31 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   await connectToDatabase();
+  console.log("Connected to database.");
 
   try {
     const jwtToken = cookies().get('token')?.value;
+    console.log("JWT Token:", jwtToken);
     if (!jwtToken) {
+      console.log("No JWT Token found.");
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
-    console.log("\nDecoded the jwt!", decoded, "\n");
+    console.log("Token Verified:", decoded);
     const currentUserProfile = await Profile.findOne({ userId: decoded._id });
 
     if (!currentUserProfile) {
+      console.log("Profile not found for user:", decoded._id);
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }
 
+    console.log("Current user profile found:", currentUserProfile);
     const potentialMatches = await Profile.find({
       zipCode: currentUserProfile.zipCode,
       userId: { $ne: decoded._id },
     });
 
-    console.log("Correctly found jwt so far ")
     const validMatches = [];
     for (const match of potentialMatches) {
       const existingEntry = await Matchmaking.findOne({
@@ -38,7 +42,7 @@ export async function GET(request) {
           { user1Id: match.userId, user2Id: decoded._id },
         ],
       });
-     
+
       if (!existingEntry ||
           (existingEntry.user1Id.equals(decoded._id) && existingEntry.user1Decision === 'pending' && existingEntry.user2Decision !== 'no') ||
           (existingEntry.user2Id.equals(decoded._id) && existingEntry.user2Decision === 'pending' && existingEntry.user1Decision !== 'no')) {
@@ -46,6 +50,7 @@ export async function GET(request) {
       }
     }
 
+    console.log("Valid matches found:", validMatches.length);
     if (validMatches.length === 0) {
       return NextResponse.json({ error: 'No matches found' }, { status: 404 });
     }
@@ -60,15 +65,19 @@ export async function GET(request) {
 
 export async function PUT(request) {
   await connectToDatabase();
+  console.log("Connected to database for PUT request.");
 
   try {
     const jwtToken = cookies().get('token')?.value;
+    console.log("JWT Token for PUT:", jwtToken);
     if (!jwtToken) {
+      console.log("No JWT Token found for PUT.");
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const { potentialMatchId, userDecision } = await request.json();
+    console.log("Decoded token for PUT:", decoded, "Potential Match ID:", potentialMatchId, "User Decision:", userDecision);
 
     let matchmakingEntry = await Matchmaking.findOne({
       $or: [
@@ -87,6 +96,7 @@ export async function PUT(request) {
         user2DecisionTimestamp: null,
         matchStatus: 'pending',
       });
+      console.log("New matchmaking entry created:", matchmakingEntry);
     } else {
       if (matchmakingEntry.user1Id.equals(decoded._id)) {
         matchmakingEntry.user1Decision = userDecision;
@@ -95,6 +105,7 @@ export async function PUT(request) {
         matchmakingEntry.user2Decision = userDecision;
         matchmakingEntry.user2DecisionTimestamp = new Date();
       }
+      console.log("Updated existing matchmaking entry:", matchmakingEntry);
     }
 
     if (matchmakingEntry.user1Decision === 'yes' && matchmakingEntry.user2Decision === 'yes') {
@@ -104,10 +115,10 @@ export async function PUT(request) {
     }
 
     await matchmakingEntry.save();
-
+    console.log("Matchmaking entry saved.");
     return NextResponse.json(matchmakingEntry, { status: 200 });
   } catch (error) {
-    console.error('Internal Server Error:', error);
+    console.error('Internal Server Error in PUT:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
