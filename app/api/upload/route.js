@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
@@ -13,8 +13,6 @@ const s3Client = new S3Client({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
-
-export const dynamic = 'force-dynamic';
 
 export async function POST(req) {
   return new Promise((resolve, reject) => {
@@ -72,8 +70,8 @@ export async function POST(req) {
   });
 }
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
+// Updated page config
+export const runtime = 'edge';
+export const api = {
+  bodyParser: false,
 };
