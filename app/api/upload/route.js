@@ -1,5 +1,4 @@
-import { S3Client } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
@@ -53,17 +52,9 @@ export async function POST(req) {
         };
 
         try {
-          const parallelUploads3 = new Upload({
-            client: s3Client,
-            params: uploadParams,
-          });
-
-          parallelUploads3.on('httpUploadProgress', (progress) => {
-            console.log(progress);
-          });
-
-          const data = await parallelUploads3.done();
-          resolve(NextResponse.json({ Location: data.Location }, { status: 200 }));
+          const command = new PutObjectCommand(uploadParams);
+          const data = await s3Client.send(command);
+          resolve(NextResponse.json({ Location: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadParams.Key}` }, { status: 200 }));
         } catch (error) {
           console.error('Error uploading to S3:', error);
           resolve(NextResponse.json({ error: 'Error uploading to S3' }, { status: 500 }));
