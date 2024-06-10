@@ -1,4 +1,4 @@
-import formidable from 'formidable';
+import Busboy from 'busboy';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
@@ -30,7 +30,6 @@ export async function POST(req) {
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const userId = decoded._id;
-
     console.log('Token verified. User ID:', userId);
 
     // Ensure the upload directory exists
@@ -38,41 +37,58 @@ export async function POST(req) {
     await fs.mkdir(uploadDir, { recursive: true });
     console.log('Upload directory ensured:', uploadDir);
 
-    // Create and configure Formidable form
-    const form = formidable({ uploadDir, keepExtensions: true });
+    // Create Busboy instance
+    const busboy = new Busboy({ headers: req.headers });
+    console.log('Busboy instance created');
 
-    console.log('Formidable form created with uploadDir:', uploadDir);
+    let filePath;
+    const fileWritePromises = [];
 
-    const formData = await new Promise((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        if (err) {
-          console.error('Error parsing form:', err);
-          reject(err);
-        } else {
-          console.log('Form parsed successfully. Fields:', fields, 'Files:', files);
-          resolve({ fields, files });
-        }
+    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+      console.log('File event received');
+      console.log(`Fieldname: ${fieldname}`);
+      console.log(`Filename: ${filename}`);
+      console.log(`Encoding: ${encoding}`);
+      console.log(`Mimetype: ${mimetype}`);
+
+      filePath = path.join(uploadDir, filename);
+      const writeStream = fs.createWriteStream(filePath);
+      file.pipe(writeStream);
+
+      const filePromise = new Promise((resolve, reject) => {
+        file.on('end', () => {
+          console.log('File upload completed');
+          resolve();
+        });
+        file.on('error', (error) => {
+          console.error('File upload error:', error);
+          reject(error);
+        });
       });
+
+      fileWritePromises.push(filePromise);
     });
 
-    console.log('FormData:', formData);
+    busboy.on('finish', async () => {
+      console.log('Busboy finish event triggered');
+      try {
+        await Promise.all(fileWritePromises);
+        console.log('All files processed');
 
-    const file = formData.files.file;
-    if (!file) {
-      console.log('No file uploaded');
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
-    }
+        const fileStream = await fs.readFile(filePath);
+        console.log('File read successfully from temp path:', filePath);
 
-    console.log('File uploaded:', file);
+        // For now, return the file details for debugging purposes
+        return NextResponse.json({ filePath }, { status: 200 });
+      } catch (error) {
+        console.error('Error processing files:', error);
+        return NextResponse.json({ error: 'Error processing files' }, { status: 500 });
+      }
+    });
 
-    const fileStream = await fs.readFile(file.filepath);
-    console.log('File read successfully from temp path:', file.filepath);
-
-    // For now, return the file details for debugging purposes
-    return NextResponse.json({ file }, { status: 200 });
-
+    req.pipe(busboy);
   } catch (error) {
-    console.error('Error processing file:', error);
-    return NextResponse.json({ error: 'Error processing file' }, { status: 500 });
+    console.error('Error processing request:', error);
+    return NextResponse.json({ error: 'Error processing request' }, { status: 500 });
   }
 }
