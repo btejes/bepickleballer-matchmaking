@@ -1,6 +1,7 @@
 import aws from 'aws-sdk';
 import formidable from 'formidable-serverless';
 import { getCookie } from 'cookies-next';
+import { NextRequest, NextResponse } from 'next/server';
 
 aws.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -10,44 +11,41 @@ aws.config.update({
 
 const s3 = new aws.S3();
 
-export const GET = async (req, res) => {
-  res.status(405).json({ message: 'Method Not Allowed' });
-};
-
-export const POST = async (req, res) => {
-  const token = getCookie('jwt', { req, res });
+export async function POST(req) {
+  const token = getCookie('jwt', { req });
   if (!token) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const form = new formidable.IncomingForm();
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      return res.status(500).json({ error: 'Error parsing the files' });
-    }
-
-    const file = files.file;
-    const userId = fields.userId;
-
-    const params = {
-      Bucket: process.env.S3_BUCKET_NAME,
-      Key: `${userId}/${file.name}`,
-      Body: file,
-      ContentType: file.type,
-      ACL: 'public-read',
-    };
-
-    try {
-      const data = await s3.upload(params).promise();
-      return res.status(200).json({ Location: data.Location });
-    } catch (error) {
-      console.error('Error uploading to S3:', error);
-      return res.status(500).json({ error: 'Error uploading to S3' });
-    }
+  const formData = await new Promise((resolve, reject) => {
+    form.parse(req, (err, fields, files) => {
+      if (err) reject(err);
+      resolve({ fields, files });
+    });
   });
-};
 
-// Ensure compatibility with Next.js 14+ app router
+  const file = formData.files.file;
+  const userId = formData.fields.userId;
+
+  const params = {
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: `${userId}/${file.name}`,
+    Body: file,
+    ContentType: file.type,
+    ACL: 'public-read',
+  };
+
+  try {
+    const data = await s3.upload(params).promise();
+    return NextResponse.json({ Location: data.Location }, { status: 200 });
+  } catch (error) {
+    console.error('Error uploading to S3:', error);
+    return NextResponse.json({ error: 'Error uploading to S3' }, { status: 500 });
+  }
+}
+
+// Use this to disable body parsing by Next.js
 export const config = {
   api: {
     bodyParser: false,
