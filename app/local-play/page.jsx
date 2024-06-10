@@ -1,6 +1,3 @@
-// src/app/local-play/page.js
-'use client';
-
 import Navbar from '@/components/Navbar';
 import { useState, useEffect } from 'react';
 import ProfileCard from '@/library/ProfileCard';
@@ -24,6 +21,7 @@ const LocalPlay = () => {
 
   const fetchNextMatch = async () => {
     try {
+      console.log('Fetching next match from API');
       const response = await fetch(`${basePath}/api/matchmaking`, {
         method: 'GET',
         credentials: 'include', // Include credentials
