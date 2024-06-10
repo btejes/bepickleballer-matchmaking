@@ -39,7 +39,7 @@ export async function POST(req) {
       fs.mkdir(uploadDir, { recursive: true })
         .then(() => {
           console.log('Upload directory ensured:', uploadDir);
-
+          console.log("\nLogging entire req headers,", req.headers, "\n");
           const busboy = new Busboy({ headers: req.headers });
           console.log('Busboy instance created');
 
