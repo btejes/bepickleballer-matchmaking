@@ -13,7 +13,7 @@ const MatchCard = ({ match, onClick }) => {
           alt=""
           width={100} 
           height={100} 
-          className={`rounded-full mr-4 w-full h-full object-cover ${!match.profileImage && 'blur-sm grayscale'}`}
+          className={`rounded-full object-cover ${!match.profileImage && 'blur-sm grayscale'}`}
           onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
         />
         <div className="flex-grow">
