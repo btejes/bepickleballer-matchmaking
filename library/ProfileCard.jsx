@@ -39,11 +39,16 @@ const ProfileCard = ({ profile, isProfilePage }) => {
       setLoading(true);
 
       try {
+        // Get the token from cookies
         const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
+
+        // Get the signed URL from the server
         const response = await fetch(`${apiBasePath}/api/getSignedUrl`, {
+          method: 'POST',
           headers: {
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
-          }
+          },
         });
 
         const signedUrlResult = await response.json();
@@ -56,6 +61,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
         const url = signedUrlResult.url;
 
+        // Upload the image directly to S3 using the signed URL
         await fetch(url, {
           method: "PUT",
           body: file,
