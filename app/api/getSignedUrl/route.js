@@ -13,23 +13,33 @@ const s3Client = new S3Client({
 });
 
 export async function POST() {
+  console.log('POST request received');
+
   try {
     const jwtToken = cookies().get('token')?.value;
+    console.log('JWT token:', jwtToken);
+
     if (!jwtToken) {
+      console.log('No JWT token found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const userId = decoded._id;
+    console.log('Token verified. User ID:', userId);
 
     const putObjectCommand = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: `${userId}/${Date.now()}`,
     });
 
+    console.log('PutObjectCommand created:', putObjectCommand);
+
     const signedUrl = await getSignedUrl(s3Client, putObjectCommand, {
       expiresIn: 60,
     });
+
+    console.log('Signed URL generated:', signedUrl);
 
     return NextResponse.json({ url: signedUrl }, { status: 200 });
   } catch (error) {
