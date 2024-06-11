@@ -37,6 +37,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
     if (file) {
       if (file.size > 1 * 1024 * 1024) { // Check if file is larger than 1MB
         setStatusMessage("File size should not exceed 1MB");
+        setFadeOut(false);
         return;
       }
 
@@ -57,6 +58,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
         if (signedUrlResult.error) {
           setStatusMessage("Failed to get signed URL");
           setLoading(false);
+          setFadeOut(false);
           return;
         }
 
@@ -97,6 +99,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
       }
 
       setLoading(false);
+      setFadeOut(false);
     }
   };
 
@@ -151,8 +154,11 @@ const ProfileCard = ({ profile, isProfilePage }) => {
             {profile.aboutYou}
           </p>
         </div>
+
+            
+
         {statusMessage && (
-          <div className="text-center p-2 rounded mt-2" style={{ color: statusMessage.startsWith('Error') ? 'red' : 'green' }}>
+          <div className="text-center p-2 rounded mt-2" style={{ color: 'red' }}>
             {statusMessage}
           </div>
         )}

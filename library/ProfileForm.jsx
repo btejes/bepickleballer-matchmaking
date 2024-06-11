@@ -261,15 +261,13 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
       </div>
 
       {message && (
-        <div
-          className={`text-center p-2 rounded ${fadeOut ? 'opacity-0 transition-opacity duration-1000' : 'opacity-100'}`}
-          style={{
-            color: message.startsWith('Error') ? 'red' : 'green',
-            transition: 'opacity 1s ease-in-out',
-          }}
-        >
-          {message}
-        </div>
+        <div className={`text-center p-2 rounded mt-2 ${fadeOut ? 'opacity-0 transition-opacity duration-1000' : 'opacity-100'}`}
+        style={{
+          color: 'red',
+          transition: 'opacity 1s ease-in-out',
+        }}>
+        {statusMessage}
+      </div>
       )}
 
       <div className="mt-6 flex justify-center">
