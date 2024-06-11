@@ -8,14 +8,14 @@ const MatchCard = ({ match, onClick }) => {
   return (
     <div className="bg-white border border-gray-300 rounded-3xl p-4 shadow-md w-full max-w-2xl mb-4 cursor-pointer" onClick={onClick}>
       <div className="flex items-center justify-between">
-        <img 
-          src={match.profileImage} 
-          alt=""
-          width={100} 
-          height={100} 
-          className={`rounded-full mr-5 object-cover aspect-ratio overflow-hidden ${!match.profileImage && 'blur-sm grayscale bg-gray-300'}`}
-          onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
-        />
+        <div className="w-24 h-24 rounded-full overflow-hidden mr-5">
+          <img 
+            src={match.profileImage} 
+            alt=""
+            className={`w-full h-full  object-cover aspect-ratio ${!match.profileImage && 'blur-sm grayscale bg-gray-300'}`}
+            onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
+          />
+        </div>
         <div className="flex-grow">
           <h2 className="text-lg font-semibold">{match.firstName} {match.lastName}</h2>
         </div>
