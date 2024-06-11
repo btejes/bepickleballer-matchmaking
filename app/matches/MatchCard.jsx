@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 const MatchCard = ({ match, onClick }) => {
   console.log("Match profile image URL:", match.profileImage); // Debug log
-  match.profileImage = match.profileImage.split('url=')[1]; // Remove query parameters
+  match.profileImage = match.profileImage.split('url=')[0]; // Remove query parameters
   console.log(match.profileImage);
   return (
     <div className="bg-white border border-gray-300 rounded-3xl p-4 shadow-md w-full max-w-2xl mb-4 cursor-pointer" onClick={onClick}>
