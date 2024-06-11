@@ -39,16 +39,13 @@ const ProfileCard = ({ profile, isProfilePage }) => {
       setLoading(true);
 
       try {
-        // Get the token from cookies
-        const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
-
         // Get the signed URL from the server
         const response = await fetch(`${apiBasePath}/api/getSignedUrl`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
           },
+          credentials: 'include',
         });
 
         const signedUrlResult = await response.json();
@@ -78,8 +75,8 @@ const ProfileCard = ({ profile, isProfilePage }) => {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
           },
+          credentials: 'include',
           body: JSON.stringify({ profileImage: imageUrl }),
         });
 
