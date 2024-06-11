@@ -35,6 +35,11 @@ const ProfileCard = ({ profile, isProfilePage }) => {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 1048576) { // 1MB = 1048576 bytes
+        setStatusMessage("File size exceeds 1MB");
+        return;
+      }
+
       setStatusMessage("Uploading file");
       setLoading(true);
 

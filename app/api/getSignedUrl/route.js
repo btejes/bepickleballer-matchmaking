@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
+import connectToDatabase from '@/library/connectToDatabase';
+import Profile from '@/library/Profile';
 
 const s3Client = new S3Client({
   region: process.env.AWS_BUCKET_REGION,
@@ -27,9 +29,22 @@ export async function POST() {
     const userId = decoded._id;
     console.log('Token verified. User ID:', userId);
 
+    await connectToDatabase();
+
+    const profile = await Profile.findOne({ userId });
+    if (profile && profile.profileImage) {
+      const oldImageKey = profile.profileImage.split('/').pop();
+      const deleteParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: oldImageKey,
+      };
+      await s3Client.send(new DeleteObjectCommand(deleteParams));
+    }
+
     const putObjectCommand = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: `${userId}/${Date.now()}`,
+      ContentType: 'image/jpeg', // Optional: specify the content type if necessary
     });
 
     console.log('PutObjectCommand created:', putObjectCommand);
