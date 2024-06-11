@@ -158,9 +158,15 @@ const ProfileCard = ({ profile, isProfilePage }) => {
             
 
         {statusMessage && (
-          <div className="text-center p-2 rounded mt-2" style={{ color: 'red' }}>
-            {statusMessage}
-          </div>
+          <div
+          className={`text-center p-2 rounded ${fadeOut ? 'opacity-0 transition-opacity duration-1000' : 'opacity-100'}`}
+          style={{
+            color: message.startsWith('Uploading') ? 'green' : 'red',
+            transition: 'opacity 1s ease-in-out',
+          }}
+        >
+          {statusMessage}
+        </div>
         )}
       </div>
     </div>
