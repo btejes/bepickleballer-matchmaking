@@ -9,7 +9,7 @@ const MatchCard = ({ match, onClick }) => {
       <div className="flex items-center justify-between">
         <Image 
           src={match.profileImage} 
-          alt={`matchcard`} 
+          alt="MatchCard"
           width={64} 
           height={64} 
           className="rounded-full mr-4" 
