@@ -5,6 +5,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
   const [averageRating, setAverageRating] = useState(null);
   const [statusMessage, setStatusMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
   const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   useEffect(() => {

@@ -40,6 +40,7 @@ export async function POST() {
       };
       await s3Client.send(new DeleteObjectCommand(deleteParams));
     }
+    console.log("\nJust tried to delete\n");
 
     const putObjectCommand = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
