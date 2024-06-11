@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 const ProfileCard = ({ profile, isProfilePage }) => {
   const [image, setImage] = useState(null);
   const [averageRating, setAverageRating] = useState(null);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   useEffect(() => {
@@ -30,51 +32,58 @@ const ProfileCard = ({ profile, isProfilePage }) => {
     }
   };
 
-
-
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
+      setStatusMessage("Uploading file");
+      setLoading(true);
 
-      console.log("\nprofileCard page, File: ", file, "\n");
       try {
-        const response = await fetch(`${apiBasePath}/api/upload`, {
-          method: 'POST',
-          body: formData,
-          credentials: 'include',
+        const response = await fetch(`${apiBasePath}/api/getSignedUrl`);
+        const signedUrlResult = await response.json();
+
+        if (signedUrlResult.error) {
+          setStatusMessage("Failed to get signed URL");
+          setLoading(false);
+          return;
+        }
+
+        const url = signedUrlResult.url;
+
+        await fetch(url, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file.type || "",
+          },
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          setImage(data.Location);
+        const imageUrl = url.split('?')[0]; // Remove query parameters
+        setImage(imageUrl);
 
-          // Update the profile image URL in the user's profile
-          const profileResponse = await fetch(`${apiBasePath}/api/profile`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({ profileImage: data.Location }),
-          });
+        // Update the profile image URL in the user's profile
+        const profileResponse = await fetch(`${apiBasePath}/api/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ profileImage: imageUrl }),
+        });
 
-          if (!profileResponse.ok) {
-            console.error('Error updating profile image:', await profileResponse.json());
-          }
-        } else {
-          console.error('Error uploading image:', await response.json());
+        if (!profileResponse.ok) {
+          console.error('Error updating profile image:', await profileResponse.json());
         }
+
+        setStatusMessage("Finished");
       } catch (error) {
         console.error('Error uploading image:', error);
+        setStatusMessage("Error uploading image");
       }
+
+      setLoading(false);
     }
   };
-
-
-
-
 
   return (
     <div className="w-full max-w-xs bg-white border border-gray-300 rounded-3xl shadow-md mx-auto overflow-hidden">
