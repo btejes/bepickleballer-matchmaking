@@ -14,9 +14,22 @@ const MatchesPage = () => {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   useEffect(() => {
-    console.log('\nUSE EFFECT CALLED\n');
     fetchMatches();
   }, []);
+
+  const fetchProfile = async (userId) => {
+    try {
+      const response = await fetch(`${basePath}/api/profile/${userId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch profile');
+      }
+      const data = await response.json();
+      return data.profileImage;
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      return '';
+    }
+  };
 
   const fetchMatches = async () => {
     try {
@@ -25,8 +38,15 @@ const MatchesPage = () => {
         throw new Error('Failed to fetch matches');
       }
       const data = await response.json();
-      console.log('Fetched matches:', data); // Debug log
-      setMatches(data);
+
+      const matchesWithImages = await Promise.all(
+        data.map(async (match) => {
+          const profileImage = await fetchProfile(match.userId);
+          return { ...match, profileImage };
+        })
+      );
+
+      setMatches(matchesWithImages);
       setError(null);
     } catch (error) {
       console.error('Error fetching matches:', error);
@@ -36,19 +56,16 @@ const MatchesPage = () => {
   };
 
   const handleMatchClick = (match) => {
-    console.log('Match clicked:', match); // Debug log
     setSelectedMatch(match);
   };
 
   const handleModalClose = () => {
-    console.log('Modal closed'); // Debug log
     setSelectedMatch(null);
     setShowRatingModal(false);
   };
 
   const handleUnmatch = (matchId) => {
-    console.log('Removing match from state:', matchId); // Debug log
-    setMatches((prevMatches) => prevMatches.filter(match => match.matchId !== matchId));
+    setMatches((prevMatches) => prevMatches.filter((match) => match._id !== matchId));
   };
 
   const openRatingModal = () => {
