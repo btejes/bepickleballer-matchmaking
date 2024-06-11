@@ -12,15 +12,9 @@ const s3Client = new S3Client({
   },
 });
 
-console.log('AWS_ACCESS_KEY:', process.env.AWS_ACCESS_KEY);
-console.log('AWS_SECRET_ACCESS_KEY:', process.env.AWS_SECRET_ACCESS_KEY);
-console.log('AWS_BUCKET_NAME:', process.env.AWS_BUCKET_NAME);
-console.log('AWS_BUCKET_REGION:', process.env.AWS_BUCKET_REGION);
-
 export async function POST() {
-  console.log('POST request received');
-
   try {
+    console.log('POST request received');
     const jwtToken = cookies().get('token')?.value;
     console.log('JWT token:', jwtToken);
 

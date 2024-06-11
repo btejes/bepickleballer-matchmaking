@@ -39,7 +39,6 @@ const ProfileCard = ({ profile, isProfilePage }) => {
       setLoading(true);
 
       try {
-        // Get the signed URL from the server
         const response = await fetch(`${apiBasePath}/api/getSignedUrl`, {
           method: 'POST',
           headers: {
@@ -58,8 +57,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
         const url = signedUrlResult.url;
 
-        // Upload the image directly to S3 using the signed URL
-        await fetch(url, {
+        const uploadResponse = await fetch(url, {
           method: "PUT",
           body: file,
           headers: {
@@ -67,10 +65,13 @@ const ProfileCard = ({ profile, isProfilePage }) => {
           },
         });
 
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload file');
+        }
+
         const imageUrl = url.split('?')[0]; // Remove query parameters
         setImage(imageUrl);
 
-        // Update the profile image URL in the user's profile
         const profileResponse = await fetch(`${apiBasePath}/api/profile`, {
           method: 'PUT',
           headers: {
