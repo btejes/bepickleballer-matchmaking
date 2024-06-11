@@ -3,7 +3,10 @@ import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import fs from 'fs/promises';
 import path from 'path';
-import Busboy from 'busboy';
+
+const http = require('http');
+
+const busboy = require('busboy');
 
 // Ensure that this route runs in the Node.js environment
 export const runtime = 'nodejs';
