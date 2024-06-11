@@ -39,11 +39,13 @@ const ProfileCard = ({ profile, isProfilePage }) => {
       if (file.size > 1 * 1024 * 1024) { // Check if file is larger than 1MB
         setStatusMessage("File size should not exceed 1MB");
         setFadeOut(false);
+        setTimeout(() => setFadeOut(true), 3000); // Trigger fade out after 3 seconds
         return;
       }
 
       setStatusMessage("Uploading file");
       setLoading(true);
+      setFadeOut(false);
 
       try {
         const response = await fetch(`${apiBasePath}/api/getSignedUrl`, {
@@ -60,6 +62,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
           setStatusMessage("Failed to get signed URL");
           setLoading(false);
           setFadeOut(false);
+          setTimeout(() => setFadeOut(true), 3000); // Trigger fade out after 3 seconds
           return;
         }
 
@@ -100,7 +103,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
       }
 
       setLoading(false);
-      setFadeOut(false);
+      setTimeout(() => setFadeOut(true), 3000); // Trigger fade out after 3 seconds
     }
   };
 
@@ -156,18 +159,16 @@ const ProfileCard = ({ profile, isProfilePage }) => {
           </p>
         </div>
 
-            
-
         {statusMessage && (
           <div
-          className={`text-center p-2 rounded ${fadeOut ? 'opacity-0 transition-opacity duration-1000' : 'opacity-100'}`}
-          style={{
-            color: statusMessage.startsWith('Uploading') ? 'green' : 'red',
-            transition: 'opacity 1s ease-in-out',
-          }}
-        >
-          {statusMessage}
-        </div>
+            className={`text-center p-2 rounded ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
+            style={{
+              color: statusMessage.startsWith('Uploading') || statusMessage === 'Finished' ? 'green' : 'red',
+              transition: 'opacity 1s ease-in-out',
+            }}
+          >
+            {statusMessage}
+          </div>
         )}
       </div>
     </div>
