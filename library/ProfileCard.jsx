@@ -35,8 +35,8 @@ const ProfileCard = ({ profile, isProfilePage }) => {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 1048576) { // 1MB = 1048576 bytes
-        setStatusMessage("File size exceeds 1MB");
+      if (file.size > 1 * 1024 * 1024) { // Check if file is larger than 1MB
+        setStatusMessage("File size should not exceed 1MB");
         return;
       }
 
@@ -61,7 +61,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
         }
 
         const url = signedUrlResult.url;
-
+        
         const uploadResponse = await fetch(url, {
           method: "PUT",
           body: file,
@@ -151,6 +151,11 @@ const ProfileCard = ({ profile, isProfilePage }) => {
             {profile.aboutYou}
           </p>
         </div>
+        {statusMessage && (
+          <div className="text-center p-2 rounded mt-2" style={{ color: statusMessage.startsWith('Error') ? 'red' : 'green' }}>
+            {statusMessage}
+          </div>
+        )}
       </div>
     </div>
   );
