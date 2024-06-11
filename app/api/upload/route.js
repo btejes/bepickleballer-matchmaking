@@ -41,9 +41,11 @@ export async function POST(req) {
     console.log('Upload directory ensured:', uploadDir);
 
     // Create Busboy instance
-    const bb = new Busboy({ headers: req.headers });
+    const bb = new busboy({ headers: req.headers });
     console.log('Busboy instance created');
 
+
+    return 42;
     let filePath;
     const fileWritePromises = [];
 
