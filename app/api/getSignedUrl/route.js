@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
@@ -31,16 +31,28 @@ export async function POST() {
 
     await connectToDatabase();
 
-    const profile = await Profile.findOne({ userId });
-    if (profile && profile.profileImage) {
-      const oldImageKey = profile.profileImage.split('/').pop();
-      const deleteParams = {
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: oldImageKey,
-      };
-      await s3Client.send(new DeleteObjectCommand(deleteParams));
+    // List all objects in the user's folder
+    const listParams = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Prefix: `${userId}/`,
+    };
+
+    const listCommand = new ListObjectsV2Command(listParams);
+    const listResponse = await s3Client.send(listCommand);
+
+    // Delete all objects found in the folder
+    if (listResponse.Contents) {
+      const deletePromises = listResponse.Contents.map((object) => {
+        const deleteParams = {
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: object.Key,
+        };
+        return s3Client.send(new DeleteObjectCommand(deleteParams));
+      });
+
+      await Promise.all(deletePromises);
+      console.log("Deleted old images");
     }
-    console.log("\nJust tried to delete\n");
 
     const putObjectCommand = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
