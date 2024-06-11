@@ -10,8 +10,8 @@ const MatchCard = ({ match, onClick }) => {
         <Image 
           src={match.profileImage} 
           alt="MatchCard"
-          width={64} 
-          height={64} 
+          width={200} 
+          height={200} 
           className="rounded-full mr-4" 
         />
         <div className="flex-grow">
