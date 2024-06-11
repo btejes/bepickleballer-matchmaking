@@ -18,6 +18,13 @@ const ProfileCard = ({ profile, isProfilePage }) => {
     }
   }, [profile]);
 
+  useEffect(() => {
+    if (statusMessage) {
+      const timeoutId = setTimeout(() => setFadeOut(true), 3000); // Start fading out after 3 seconds
+      return () => clearTimeout(timeoutId); // Clear timeout if component unmounts or message changes
+    }
+  }, [statusMessage]);
+
   const fetchAverageRating = async (userId) => {
     try {
       const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`);
@@ -44,6 +51,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
       setStatusMessage("Uploading file");
       setLoading(true);
+      setFadeOut(false);
 
       try {
         const response = await fetch(`${apiBasePath}/api/getSignedUrl`, {
@@ -156,18 +164,16 @@ const ProfileCard = ({ profile, isProfilePage }) => {
           </p>
         </div>
 
-            
-
         {statusMessage && (
           <div
-          className={`text-center p-2 rounded ${fadeOut ? 'opacity-0 transition-opacity duration-1000' : 'opacity-100'}`}
-          style={{
-            color: statusMessage.startsWith('Uploading' || 'Finished') ? 'green' : 'red',
-            transition: 'opacity 1s ease-in-out',
-          }}
-        >
-          {statusMessage}
-        </div>
+            className={`text-center p-2 rounded ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
+            style={{
+              color: statusMessage.startsWith('Uploading') || statusMessage === 'Finished' ? 'green' : 'red',
+              transition: 'opacity 1s ease-in-out',
+            }}
+          >
+            {statusMessage}
+          </div>
         )}
       </div>
     </div>
