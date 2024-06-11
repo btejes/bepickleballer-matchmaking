@@ -20,8 +20,18 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
   useEffect(() => {
     if (statusMessage) {
-      const timeoutId = setTimeout(() => setFadeOut(true), 3000); // Start fading out after 3 seconds
-      return () => clearTimeout(timeoutId); // Clear timeout if component unmounts or message changes
+      setFadeOut(false); // Reset fade out before starting the timer
+      const timer1 = setTimeout(() => {
+        setFadeOut(true);
+      }, 3000); // Wait for 3 seconds before starting to fade out
+      const timer2 = setTimeout(() => {
+        setStatusMessage('');
+        setFadeOut(false);
+      }, 4000); // Wait for 4 seconds before clearing the message (1 second for the fade out duration)
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
     }
   }, [statusMessage]);
 
