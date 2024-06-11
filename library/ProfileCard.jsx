@@ -39,7 +39,13 @@ const ProfileCard = ({ profile, isProfilePage }) => {
       setLoading(true);
 
       try {
-        const response = await fetch(`${apiBasePath}/api/getSignedUrl`);
+        const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
+        const response = await fetch(`${apiBasePath}/api/getSignedUrl`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        });
+
         const signedUrlResult = await response.json();
 
         if (signedUrlResult.error) {
@@ -66,8 +72,8 @@ const ProfileCard = ({ profile, isProfilePage }) => {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
-          credentials: 'include',
           body: JSON.stringify({ profileImage: imageUrl }),
         });
 
