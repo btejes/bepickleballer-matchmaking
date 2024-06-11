@@ -10,10 +10,11 @@ const MatchCard = ({ match, onClick }) => {
       <div className="flex items-center justify-between">
         <img 
           src={match.profileImage} 
-          alt="MatchCard"
-          width={64} 
-          height={64} 
-          className="rounded-full mr-4" 
+          alt=""
+          width={100} 
+          height={100} 
+          className={`rounded-full mr-4 w-full h-full object-cover ${!match.profileImage && 'blur-sm grayscale'}`}
+          onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
         />
         <div className="flex-grow">
           <h2 className="text-lg font-semibold">{match.firstName} {match.lastName}</h2>
