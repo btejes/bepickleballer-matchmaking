@@ -7,7 +7,7 @@ const Navbar = () => {
       <div className="flex items-center">
         <Link href="https://bepickleballer.com">
           <img
-            src={`${basePath}/logo.png`} // Update the src to use the basePath
+            src={`${basePath}/logo.png`}
             alt="Logo"
             className="h-12 w-auto sm:h-16 sm:w-auto lg:h-20 lg:w-auto cursor-pointer"
           />
