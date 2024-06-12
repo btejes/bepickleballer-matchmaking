@@ -102,8 +102,8 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-3 rounded-3xl shadow-md text-black max-w-2xl mx-auto">
-      <div className="flex flex-row">
+    <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-md text-black max-w-2xl mx-auto">
+      <div className="flex flex-row p-3">
         <div className="w-1/2 p-2">
           <label htmlFor="firstName">First Name</label>
           <input
