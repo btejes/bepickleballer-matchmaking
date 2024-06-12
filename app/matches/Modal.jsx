@@ -70,7 +70,7 @@ const Modal = ({ match, onClose, onUnmatch }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-75">
-      <div className="bg-white rounded-3xl p-4 w-96 relative">
+      <div className="bg-white text-black rounded-3xl p-4 w-96 relative">
         <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>
           ×
         </button>
