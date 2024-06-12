@@ -84,11 +84,11 @@ const ProfilePage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-2">
         <div className="max-w-4xl mx-auto p-4 rounded-md">
-          <div className="flex flex-col lg:flex-row justify-between items-stretch">
+          <div className="text-black flex flex-col lg:flex-row justify-between items-stretch">
             <div className="order-2 lg:order-1 lg:flex-1 px-2 py-2">
               <ProfileCard profile={profile} isProfilePage={true} />
             </div>
