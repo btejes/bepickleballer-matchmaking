@@ -36,7 +36,7 @@ const ClientButtons = () => {
   const handleLocalPlayClick = (e) => {
     if (!profile) {
       e.preventDefault();
-      setMissingFields(['firstName', 'gender', 'ageRange', 'duprRating', 'skillLevel', 'zipCode', 'openForMatches', 'aboutYou', 'phone', 'email', 'profileImage']);
+      setMissingFields(['firstName', 'gender', 'ageRange', 'skillLevel', 'zipCode', 'openForMatches', 'aboutYou', 'phone', 'email', 'profileImage']);
       setIsLocalPlayModalOpen(true);
       return;
     }
@@ -45,7 +45,6 @@ const ClientButtons = () => {
       'firstName',
       'gender',
       'ageRange',
-      'duprRating',
       'skillLevel',
       'zipCode',
       'openForMatches',
