@@ -1,7 +1,6 @@
 import Link from 'next/link';
 
 const Navbar = () => {
-  // Assuming your environment variable is named NEXT_PUBLIC_BASE_PATH
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   return (
     <nav className="navbar bg-white px-4 py-2 shadow-md flex justify-between items-center">
@@ -16,10 +15,12 @@ const Navbar = () => {
       </div>
       <div className="flex items-center space-x-4">
         <Link href="/homepage" className="text-black hover:underline">
-          Find
+          <span className="block lg:hidden">Find</span>
+          <span className="hidden lg:block">Find Match</span>
         </Link>
         <Link href="/matches" className="text-black hover:underline">
-          Matches
+          <span className="block lg:hidden">Matches</span>
+          <span className="hidden lg:block">My Matches</span>
         </Link>
         <Link href="/faq" className="text-black hover:underline">
           <div className="flex items-center justify-center w-8 h-8 rounded-full border border-black">
