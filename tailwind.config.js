@@ -8,28 +8,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#3555A2',
-        button: '#FF5C36',
-        box: '#ffffff',
+        background: "#3555A2",
+        button: "#FF5C36",
+        text: "#ffffff",
       },
     },
   },
-  darkMode: false, // Disable dark mode
-  plugins: [
-    require('daisyui'),
-  ],
-  daisyui: {
-    themes: [
-      {
-        light: {
-          "primary": "#FF5C36",  // Button color
-          "secondary": "#3555A2", // Background color
-          "accent": "#ffffff",    // Box and form color
-          "neutral": "#ffffff",   // Neutral color for forms and boxes
-          "base-100": "#ffffff",  // Base color for light theme
-        },
-      },
-    ],
-    darkTheme: false, // Ensure dark mode is disabled
-  },
+  plugins: ['daisyui'],
 };
