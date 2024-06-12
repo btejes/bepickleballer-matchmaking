@@ -93,14 +93,14 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-75">
-      <div className="bg-white rounded-lg p-4 w-96 relative">
+      <div className="bg-white text-black rounded-lg p-4 w-96 relative">
         <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>
           ×
         </button>
         {isSubmitted || existingRating ? (
           <div className="text-center">
             <h2 className="text-xl font-bold">Thank You!</h2>
-            <p className="text-sm text-gray-500 text-center mt-2 mb-4">
+            <p className="text-sm text-black text-center mt-2 mb-4">
               Thank you for helping to build trust in our community.
             </p>
             <div className="mt-4">
@@ -130,7 +130,7 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
         ) : (
           <>
             <h2 className="text-xl font-bold">Rate {match.firstName}</h2>
-            <p className="text-sm text-gray-500 text-center mt-2 mb-4">
+            <p className="text-sm text-black text-center mt-2 mb-4">
               Ratings are anonymous. A player will see their ratings after receiving three ratings for an average.
             </p>
             <div className="mt-4">
@@ -155,7 +155,7 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
               <button className="bg-gray-500 text-white py-2 px-4 rounded" onClick={onBack}>
                 Back
               </button>
-              <p className="text-sm text-gray-500 text-center mt-2 mb-4">
+              <p className="text-sm text-black text-center mt-2 mb-4">
                 Ratings Are Final!
               </p>
               <button className="bg-green-500 text-white py-2 px-4 rounded" onClick={handleSubmit}>
