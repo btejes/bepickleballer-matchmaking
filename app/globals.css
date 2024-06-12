@@ -2,38 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import fonts */
-@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Muli&display=swap');
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-  --primary-color: #34d399; /* Tailwind color emerald-400 */
-  --secondary-color: #047857; /* Tailwind color emerald-900 */
-  --text-color: #1f2937; /* Tailwind color gray-800 */
-  --base-background-color: #fff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-    --primary-color: #10b981; /* Tailwind color emerald-500 */
-    --secondary-color: #065f46; /* Tailwind color emerald-800 */
-    --text-color: #d1d5db; /* Tailwind color gray-300 */
-    --base-background-color: #000;
-  }
+  --background-color: #3555A2;
+  --button-color: #FF5C36;
+  --text-color: #ffffff;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgb(var(--background-end-rgb))
-  ) rgb(var(--background-start-rgb));
+  color: var(--text-color);
+  background-color: var(--background-color);
   font-family: 'Muli', sans-serif;
 }
 
@@ -42,55 +20,28 @@ body {
     text-wrap: balance;
   }
 
-  .bg-lightGreen {
-    background-color: var(--primary-color);
+  .bg-background {
+    background-color: var(--background-color);
   }
 
-  .bg-darkGreen {
-    background-color: var(--secondary-color);
+  .bg-button {
+    background-color: var(--button-color);
   }
 
   .text-primary {
-    color: var(--primary-color);
-  }
-
-  .text-secondary {
-    color: var(--secondary-color);
-  }
-
-  .text-darkGray {
     color: var(--text-color);
   }
 
-  .icon {
-    background-color: transparent;
-  }
-
-  .font-luckiest {
-    font-family: 'Luckiest Guy', sans-serif;
-  }
 
   .has-text-align-center {
     text-align: center;
   }
 
-  .has-base-background-color {
-    background-color: var(--base-background-color);
-  }
-
   .has-background {
-    background-color: var(--base-background-color);
+    background-color: var(--background-color);
   }
 
-  .nfd-text-huge {
-    font-size: 2.5rem;
-  }
-
-  .nfd-text-current {
-    color: rgb(var(--foreground-rgb));
-  }
-
-  .md\:nfd-no-br {
-    @apply md:no-br;
+  .has-button-color {
+    background-color: var(--button-color);
   }
 }
