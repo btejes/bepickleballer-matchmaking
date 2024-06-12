@@ -234,6 +234,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             maxLength="10"
             className="mt-1 block border border-gray-300 rounded-md shadow-sm p-1 text-center"
             style={{ width: '12ch' }}
+            autoComplete="off"
           />
           {errors.phone && <span className="text-red-500 text-sm">{errors.phone}</span>}
         </div>
@@ -247,6 +248,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             onChange={handleChange}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 mb-4 text-center"
             style={{ width: '30ch' }}
+            autoComplete="off"
           />
           {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
         </div>
