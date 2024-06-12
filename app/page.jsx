@@ -7,7 +7,7 @@ const LoginPage = () => {
       <NavbarBasicLogo />
       <div className="flex flex-col items-center justify-center flex-grow">
         <h1 className="text-5xl font-bold mb-6 text-center text-white">
-        Find Your Perfect “Pickle Baller” Partner
+        Find Your Perfect Pickle “Baller” Partner
         </h1>
         <div className="p-6 max-w-md w-full bg-white rounded-lg shadow-md mt-4">
           <EmailForm />
