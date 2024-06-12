@@ -7,7 +7,7 @@ const FaqComponent = ({ question, answer }) => {
 
   return (
     <details
-      className="bg-white border border-gray-300 p-4 rounded-md shadow-md"
+      className="bg-white border text-black border-gray-300 p-4 rounded-md shadow-md"
       open={isOpen}
       onToggle={() => setIsOpen(!isOpen)}
     >
