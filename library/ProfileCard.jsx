@@ -144,7 +144,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
       <div className="p-4">
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-center">
-            <p className="text-sm font-bold text-black">{profile.firstName} {profile.lastName}</p>
+            <p className="text-sm font-bold text-black">{profile.firstName}</p>
             <div className="flex items-center">
               <svg
                 width="24"

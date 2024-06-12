@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 const ProfileSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   firstName: { type: String, default: '' },
-  lastName: { type: String, default: '' },
   gender: { type: String, default: '' },
   ageRange: { type: String, default: '' },
   duprRating: { type: String, default: '' },

@@ -154,15 +154,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           {errors.zipCode && <span className="text-red-500 text-sm">{errors.zipCode}</span>}
         </div>
         <div className="w-1/2 p-2">
-          <label htmlFor="lastName">Last Name</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          />
           <label htmlFor="ageRange">Age Range</label>
           <select
             id="ageRange"

@@ -15,7 +15,7 @@ const MatchCard = ({ match, onClick }) => {
           />
         </div>
         <div className="flex-grow">
-          <h2 className="text-lg font-semibold">{match.firstName} {match.lastName}</h2>
+          <h2 className="text-lg font-semibold">{match.firstName}</h2>
         </div>
         <div className="flex space-x-6">
           <p className="text-black">DUPR: {match.duprRating}</p>

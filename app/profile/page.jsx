@@ -10,7 +10,6 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 const ProfilePage = () => {
   const [profile, setProfile] = useState({
     firstName: '',
-    lastName: '',
     gender: '',
     ageRange: '',
     duprRating: '',
