@@ -86,7 +86,7 @@ const LocalPlay = () => {
       <div className="w-full">
         <Navbar />
       </div>
-      <div className="flex-grow w-full bg-gray-200 flex flex-col items-center justify-center overflow-hidden">
+      <div className="flex-grow w-full flex flex-col items-center justify-center overflow-hidden">
         {currentMatch ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="flex items-center justify-center space-x-4">
@@ -109,7 +109,7 @@ const LocalPlay = () => {
           <p>{error || 'Loading...'}</p>
         )}
       </div>
-      <div className="w-full h-auto bg-white p-2 flex justify-between">
+      <div className="w-full text-black h-auto bg-white p-2 flex justify-between">
         <select
           name="preferredGender"
           value={preferences.preferredGender}
