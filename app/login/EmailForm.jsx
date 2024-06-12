@@ -42,7 +42,7 @@ const EmailForm = () => {
     <div>
       {emailSent ? (
         <div className="text-center">
-          <h2 className="text-3xl font-bold mb-4 text-center text-darkGray">Check Email For Your Magic Link!</h2>
+          <h2 className="text-3xl font-bold mb-4 text-center text-black">Check Email For Your Magic Link!</h2>
           <p className="mt-4 text-center text-black">
             A secure sign-in link has been sent to <big><strong>{email}</strong></big> <br></br> Click the link in the email to sign in to Matchmaking.
           </p>
@@ -50,8 +50,8 @@ const EmailForm = () => {
       ) : (
         <>
           <br></br>
-          <h2 className="text-3xl font-bold mb-4 text-center text-darkGray">Sign In</h2>
-          <p className="mb-6 text-center text-darkGray">
+          <h2 className="text-3xl font-bold mb-4 text-center text-black">Sign In</h2>
+          <p className="mb-6 text-center text-black">
             Enter your email to get a secure sign-in link. This magic link signs you in without needing a password, no signup step required!
           </p>
           <form onSubmit={handleSubmit} className="flex flex-col items-center">
@@ -67,7 +67,7 @@ const EmailForm = () => {
             </div>
             <button
               type="submit"
-              className="btn bg-[#FF5C36] text-white px-4 py-2 hover:bg-[#3555A2] rounded-lg shadow-sm"
+              className="btn bg-button text-white px-4 py-2 hover:bg-[#3555A2] rounded-lg shadow-sm"
               disabled={emailSent}
             >
               Get Magic Link
