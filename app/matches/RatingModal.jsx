@@ -19,11 +19,15 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
   };
 
   const handleMouseEnter = (category, value) => {
-    setHoverValue((prevHover) => ({ ...prevHover, [category]: value }));
+    if (!isSubmitted) {
+      setHoverValue((prevHover) => ({ ...prevHover, [category]: value }));
+    }
   };
 
   const handleMouseLeave = (category) => {
-    setHoverValue((prevHover) => ({ ...prevHover, [category]: 0 }));
+    if (!isSubmitted) {
+      setHoverValue((prevHover) => ({ ...prevHover, [category]: 0 }));
+    }
   };
 
   const handleSubmit = async () => {
@@ -65,7 +69,7 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
       return (
         <label
           key={index}
-          className="cursor-pointer"
+          className={`cursor-pointer ${isSubmitted ? 'cursor-default' : ''}`}
           onMouseEnter={() => handleMouseEnter(category, ratingValue)}
           onMouseLeave={() => handleMouseLeave(category)}
         >
@@ -75,6 +79,7 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
             value={ratingValue}
             onClick={() => isEditable && handleRatingChange(category, ratingValue)}
             className="hidden"
+            disabled={isSubmitted}
           />
           <svg
             width="30"
