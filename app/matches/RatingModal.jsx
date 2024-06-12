@@ -19,11 +19,16 @@ const RatingModal = ({ match, onClose, onBack, existingRating }) => {
   };
 
   const handleMouseEnter = (category, value) => {
-    setHoverValue((prevHover) => ({ ...prevHover, [category]: value }));
+    if (!isSubmitted || !existingRating) {
+      setHoverValue((prevHover) => ({ ...prevHover, [category]: value }));
+    };
+   
   };
 
   const handleMouseLeave = (category) => {
-    setHoverValue((prevHover) => ({ ...prevHover, [category]: 0 }));
+    if (!isSubmitted || !existingRating) {
+      setHoverValue((prevHover) => ({ ...prevHover, [category]: 0 }));
+    }
   };
 
   const handleSubmit = async () => {
