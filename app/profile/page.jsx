@@ -20,6 +20,8 @@ const ProfilePage = () => {
     phone: '',
     email: '',
     profileImage: '',
+    casualCompetitive: '',
+    outdoorIndoor: '',
   });
   const [message, setMessage] = useState('');
 
