@@ -204,7 +204,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             onChange={handleChange}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           >
-            <option value="">Play Style</option>
+            <option value="">Unselected</option>
             <option value="casual">Casual</option>
             <option value="competitive">Competitive</option>
           </select>
@@ -216,9 +216,10 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             onChange={handleChange}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           >
-            <option value="">Both</option>
+            <option value="">Unselected</option>
             <option value="outdoor">Outdoor</option>
             <option value="indoor">Indoor</option>
+            <option value="both">Both</option>
           </select>
         </div>
       </div>
