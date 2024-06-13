@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
 
 export async function middleware(request) {
+  return
   const { pathname } = request.nextUrl;
 
   console.log(`Middleware activated. Request Path: ${pathname}`);
