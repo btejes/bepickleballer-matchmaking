@@ -5,7 +5,7 @@ import { jwtVerify } from 'jose';
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  console.log(`Middleware activated. Request Path: /matchmaking${pathname}`);
+  console.log(`Middleware activated. Request Path: ${pathname}`);
   console.log("\nRequest URL:", request.url, "\n");
 
   // Log all cookies
@@ -33,5 +33,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/profile', '/homepage', '/matches', '/local-play'],
+  matcher: ['/matchmaking/profile', '/matchmaking/homepage', '/matchmaking/matches', '/matchmaking/local-play'],
 };
