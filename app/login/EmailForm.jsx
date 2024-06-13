@@ -77,7 +77,7 @@ const EmailForm = () => {
       )}
       {/* Footer with Privacy Policy and Terms of Service */}
       <div className="mt-6 text-center text-black">
-        <p className="text-sm">
+        <p className="text-xs">
           By clicking &quot;Get Magic Link&quot; and signing up, you agree to Be Pickle Baller&apos;s 
           <a href="https://bepickleballer.com/terms-of-service/" className="text-blue-500 hover:underline"> Terms of Service </a> 
           and that you have read our 
