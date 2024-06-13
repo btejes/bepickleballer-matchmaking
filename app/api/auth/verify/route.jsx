@@ -16,12 +16,14 @@ export async function GET(request) {
   
 
   if (!tokenDoc || tokenDoc.expires < Date.now()) {
+    console.log("\nExpired token or no token doc found routing to login\n");
     return NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}`);
   }
 
   // Retrieve the user's ID based on the email in the token
   const user = await User.findOne({ email: tokenDoc.email });
   if (!user) {
+    console.log("\nNo user found routing to login\n");
     return NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}`);
   }
 
@@ -39,6 +41,7 @@ export async function GET(request) {
 
   // Delete the token after verification
   await Token.deleteOne({ token });
+  console.log("\nOld auth token deleted from token collection DB\n");
 
   // Update the user's emailVerified and lastVerifiedLogin fields
   if (!user.emailVerified) {
@@ -48,6 +51,7 @@ export async function GET(request) {
   await user.save();
 
   // Redirect user to the homepage with the JWT set in a secure, HttpOnly cookie
+  console.log("\nAbout to route to homepage from auth verify api\n");
   const response = NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/homepage`);
   response.cookies.set('token', jwtToken, {
     httpOnly: true,
@@ -57,5 +61,6 @@ export async function GET(request) {
     domain: 'bepickleballer.com'  // Ensure cookie is available across all subdomains
   });
 
+  console.log("\nReturning response from auth verify api: ", response, "\n");
   return response;
 }
