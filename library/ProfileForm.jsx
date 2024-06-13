@@ -242,8 +242,9 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             </small>
           </div>
         </div>
+        <br></br>
         <div className="col-span-2 flex justify-left">
-          <small className="text-gray-500 mt-5">
+          <small className="text-gray-500">
             Only accepted matches see phone and email below
           </small>
         </div>
