@@ -17,6 +17,7 @@ export async function middleware(request) {
     response.headers.set('Access-Control-Allow-Origin', 'https://bepickleballer.com');
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Authorization');
+
     console.log("\nReturning out of middleware api route found\n");
     return response;
   }
@@ -30,8 +31,8 @@ export async function middleware(request) {
   console.log(`\nJWT Token: ${token}`);
 
   if (!token) {
-    console.log('\nNo JWT Token found. Redirecting to root.');
-    return NextResponse.redirect(new URL('/matchmaking', request.url));
+    console.log('\nNo JWT Token found. Redirecting to login.\n');
+    return NextResponse.redirect(new URL(`/${basePath}`, request.url));
   }
 
   try {
@@ -41,7 +42,7 @@ export async function middleware(request) {
     return NextResponse.next();
   } catch (error) {
     console.log('JWT Verification Error:', error);
-    return NextResponse.redirect(new URL('/matchmaking', request.url));
+    return NextResponse.redirect(new URL(`/${basePath}`, request.url));
   }
 }
 
