@@ -4,11 +4,12 @@ import { jwtVerify } from 'jose';
 
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   console.log(`Middleware activated. Request Path: ${pathname}`);
 
-  // Allow all /api/ routes and auth/verify route without JWT authentication
-  if (pathname.startsWith('/api/') || pathname === '/auth/verify') {
+  // Allow all /api/ routes and specific auth/verify route without JWT authentication
+  if (pathname.startsWith('/api/') || pathname === `/${basePath}/api/auth/verify`) {
     console.log('Path is an API route or auth/verify route. Proceeding without authentication.');
 
     // Handle CORS for API routes
@@ -44,5 +45,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/profile', '/homepage', '/matches', '/local-play', '/api/(.*)', '/auth/verify'],
+  matcher: ['/profile', '/homepage', '/matches', '/local-play', '/api/(.*)', '/matchmaking/api/auth/verify'],
 };
