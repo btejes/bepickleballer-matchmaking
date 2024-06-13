@@ -4,13 +4,13 @@ import { jwtVerify } from 'jose';
 
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
-  
+
   console.log(`Middleware activated. Request Path: ${pathname}`);
 
-  // Allow all /api/ routes without JWT authentication
-  if (pathname.startsWith('/api/')) {
-    console.log('Path is an API route. Proceeding without authentication.');
-    
+  // Allow all /api/ routes and auth/verify route without JWT authentication
+  if (pathname.startsWith('/api/') || pathname === '/auth/verify') {
+    console.log('Path is an API route or auth/verify route. Proceeding without authentication.');
+
     // Handle CORS for API routes
     const response = NextResponse.next();
     response.headers.set('Access-Control-Allow-Origin', 'https://bepickleballer.com');
@@ -24,9 +24,9 @@ export async function middleware(request) {
 
   // Read JWT token from cookies for protected routes
   const token = cookies().get('token')?.value;
-  
+
   console.log(`JWT Token: ${token}`);
-  
+
   if (!token) {
     console.log('No JWT Token found. Redirecting to root.');
     return NextResponse.redirect(new URL('/matchmaking', request.url));
@@ -44,5 +44,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/profile', '/homepage', '/matches', '/local-play', '/api/(.*)'],
+  matcher: ['/profile', '/homepage', '/matches', '/local-play', '/api/(.*)', '/auth/verify'],
 };
