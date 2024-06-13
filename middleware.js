@@ -9,7 +9,7 @@ export async function middleware(request) {
   console.log(`Middleware activated. Request Path: ${pathname}`);
 
   // Allow all /api/ routes and specific auth/verify route without JWT authentication
-  if (pathname.startsWith('/api/') || pathname === `/${basePath}/api/auth/verify`) {
+  if (pathname.startsWith('/api/')) {
     console.log('Path is an API route or auth/verify route. Proceeding without authentication.');
 
     // Handle CORS for API routes
@@ -17,19 +17,20 @@ export async function middleware(request) {
     response.headers.set('Access-Control-Allow-Origin', 'https://bepickleballer.com');
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Authorization');
+    console.log("\nReturning out of middleware api route found\n");
     return response;
   }
 
   // Log all cookies
-  console.log('All cookies:', cookies().getAll());
+  console.log('\nAll cookies: ', cookies().getAll());
 
   // Read JWT token from cookies for protected routes
   const token = cookies().get('token')?.value;
 
-  console.log(`JWT Token: ${token}`);
+  console.log(`\nJWT Token: ${token}`);
 
   if (!token) {
-    console.log('No JWT Token found. Redirecting to root.');
+    console.log('\nNo JWT Token found. Redirecting to root.');
     return NextResponse.redirect(new URL('/matchmaking', request.url));
   }
 
@@ -45,5 +46,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/profile', '/homepage', '/matches', '/local-play', '/api/(.*)', '/matchmaking/api/auth/verify'],
+  matcher: ['/profile', '/homepage', '/matches', '/local-play', '/api/(.*)'],
 };
