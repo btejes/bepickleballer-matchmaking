@@ -208,7 +208,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="casual">Casual</option>
             <option value="competitive">Competitive</option>
           </select>
-          <label htmlFor="outdoorIndoor">Indoor or Outdoor</label>
+          <label htmlFor="outdoorIndoor">Indoor/Outdoor</label>
           <select
             id="outdoorIndoor"
             name="outdoorIndoor"
