@@ -53,7 +53,9 @@ export async function GET(request) {
   // Redirect user to the homepage with the JWT set in a secure, HttpOnly cookie
   console.log("\nAbout to route to homepage from auth verify api\n");
   console.log("\nAteemtping to redirect to this path: ", `${process.env.BASE_URL}${apiBasePath}/homepage`, "\n");
-  const response = NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/homepage`);
+  console.log("\nRequest url: ", request.url, "\n");
+  const response = NextResponse.redirect(new URL('/matchmaking', request.url));
+  // `${process.env.BASE_URL}${apiBasePath}/homepage`
   response.cookies.set('token', jwtToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
