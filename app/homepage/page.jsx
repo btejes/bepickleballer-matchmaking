@@ -5,7 +5,7 @@ export const metadata = {
   title: 'Matchmaking - Pickleball Matchmaking',
   description: 'Find your Pickleball match',
 };
-
+console.log("\nEntered Home Page Front End\n");
 const Homepage = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
