@@ -33,5 +33,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/matchmaking/profile', '/matchmaking/homepage', '/matchmaking/matches', '/matchmaking/local-play'],
+  matcher: ['/profile', '/homepage', '/matches', '/local-play'],
 };
