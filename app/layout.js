@@ -8,6 +8,8 @@ export const metadata = {
   description: 'Pickleball Matchmaking Platform',
 };
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 // Main layout component
 export default function RootLayout({ children }) {
   return (
@@ -16,7 +18,7 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
-        <link rel="icon" href="/favicon-logo.png" />
+        <link rel="icon" href={`${basePath}/favicon-logo.png`} />
       </head>
       <body className={`${inter.className} bg-lightGreen`}>
         {children}

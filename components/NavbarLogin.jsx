@@ -1,7 +1,6 @@
 import Link from 'next/link';
 
 const NavbarBasicLogo = () => {
-  // Assuming your environment variable is named NEXT_PUBLIC_BASE_PATH
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   return (
