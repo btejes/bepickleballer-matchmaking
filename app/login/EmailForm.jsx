@@ -79,7 +79,7 @@ const EmailForm = () => {
       <div className="mt-6 text-center text-black">
         <p className="text-sm">
           By clicking &quot;Get Magic Link&quot; and signing up, you agree to Be Pickle Baller&apos;s 
-          <a href="https://bepickleballer.com/terms-of-service/" className="text-blue-500 hover:underline"> Terms of Service</a> 
+          <a href="https://bepickleballer.com/terms-of-service/" className="text-blue-500 hover:underline"> Terms of Service </a> 
           and that you have read our 
           <a href="https://bepickleballer.com/privacy-policy/" className="text-blue-500 hover:underline"> Privacy Policy</a>.
         </p>
