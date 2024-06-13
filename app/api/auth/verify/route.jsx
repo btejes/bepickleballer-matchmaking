@@ -62,5 +62,6 @@ export async function GET(request) {
   });
 
   console.log("\nReturning response from auth verify api: ", response, "\n");
+  response.status = 302; // Explicitly set status to 302 for redirect
   return response;
 }
