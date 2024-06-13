@@ -57,11 +57,10 @@ export async function GET(request) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'None', // Important for cross-site access
-    path: '/matchmaking',
+    path: '/',
     domain: 'bepickleballer.com'  // Ensure cookie is available across all subdomains
   });
 
   console.log("\nReturning response from auth verify api: ", response, "\n");
-  response.status = 302; // Explicitly set status to 302 for redirect
   return response;
 }
