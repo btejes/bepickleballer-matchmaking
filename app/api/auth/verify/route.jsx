@@ -44,7 +44,7 @@ export async function GET(request) {
   await user.save();
 
   console.log("\nAbout to route to homepage from auth verify api\n");
-
+  console.log("\nAteemtping to redirect to this path: ", `${process.env.BASE_URL}${apiBasePath}/homepage`, "\n");
   const response = NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/homepage`);
   response.cookies.set('token', jwtToken, {
     httpOnly: true,
