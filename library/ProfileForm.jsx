@@ -196,6 +196,30 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="no">No</option>
             <option value="yes">Yes</option>
           </select>
+          <label htmlFor="casualCompetitive">Play Style</label>
+          <select
+            id="casualCompetitive"
+            name="casualCompetitive"
+            value={formData.casualCompetitive || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+          >
+            <option value="">Play Style</option>
+            <option value="casual">Casual</option>
+            <option value="competitive">Competitive</option>
+          </select>
+          <label htmlFor="outdoorIndoor">Indoor or Outdoor</label>
+          <select
+            id="outdoorIndoor"
+            name="outdoorIndoor"
+            value={formData.outdoorIndoor || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+          >
+            <option value="">Both</option>
+            <option value="outdoor">Outdoor</option>
+            <option value="indoor">Indoor</option>
+          </select>
         </div>
       </div>
     

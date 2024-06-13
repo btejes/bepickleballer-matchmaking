@@ -13,6 +13,8 @@ const ProfileSchema = new mongoose.Schema({
   phone: { type: String, default: '' },
   email: { type: String, default: '' },  // This is the matchmaking contact email
   profileImage: { type: String, default: '' },
+  casualCompetitive: { type: String, default: '' }, // Added field
+  outdoorIndoor: { type: String, default: '' } // Added field
 });
 
 export default mongoose.models.Profile || mongoose.model('Profile', ProfileSchema);
