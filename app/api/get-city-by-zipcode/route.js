@@ -24,19 +24,9 @@ const findCityByZipCode = async (filePath, zipCode) => {
     });
 
     console.log(`CSV file read successfully`);
-    const headers = Object.keys(data[0]);
-    console.log(`Headers: ${headers}`);
-    const zipColumnIndex = headers.indexOf('PHYSICAL ZIP');
-    const cityColumnIndex = headers.indexOf('PHYSICAL CITY');
-
-    if (zipColumnIndex === -1 || cityColumnIndex === -1) {
-      throw new Error('Specified columns not found in the CSV file');
-    }
-
-    console.log(`Zip Column Index: ${zipColumnIndex}, City Column Index: ${cityColumnIndex}`);
-
-    for (let i = 0; i < data.length; i++) {
-      const row = data[i];
+    console.log(`First few rows of JSON data: ${JSON.stringify(data.slice(0, 5))}`);
+    
+    for (let row of data) {
       if (row['PHYSICAL ZIP'] == zipCode) {
         console.log(`Matching row found: ${JSON.stringify(row)}`);
         return row['PHYSICAL CITY'];
