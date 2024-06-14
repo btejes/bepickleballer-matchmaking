@@ -4,6 +4,8 @@ import path from 'path';
 import fs from 'fs';
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env') });
 
+console.log('xlsx library:', xlsx);
+
 const findCityByZipCode = async (filePath, zipCode) => {
   console.log(`Reading Excel file from path: ${filePath}`);
   try {
