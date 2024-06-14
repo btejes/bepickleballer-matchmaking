@@ -38,6 +38,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const debouncedHandleZipCodeChange = useCallback(debounce(async (zipCode) => {
     const basePath = '/matchmaking';
     if (/^\d{5}$/.test(zipCode)) {
+      console.log("\nDebounced Zipcode:", zipCode, "\n");
       try {
         const response = await fetch(`${basePath}/api/get-city-by-zipcode`, {
           method: 'POST',
@@ -48,10 +49,13 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           body: JSON.stringify({ zipCode }),
         });
 
+        console.log("\nResponse Status:", response.status, "\n");
+
         if (response.status === 404) {
           setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'City not found for the provided ZIP code' }));
         } else if (response.status === 500) {
           const { error } = await response.json();
+          console.error('Error:', error);
           setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'Internal server error' }));
         } else if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -59,26 +63,26 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           const data = await response.json();
           if (data.city) {
             setFormData((prevData) => ({ ...prevData, city: data.city }));
-            onProfileChange((prevProfile) => ({ ...prevProfile, city: data.city }));
+            onProfileChange({ ...formData, city: data.city });
           }
         }
       } catch (error) {
-        setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'Error fetching city' }));
+        console.error('Error fetching city:', error);
       }
     }
-  }, 500), []);
+  }, 500), [formData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
+    console.log("\nUpdated Value:", updatedValue, "\n");
     let error = '';
 
     if (name === 'zipCode') {
-      if (updatedValue.length <= 5) {
-        setFormData((prevData) => ({ ...prevData, zipCode: updatedValue }));
-        if (updatedValue.length === 5) {
-          debouncedHandleZipCodeChange(updatedValue);
-        }
+      setFormData((prevData) => ({ ...prevData, zipCode: updatedValue }));
+      console.log("\nZipcode value:", updatedValue, "\n");
+      if (updatedValue.length === 5) {
+        debouncedHandleZipCodeChange(updatedValue);
       }
     } else if (name === 'duprRating') {
       if (updatedValue === '' || (/^(2(\.\d{1,2})?|[3-7](\.\d{1,2})?|8(\.0{0,2})?)$/.test(updatedValue))) {
@@ -107,7 +111,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
     setFormData((prevData) => ({ ...prevData, [name]: updatedValue }));
-    onProfileChange((prevProfile) => ({ ...prevProfile, [name]: updatedValue }));
+    onProfileChange({ ...formData, [name]: updatedValue });
   };
 
   const handleKeyPress = (e, name) => {
@@ -221,6 +225,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="Advanced">Advanced</option>
           </select>
           <label htmlFor="openForMatches">Open For Matches</label>
+         
           <select
             id="openForMatches"
             name="openForMatches"
@@ -258,7 +263,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           </select>
         </div>
       </div>
-
+    
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2 flex flex-col relative">
           <div className="relative">
