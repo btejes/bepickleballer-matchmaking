@@ -1,7 +1,7 @@
-// cache-control-middleware.js
+// middlewares/cache-control-middleware.js
 import { NextResponse } from 'next/server';
 
-export function middleware(request) {
+export function cacheControlMiddleware(request) {
   const response = NextResponse.next();
 
   // Set cache-control headers to disable caching
