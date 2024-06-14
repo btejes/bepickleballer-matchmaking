@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import debounce from 'lodash.debounce';
 
 const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const [formData, setFormData] = useState(profile);
@@ -34,17 +35,15 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     }
   }, [message]);
 
-  const handleZipCodeChange = async (e) => {
-    const zipCode = e.target.value;
+  const debouncedHandleZipCodeChange = useCallback(debounce(async (zipCode) => {
     const basePath = '/matchmaking';
-    setFormData({ ...formData, zipCode });
-
     if (/^\d{5}$/.test(zipCode)) {
       try {
         const response = await fetch(`${basePath}/api/get-city-by-zipcode`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
           },
           body: JSON.stringify({ zipCode }),
         });
@@ -70,7 +69,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
         console.error('Error fetching city:', error);
       }
     }
-  };
+  }, 500), [formData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,7 +77,8 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     let error = '';
 
     if (name === 'zipCode') {
-      handleZipCodeChange(e);
+      setFormData((prevData) => ({ ...prevData, zipCode: value }));
+      debouncedHandleZipCodeChange(value);
     } else if (name === 'duprRating') {
       if (value === '' || (/^(2(\.\d{1,2})?|[3-7](\.\d{1,2})?|8(\.0{0,2})?)$/.test(value))) {
         updatedValue = value;
@@ -180,7 +180,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             id="zipCode"
             name="zipCode"
             value={formData.zipCode || ''}
-            onChange={handleZipCodeChange}
+            onChange={handleChange}
             onKeyPress={(e) => handleKeyPress(e, 'zipCode')}
             maxLength="5"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
@@ -220,6 +220,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="Advanced">Advanced</option>
           </select>
           <label htmlFor="openForMatches">Open For Matches</label>
+         
           <select
             id="openForMatches"
             name="openForMatches"
