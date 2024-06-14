@@ -36,7 +36,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
   const handleZipCodeChange = async (e) => {
     const zipCode = e.target.value;
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+    const basePath = '/matchmaking';
     setFormData({ ...formData, zipCode });
 
     if (/^\d{5}$/.test(zipCode)) {
@@ -49,22 +49,24 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           body: JSON.stringify({ zipCode }),
         });
 
-        if (!response.ok) {
+        if (response.status === 404) {
+          setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'City not found for the provided ZIP code' }));
+        } else if (response.status === 500) {
+          const { error } = await response.json();
+          console.error('Error:', error);
+          setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'Internal server error' }));
+        } else if (!response.ok) {
           throw new Error('Network response was not ok');
+        } else {
+          const data = await response.json();
+          if (data.city) {
+            setFormData((prevData) => ({ ...prevData, city: data.city }));
+            onProfileChange({ ...formData, city: data.city });
+          }
         }
-
-        const data = await response.json();
-        const city = data.city || '';
-        setFormData({ ...formData, zipCode, city });
-        onProfileChange({ ...formData, zipCode, city });
       } catch (error) {
         console.error('Error fetching city:', error);
-        setFormData({ ...formData, zipCode, city: '' });
-        onProfileChange({ ...formData, zipCode, city: '' });
       }
-    } else {
-      setFormData({ ...formData, zipCode, city: '' });
-      onProfileChange({ ...formData, zipCode, city: '' });
     }
   };
 
