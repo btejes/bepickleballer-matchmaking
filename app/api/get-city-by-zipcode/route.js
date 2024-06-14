@@ -49,7 +49,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'ZIP code is required' }, { status: 400 });
     }
 
-    const filePath = path.resolve('library', 'US_Zipcode_Cities.xlsx'); // Path to your .xlsx file in the library folder
+    const filePath = path.join(process.cwd(), 'app', 'library', 'US_Zipcode_Cities.xlsx'); // Path to your .xlsx file in the app/library folder
     console.log(`Using file path: ${filePath}`);
     const city = findCityByZipCode(filePath, zipCode);
 
