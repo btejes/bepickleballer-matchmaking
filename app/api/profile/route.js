@@ -6,6 +6,13 @@ import jwt from 'jsonwebtoken';
 
 export const dynamic = 'force-dynamic';
 
+const cacheControlHeaders = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+  'Pragma': 'no-cache',
+  'Expires': '0',
+  'Surrogate-Control': 'no-store',
+};
+
 export async function GET() {
   await connectToDatabase();
 
@@ -13,7 +20,10 @@ export async function GET() {
     const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
       console.log("\nNo jwt found in profile api\n");
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: cacheControlHeaders,
+      });
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
@@ -21,13 +31,22 @@ export async function GET() {
 
     console.log("\nProfile Found: ", profile, "\n");
     if (!profile) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+      return new NextResponse(JSON.stringify({ error: 'Profile not found' }), {
+        status: 404,
+        headers: cacheControlHeaders,
+      });
     }
 
-    return NextResponse.json(profile, { status: 200 });
+    return new NextResponse(JSON.stringify(profile), {
+      status: 200,
+      headers: cacheControlHeaders,
+    });
   } catch (error) {
     console.error('Internal Server Error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return new NextResponse(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: cacheControlHeaders,
+    });
   }
 }
 
@@ -37,7 +56,10 @@ export async function PUT(request) {
   try {
     const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: cacheControlHeaders,
+      });
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
@@ -50,12 +72,21 @@ export async function PUT(request) {
     );
 
     if (!profile) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+      return new NextResponse(JSON.stringify({ error: 'Profile not found' }), {
+        status: 404,
+        headers: cacheControlHeaders,
+      });
     }
 
-    return NextResponse.json(profile, { status: 200 });
+    return new NextResponse(JSON.stringify(profile), {
+      status: 200,
+      headers: cacheControlHeaders,
+    });
   } catch (error) {
     console.error('Internal Server Error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return new NextResponse(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: cacheControlHeaders,
+    });
   }
 }
