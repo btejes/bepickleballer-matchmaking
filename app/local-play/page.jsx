@@ -43,7 +43,7 @@ const LocalPlay = () => {
       }
     } catch (error) {
       console.error('Error fetching next match:', error);
-      setError('No 1matches found');
+      setError('No matches found');
       setCurrentMatch(null);
     }
   };
