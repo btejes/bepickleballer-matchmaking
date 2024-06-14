@@ -34,17 +34,46 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     }
   }, [message]);
 
+  const handleZipCodeChange = async (e) => {
+    const zipCode = e.target.value;
+    setFormData({ ...formData, zipCode });
+
+    if (/^\d{5}$/.test(zipCode)) {
+      try {
+        const response = await fetch('/api/get-city-by-zipcode', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ zipCode }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        const city = data.city || '';
+        setFormData({ ...formData, zipCode, city });
+        onProfileChange({ ...formData, zipCode, city });
+      } catch (error) {
+        console.error('Error fetching city:', error);
+        setFormData({ ...formData, zipCode, city: '' });
+        onProfileChange({ ...formData, zipCode, city: '' });
+      }
+    } else {
+      setFormData({ ...formData, zipCode, city: '' });
+      onProfileChange({ ...formData, zipCode, city: '' });
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
     let error = '';
 
     if (name === 'zipCode') {
-      if (/^\d{0,5}$/.test(value)) {
-        updatedValue = value;
-      } else {
-        error = 'Zip Code must be 5 digits.';
-      }
+      handleZipCodeChange(e);
     } else if (name === 'duprRating') {
       if (value === '' || (/^(2(\.\d{1,2})?|[3-7](\.\d{1,2})?|8(\.0{0,2})?)$/.test(value))) {
         updatedValue = value;
@@ -146,7 +175,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             id="zipCode"
             name="zipCode"
             value={formData.zipCode || ''}
-            onChange={handleChange}
+            onChange={handleZipCodeChange}
             onKeyPress={(e) => handleKeyPress(e, 'zipCode')}
             maxLength="5"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"

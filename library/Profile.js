@@ -8,6 +8,7 @@ const ProfileSchema = new mongoose.Schema({
   duprRating: { type: String, default: '' },
   skillLevel: { type: String, default: '' },
   zipCode: { type: String, default: '' },
+  city: { type: String, default: '' },
   openForMatches: { type: String, default: '' },
   aboutYou: { type: String, default: '' },
   phone: { type: String, default: '' },
