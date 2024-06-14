@@ -53,9 +53,11 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'City not found for the provided ZIP code' }));
         } else if (response.status === 500) {
           const { error } = await response.json();
+          console.log('Error:', error);
           console.error('Error:', error);
           setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'Internal server error' }));
         } else if (!response.ok) {
+          console.log("\nNetwork response was not ok\n");
           throw new Error('Network response was not ok');
         } else {
           const data = await response.json();
