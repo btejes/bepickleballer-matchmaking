@@ -38,6 +38,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const debouncedHandleZipCodeChange = useCallback(debounce(async (zipCode) => {
     const basePath = '/matchmaking';
     if (/^\d{5}$/.test(zipCode)) {
+      console.log("\nZipcode:", zipCode, "\n");
       try {
         const response = await fetch(`${basePath}/api/get-city-by-zipcode`, {
           method: 'POST',
@@ -47,6 +48,8 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           },
           body: JSON.stringify({ zipCode }),
         });
+
+        console.log("\nZipcode:", zipCode, "\n");
 
         if (response.status === 404) {
           setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'City not found for the provided ZIP code' }));
@@ -74,10 +77,12 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
+    console.log("\nUpdated Value: ", updatedValue, "\n");
     let error = '';
 
     if (name === 'zipCode') {
       setFormData((prevData) => ({ ...prevData, zipCode: value }));
+      console.log("\nZipcode:", zipCode, "\n");
       if (value.length === 5) {
         debouncedHandleZipCodeChange(value);
       }
