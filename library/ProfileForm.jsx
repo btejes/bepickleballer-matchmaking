@@ -78,7 +78,9 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
     if (name === 'zipCode') {
       setFormData((prevData) => ({ ...prevData, zipCode: value }));
-      debouncedHandleZipCodeChange(value);
+      if (value.length === 5) {
+        debouncedHandleZipCodeChange(value);
+      }
     } else if (name === 'duprRating') {
       if (value === '' || (/^(2(\.\d{1,2})?|[3-7](\.\d{1,2})?|8(\.0{0,2})?)$/.test(value))) {
         updatedValue = value;
@@ -134,6 +136,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
       setMessage(result.message);
     }
   };
+
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-md text-black max-w-2xl mx-auto">
