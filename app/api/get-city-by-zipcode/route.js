@@ -17,6 +17,7 @@ const findCityByZipCode = async (filePath, zipCode) => {
     console.log(`File buffer read successfully: ${fileBuffer.length} bytes`);
     
     const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
+    console.log(`Workbook read successfully`);
     const sheetName = workbook.SheetNames[0];
     console.log(`Sheet name found: ${sheetName}`);
     const worksheet = workbook.Sheets[sheetName];
