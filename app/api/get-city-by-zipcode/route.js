@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import csv from 'csv-parser';
+import fastcsv from 'fast-csv';
 import path from 'path';
 import fs from 'fs';
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env') });
@@ -17,7 +17,7 @@ const findCityByZipCode = async (filePath, zipCode) => {
     const data = await new Promise((resolve, reject) => {
       const results = [];
       fs.createReadStream(filePath)
-        .pipe(csv())
+        .pipe(fastcsv.parse({ headers: true }))
         .on('data', (row) => results.push(row))
         .on('end', () => resolve(results))
         .on('error', (error) => reject(error));
