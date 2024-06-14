@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import XlsxPopulate from 'xlsx-populate';
+import fastcsv from 'fast-csv';
 import path from 'path';
 import fs from 'fs';
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env') });
 
 const findCityByZipCode = async (filePath, zipCode) => {
-  console.log(`Reading Excel file from path: ${filePath}`);
+  console.log(`Reading CSV file from path: ${filePath}`);
   try {
     if (!fs.existsSync(filePath)) {
       console.error(`File does not exist at path: ${filePath}`);
@@ -13,37 +13,40 @@ const findCityByZipCode = async (filePath, zipCode) => {
     }
 
     console.log(`File exists at path: ${filePath}`);
-    const fileBuffer = fs.readFileSync(filePath);
-    console.log(`File buffer read successfully: ${fileBuffer.length} bytes`);
 
-    const workbook = await XlsxPopulate.fromDataAsync(fileBuffer);
-    console.log(`Workbook read successfully`);
-    const sheet = workbook.sheet(0);
-    const jsonData = sheet.usedRange().value();
-    console.log(`First few rows of JSON data: ${JSON.stringify(jsonData.slice(0, 5))}`);
-    const headers = jsonData[0];
+    const data = await new Promise((resolve, reject) => {
+      const results = [];
+      fs.createReadStream(filePath)
+        .pipe(fastcsv.parse({ headers: true }))
+        .on('data', (row) => results.push(row))
+        .on('end', () => resolve(results))
+        .on('error', (error) => reject(error));
+    });
+
+    console.log(`CSV file read successfully`);
+    const headers = Object.keys(data[0]);
     console.log(`Headers: ${headers}`);
     const zipColumnIndex = headers.indexOf('PHYSICAL ZIP');
     const cityColumnIndex = headers.indexOf('PHYSICAL CITY');
 
     if (zipColumnIndex === -1 || cityColumnIndex === -1) {
-      throw new Error('Specified columns not found in the Excel file');
+      throw new Error('Specified columns not found in the CSV file');
     }
 
     console.log(`Zip Column Index: ${zipColumnIndex}, City Column Index: ${cityColumnIndex}`);
 
-    for (let i = 1; i < jsonData.length; i++) {
-      const row = jsonData[i];
-      if (row[zipColumnIndex] == zipCode) {
+    for (let i = 0; i < data.length; i++) {
+      const row = data[i];
+      if (row['PHYSICAL ZIP'] == zipCode) {
         console.log(`Matching row found: ${JSON.stringify(row)}`);
-        return row[cityColumnIndex];
+        return row['PHYSICAL CITY'];
       }
     }
 
     console.log(`No matching city found for ZIP code: ${zipCode}`);
     return null;
   } catch (error) {
-    console.error(`Error processing Excel file: ${error.message}`);
+    console.error(`Error processing CSV file: ${error.message}`);
     return `Error: ${error.message}`;
   }
 };
@@ -59,7 +62,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'ZIP code is required' }, { status: 400 });
     }
 
-    const filePath = path.resolve('library/US_Zipcode_Cities.xlsx'); // Adjusted path based on filesystem
+    const filePath = path.resolve('library/US_Zipcode_Cities.csv'); // Adjusted path based on filesystem
     console.log(`Using file path: ${filePath}`);
     const city = await findCityByZipCode(filePath, zipCode);
 
