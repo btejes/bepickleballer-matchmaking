@@ -27,6 +27,7 @@
     "fs": "^0.0.1-security",
     "jose": "^5.4.0",
     "jsonwebtoken": "^9.0.2",
+    "lodash.debounce": "^4.0.8",
     "mailgun.js": "^10.2.1",
     "mongoose": "^8.3.5",
     "nanoid": "^5.0.7",
