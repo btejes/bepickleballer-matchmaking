@@ -36,11 +36,12 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
   const handleZipCodeChange = async (e) => {
     const zipCode = e.target.value;
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
     setFormData({ ...formData, zipCode });
 
     if (/^\d{5}$/.test(zipCode)) {
       try {
-        const response = await fetch('/api/get-city-by-zipcode', {
+        const response = await fetch(`${basePath}/api/get-city-by-zipcode`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
