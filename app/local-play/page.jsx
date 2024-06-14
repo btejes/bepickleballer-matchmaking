@@ -43,15 +43,10 @@ const LocalPlay = () => {
       }
     } catch (error) {
       console.error('Error fetching next match:', error);
-      setError(
-        `Want More Pickleball Matches?\n\n` +
-        `Get more matches sooner by sharing bepickleballer.com in your Pickleball Facebook Group or community groups. More shares = More players = More matches for you!\n\n` +
-        `Thank you for your support!`
-      );
+      setError('No matches found');
       setCurrentMatch(null);
     }
   };
-  
 
   const handlePreferenceChange = (e) => {
     const { name, value } = e.target;

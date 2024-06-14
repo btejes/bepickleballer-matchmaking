@@ -52,7 +52,7 @@ export async function GET(request) {
 
     console.log("Valid matches found:", validMatches.length);
     if (validMatches.length === 0) {
-      return NextResponse.json({ error: 'No matches found' }, { status: 404 });
+      return NextResponse.json({ error: '' }, { status: 404 });
     }
 
     const randomMatch = validMatches[Math.floor(Math.random() * validMatches.length)];

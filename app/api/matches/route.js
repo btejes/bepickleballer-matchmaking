@@ -26,7 +26,11 @@ export const GET = async (req) => {
     });
 
     if (matchedEntries.length === 0) {
-      return NextResponse.json({ error: 'No matches found' }, { status: 404 });
+      return NextResponse.json({ error: 
+        `Want More Pickleball Matches?\n\n` +
+        `Get more matches sooner by sharing bepickleballer.com in your Pickleball Facebook Group or community groups. More shares = More players = More matches for you!\n\n` +
+        `Thank you for your support!`
+      }, { status: 404 });
     }
 
     const matchedProfiles = await Promise.all(
