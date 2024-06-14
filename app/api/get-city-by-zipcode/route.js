@@ -4,6 +4,39 @@ import path from 'path';
 import fs from 'fs';
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env') });
 
+// Function to read and parse the CSV file
+const readCSV = async (filePath) => {
+  return new Promise((resolve, reject) => {
+    const results = [];
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on('data', (row) => results.push(row))
+      .on('end', () => resolve(results))
+      .on('error', (error) => reject(error));
+  });
+};
+
+// Function to perform binary search on the sorted data
+const binarySearch = (data, zipCode) => {
+  let left = 0;
+  let right = data.length - 1;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    const currentZip = data[mid]['PHYSICAL ZIP'];
+
+    if (currentZip === zipCode) {
+      return data[mid]['PHYSICAL CITY'];
+    } else if (currentZip < zipCode) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+
+  return null;
+};
+
 const findCityByZipCode = async (filePath, zipCode) => {
   console.log(`Reading CSV file from path: ${filePath}`);
   try {
@@ -14,27 +47,20 @@ const findCityByZipCode = async (filePath, zipCode) => {
 
     console.log(`File exists at path: ${filePath}`);
 
-    const data = await new Promise((resolve, reject) => {
-      const results = [];
-      fs.createReadStream(filePath)
-        .pipe(csv())
-        .on('data', (row) => results.push(row))
-        .on('end', () => resolve(results))
-        .on('error', (error) => reject(error));
-    });
+    const data = await readCSV(filePath);
 
     console.log(`CSV file read successfully`);
     console.log(`First few rows of JSON data: ${JSON.stringify(data.slice(0, 5))}`);
     
-    for (let row of data) {
-      if (row['PHYSICAL ZIP'] == zipCode) {
-        console.log(`Matching row found: ${JSON.stringify(row)}`);
-        return row['PHYSICAL CITY'];
-      }
-    }
+    const city = binarySearch(data, zipCode);
 
-    console.log(`No matching city found for ZIP code: ${zipCode}`);
-    return null;
+    if (city) {
+      console.log(`Matching row found: ${city}`);
+      return city;
+    } else {
+      console.log(`No matching city found for ZIP code: ${zipCode}`);
+      return null;
+    }
   } catch (error) {
     console.error(`Error processing CSV file: ${error.message}`);
     return `Error: ${error.message}`;
