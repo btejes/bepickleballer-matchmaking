@@ -106,7 +106,12 @@ const LocalPlay = () => {
             </div>
           </div>
         ) : (
-          <p>{error || 'Loading...'}</p>
+          <p>
+            {error === 'No matches found'
+              ? 'Want More Pickleball Matches?\n\nGet more matches sooner by sharing bepickleballer.com in your Pickleball Facebook Group or community groups. More shares = More players = More matches for you!\n\nThank you for your support!'
+              : error || 'Loading...'}
+          </p>
+
         )}
       </div>
       <div className="w-full text-black h-auto bg-white p-2 flex justify-between">
