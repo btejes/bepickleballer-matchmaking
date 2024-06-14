@@ -38,7 +38,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const debouncedHandleZipCodeChange = useCallback(debounce(async (zipCode) => {
     const basePath = '/matchmaking';
     if (/^\d{5}$/.test(zipCode)) {
-      console.log("\nZipcode:", zipCode, "\n");
+      console.log("\nDebounced Zipcode:", zipCode, "\n");
       try {
         const response = await fetch(`${basePath}/api/get-city-by-zipcode`, {
           method: 'POST',
@@ -49,17 +49,15 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           body: JSON.stringify({ zipCode }),
         });
 
-        console.log("\nZipcode:", zipCode, "\n");
+        console.log("\nResponse Status:", response.status, "\n");
 
         if (response.status === 404) {
           setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'City not found for the provided ZIP code' }));
         } else if (response.status === 500) {
           const { error } = await response.json();
-          console.log('Error:', error);
           console.error('Error:', error);
           setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'Internal server error' }));
         } else if (!response.ok) {
-          console.log("\nNetwork response was not ok\n");
           throw new Error('Network response was not ok');
         } else {
           const data = await response.json();
@@ -77,34 +75,34 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
-    console.log("\nUpdated Value: ", updatedValue, "\n");
+    console.log("\nUpdated Value:", updatedValue, "\n");
     let error = '';
 
     if (name === 'zipCode') {
-      setFormData((prevData) => ({ ...prevData, zipCode: value }));
-      console.log("\nZipcode:", zipCode, "\n");
-      if (value.length === 5) {
-        debouncedHandleZipCodeChange(value);
+      setFormData((prevData) => ({ ...prevData, zipCode: updatedValue }));
+      console.log("\nZipcode value:", updatedValue, "\n");
+      if (updatedValue.length === 5) {
+        debouncedHandleZipCodeChange(updatedValue);
       }
     } else if (name === 'duprRating') {
-      if (value === '' || (/^(2(\.\d{1,2})?|[3-7](\.\d{1,2})?|8(\.0{0,2})?)$/.test(value))) {
+      if (updatedValue === '' || (/^(2(\.\d{1,2})?|[3-7](\.\d{1,2})?|8(\.0{0,2})?)$/.test(updatedValue))) {
         updatedValue = value;
       } else {
         error = 'DUPR Rating must be a number between 2.0 and 8.0 with up to 2 decimal places.';
       }
     } else if (name === 'phone') {
-      if (/^\d{0,10}$/.test(value)) {
+      if (/^\d{0,10}$/.test(updatedValue)) {
         updatedValue = value;
       } else {
         error = 'Phone number must be 10 digits.';
       }
     } else if (name === 'email') {
       updatedValue = value;
-      if (!/\S+@\S+\.\S+/.test(value)) {
+      if (!/\S+@\S+\.\S+/.test(updatedValue)) {
         error = 'Must be a valid email.';
       }
     } else if (name === 'aboutYou') {
-      if (value.length <= 140) {
+      if (updatedValue.length <= 140) {
         updatedValue = value;
       } else {
         error = 'About You must be 140 characters or less.';
@@ -119,7 +117,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const handleKeyPress = (e, name) => {
     const charCode = e.which ? e.which : e.keyCode;
     const charStr = String.fromCharCode(charCode);
-    
+
     if (name === 'zipCode' || name === 'phone') {
       if (!/^\d$/.test(charStr)) {
         e.preventDefault();
@@ -141,7 +139,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
       setMessage(result.message);
     }
   };
-
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-md text-black max-w-2xl mx-auto">
