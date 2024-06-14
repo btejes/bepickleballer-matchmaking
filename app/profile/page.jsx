@@ -15,6 +15,7 @@ const ProfilePage = () => {
     duprRating: '',
     skillLevel: '',
     zipCode: '',
+    city: '',
     openForMatches: '',
     aboutYou: '',
     phone: '',
