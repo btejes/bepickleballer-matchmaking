@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
-import xlsx from 'xlsx';
+import XlsxPopulate from 'xlsx-populate';
 import path from 'path';
 import fs from 'fs';
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env') });
-
-console.log('xlsx library:', xlsx);
 
 const findCityByZipCode = async (filePath, zipCode) => {
   console.log(`Reading Excel file from path: ${filePath}`);
@@ -17,13 +15,11 @@ const findCityByZipCode = async (filePath, zipCode) => {
     console.log(`File exists at path: ${filePath}`);
     const fileBuffer = fs.readFileSync(filePath);
     console.log(`File buffer read successfully: ${fileBuffer.length} bytes`);
-    
-    const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
+
+    const workbook = await XlsxPopulate.fromDataAsync(fileBuffer);
     console.log(`Workbook read successfully`);
-    const sheetName = workbook.SheetNames[0];
-    console.log(`Sheet name found: ${sheetName}`);
-    const worksheet = workbook.Sheets[sheetName];
-    const jsonData = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
+    const sheet = workbook.sheet(0);
+    const jsonData = sheet.usedRange().value();
     console.log(`First few rows of JSON data: ${JSON.stringify(jsonData.slice(0, 5))}`);
     const headers = jsonData[0];
     console.log(`Headers: ${headers}`);
