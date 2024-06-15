@@ -34,37 +34,44 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     }
   }, [message]);
 
+  // Watch zipCode in formData and make API call when it reaches 5 digits
+  useEffect(() => {
+    const zipCode = formData.zipCode;
+    if (/^\d{5}$/.test(zipCode)) {
+      handleZipCodeChange(zipCode);
+    }
+  }, [formData.zipCode]);
+
   const handleZipCodeChange = async (zipCode) => {
     const basePath = '/matchmaking';
-    if (/^\d{5}$/.test(zipCode)) {
-      try {
-        const response = await fetch(`${basePath}/api/get-city-by-zipcode`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache',
-          },
-          body: JSON.stringify({ zipCode }),
-        });
+    try {
+      const response = await fetch(`${basePath}/api/get-city-by-zipcode`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
+        },
+        body: JSON.stringify({ zipCode }),
+      });
 
-        if (response.status === 404) {
-          setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'City not found for the provided ZIP code' }));
-        } else if (response.status === 500) {
-          const { error } = await response.json();
-          console.error('Error:', error);
-          setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'Internal server error' }));
-        } else if (!response.ok) {
-          throw new Error('Network response was not ok');
-        } else {
-          const data = await response.json();
-          if (data.city) {
-            setFormData((prevData) => ({ ...prevData, city: data.city }));
-            onProfileChange({ ...formData, city: data.city });
-          }
+      if (response.status === 404) {
+        setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'City not found for the provided ZIP code' }));
+      } else if (response.status === 500) {
+        const { error } = await response.json();
+        console.error('Error:', error);
+        setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'Internal server error' }));
+      } else if (!response.ok) {
+        throw new Error('Network response was not ok');
+      } else {
+        const data = await response.json();
+        if (data.city) {
+          // Update only the city without affecting the zipCode
+          setFormData((prevData) => ({ ...prevData, city: data.city }));
+          onProfileChange((prevData) => ({ ...prevData, city: data.city }));
         }
-      } catch (error) {
-        console.error('Error fetching city:', error);
       }
+    } catch (error) {
+      console.error('Error fetching city:', error);
     }
   };
 
@@ -75,11 +82,9 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
     if (name === 'zipCode') {
       if (/^\d{0,5}$/.test(updatedValue)) {
-        setFormData((prevData) => ({ ...prevData, zipCode: updatedValue }));
-        onProfileChange({ ...formData, zipCode: updatedValue });
-        if (updatedValue.length === 5) {
-          handleZipCodeChange(updatedValue);
-        }
+        const newFormData = { ...formData, zipCode: updatedValue };
+        setFormData(newFormData);
+        onProfileChange(newFormData);
       }
     } else if (name === 'duprRating') {
       if (updatedValue === '' || (/^(2(\.\d{1,2})?|[3-7](\.\d{1,2})?|8(\.0{0,2})?)$/.test(updatedValue))) {
@@ -204,45 +209,9 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="Intermediate">Intermediate</option>
             <option value="Advanced">Advanced</option>
           </select>
-          <label htmlFor="openForMatches">Open For Matches</label>
-          <select
-            id="openForMatches"
-            name="openForMatches"
-            value={formData.openForMatches || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="no">No</option>
-            <option value="yes">Yes</option>
-          </select>
-          <label htmlFor="casualCompetitive">Play Style</label>
-          <select
-            id="casualCompetitive"
-            name="casualCompetitive"
-            value={formData.casualCompetitive || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="">Unselected</option>
-            <option value="casual">Casual</option>
-            <option value="competitive">Competitive</option>
-          </select>
-          <label htmlFor="outdoorIndoor">Indoor/Outdoor</label>
-          <select
-            id="outdoorIndoor"
-            name="outdoorIndoor"
-            value={formData.outdoorIndoor || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="">Unselected</option>
-            <option value="outdoor">Outdoor</option>
-            <option value="indoor">Indoor</option>
-            <option value="both">Both</option>
-          </select>
         </div>
       </div>
-    
+
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2 flex flex-col relative">
           <div className="relative">
