@@ -34,13 +34,16 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     }
   }, [message]);
 
-  // Watch zipCode in formData and make API call when it reaches 5 digits
   useEffect(() => {
     const zipCode = formData.zipCode;
     if (/^\d{5}$/.test(zipCode)) {
       handleZipCodeChange(zipCode);
     }
   }, [formData.zipCode]);
+
+  useEffect(() => {
+    onProfileChange(formData);
+  }, [formData, onProfileChange]);
 
   const handleZipCodeChange = async (zipCode) => {
     const basePath = '/matchmaking';
@@ -65,9 +68,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
       } else {
         const data = await response.json();
         if (data.city) {
-          // Update only the city without affecting the zipCode
           setFormData((prevData) => ({ ...prevData, city: data.city }));
-          onProfileChange((prevData) => ({ ...prevData, city: data.city }));
         }
       }
     } catch (error) {
@@ -82,9 +83,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
     if (name === 'zipCode') {
       if (/^\d{0,5}$/.test(updatedValue)) {
-        const newFormData = { ...formData, zipCode: updatedValue };
-        setFormData(newFormData);
-        onProfileChange(newFormData);
+        setFormData((prevData) => ({ ...prevData, zipCode: updatedValue }));
       }
     } else if (name === 'duprRating') {
       if (updatedValue === '' || (/^(2(\.\d{1,2})?|[3-7](\.\d{1,2})?|8(\.0{0,2})?)$/.test(updatedValue))) {
@@ -113,7 +112,21 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
     setFormData((prevData) => ({ ...prevData, [name]: updatedValue }));
-    onProfileChange({ ...formData, [name]: updatedValue });
+  };
+
+  const handleKeyPress = (e, name) => {
+    const charCode = e.which ? e.which : e.keyCode;
+    const charStr = String.fromCharCode(charCode);
+
+    if (name === 'zipCode' || name === 'phone') {
+      if (!/^\d$/.test(charStr)) {
+        e.preventDefault();
+      }
+    } else if (name === 'duprRating') {
+      if (!/^\d$/.test(charStr) && charStr !== '.') {
+        e.preventDefault();
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -159,6 +172,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             name="duprRating"
             value={formData.duprRating || ''}
             onChange={handleChange}
+            onKeyPress={(e) => handleKeyPress(e, 'duprRating')}
             min="2.0"
             max="8.0"
             step="0.01"
@@ -172,6 +186,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             name="zipCode"
             value={formData.zipCode || ''}
             onChange={handleChange}
+            onKeyPress={(e) => handleKeyPress(e, 'zipCode')}
             maxLength="5"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           />
@@ -209,6 +224,42 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="Intermediate">Intermediate</option>
             <option value="Advanced">Advanced</option>
           </select>
+          <label htmlFor="openForMatches">Open For Matches</label>
+          <select
+            id="openForMatches"
+            name="openForMatches"
+            value={formData.openForMatches || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+          >
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+          <label htmlFor="casualCompetitive">Play Style</label>
+          <select
+            id="casualCompetitive"
+            name="casualCompetitive"
+            value={formData.casualCompetitive || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+          >
+            <option value="">Unselected</option>
+            <option value="casual">Casual</option>
+            <option value="competitive">Competitive</option>
+          </select>
+          <label htmlFor="outdoorIndoor">Indoor/Outdoor</label>
+          <select
+            id="outdoorIndoor"
+            name="outdoorIndoor"
+            value={formData.outdoorIndoor || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+          >
+            <option value="">Unselected</option>
+            <option value="outdoor">Outdoor</option>
+            <option value="indoor">Indoor</option>
+            <option value="both">Both</option>
+          </select>
         </div>
       </div>
 
@@ -230,7 +281,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             </small>
           </div>
         </div>
-        <br></br>
         <div className="col-span-2 flex justify-left">
           <small className="text-gray-500">
             Only accepted matches see phone and email below
