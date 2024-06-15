@@ -107,7 +107,7 @@ const LocalPlay = () => {
           </div>
         ) : (
 
-          <p className="justify-center p-5 text-black text-center bg-white rounded-3xl shadow-2xl">
+          <p className="justify-center p-5 text-black text-center bg-gray-300 rounded-3xl shadow-2xl">
             {error === 'No matches found' ? (
               <>
                 No profiles found. Check back soon!
@@ -118,7 +118,7 @@ const LocalPlay = () => {
                   <strong><big>Want to see more profiles? Spread the word!</big></strong>
                   <br />
                   <br />
-                  Share <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer"><strong>BePickleBaller.com</strong></a> <br></br>in all your favorite online pickleball groups!
+                  Share  <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer " style={{ color: '#0000EE' }}><strong>BePickleBaller.com</strong></a> <br></br>with all your favorite pickleball groups!
                   <br />
                   <br />
                   More shares = More players = More potential matches for you!
