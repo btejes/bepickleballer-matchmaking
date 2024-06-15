@@ -107,7 +107,7 @@ const LocalPlay = () => {
           </div>
         ) : (
 
-          <p className="justify-center p-4 text-black text-center bg-white rounded-3xl shadow-2xl">
+          <p className="justify-center p-5 text-black text-center bg-white rounded-3xl shadow-2xl">
             {error === 'No matches found' ? (
               <>
                 No profiles found. Check back soon!
