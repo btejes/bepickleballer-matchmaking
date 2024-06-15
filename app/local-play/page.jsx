@@ -118,7 +118,7 @@ const LocalPlay = () => {
                   <strong><big>Want to see more profiles? Spread the word!</big></strong>
                   <br />
                   <br />
-                  Share  <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer " style={{ color: '#0000EE' }}><strong>BePickleBaller.com</strong></a> <br></br>with all your favorite pickleball groups!
+                  Share  <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer " style={{ color: '#0000EE', fontStyle: 'italic' }}><strong><italic></italic>BePickleBaller.com</strong></a> <br></br>with all your favorite pickleball groups!
                   <br />
                   <br />
                   More shares = More players = More potential matches for you!
