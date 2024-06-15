@@ -42,10 +42,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     }
   }, [formData.zipCode]);
 
-  useEffect(() => {
-    onProfileChange(formData);
-  }, [formData, onProfileChange]);
-
   const handleZipCodeChange = async (zipCode) => {
     const basePath = '/matchmaking';
     try {
@@ -71,6 +67,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
         if (data.city) {
           // Update only the city without affecting the zipCode
           setFormData((prevData) => ({ ...prevData, city: data.city }));
+          onProfileChange((prevData) => ({ ...prevData, city: data.city }));
         }
       }
     } catch (error) {
@@ -85,7 +82,9 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
     if (name === 'zipCode') {
       if (/^\d{0,5}$/.test(updatedValue)) {
-        setFormData((prevData) => ({ ...prevData, zipCode: updatedValue }));
+        const newFormData = { ...formData, zipCode: updatedValue };
+        setFormData(newFormData);
+        onProfileChange(newFormData);
       }
     } else if (name === 'duprRating') {
       if (updatedValue === '' || (/^(2(\.\d{1,2})?|[3-7](\.\d{1,2})?|8(\.0{0,2})?)$/.test(updatedValue))) {
@@ -114,6 +113,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
     setFormData((prevData) => ({ ...prevData, [name]: updatedValue }));
+    onProfileChange({ ...formData, [name]: updatedValue });
   };
 
   const handleSubmit = async (e) => {
@@ -208,42 +208,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="Beginner">Beginner</option>
             <option value="Intermediate">Intermediate</option>
             <option value="Advanced">Advanced</option>
-          </select>
-          <label htmlFor="openForMatches">Open For Matches</label>
-          <select
-            id="openForMatches"
-            name="openForMatches"
-            value={formData.openForMatches || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="no">No</option>
-            <option value="yes">Yes</option>
-          </select>
-          <label htmlFor="casualCompetitive">Play Style</label>
-          <select
-            id="casualCompetitive"
-            name="casualCompetitive"
-            value={formData.casualCompetitive || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="">Unselected</option>
-            <option value="casual">Casual</option>
-            <option value="competitive">Competitive</option>
-          </select>
-          <label htmlFor="outdoorIndoor">Indoor/Outdoor</label>
-          <select
-            id="outdoorIndoor"
-            name="outdoorIndoor"
-            value={formData.outdoorIndoor || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="">Unselected</option>
-            <option value="outdoor">Outdoor</option>
-            <option value="indoor">Indoor</option>
-            <option value="both">Both</option>
           </select>
         </div>
       </div>
