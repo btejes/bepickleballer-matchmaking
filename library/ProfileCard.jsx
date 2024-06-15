@@ -12,17 +12,13 @@ const ProfileCard = ({ profile, isProfilePage }) => {
     if (profile.profileImage) {
       setImage(profile.profileImage);
     }
+  }, [profile.profileImage]);
 
+  useEffect(() => {
     if (profile.userId) {
       fetchAverageRating(profile.userId);
     }
-  }, []); // This effect runs only once, when the component is mounted
-
-  useEffect(() => {
-    if (profile.profileImage) {
-      setImage(profile.profileImage);
-    }
-  }, [profile.profileImage]);
+  }, []); // This effect runs only once when the component mounts
 
   useEffect(() => {
     if (statusMessage) {
