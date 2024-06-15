@@ -76,6 +76,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     if (name === 'zipCode') {
       if (/^\d{0,5}$/.test(updatedValue)) {
         setFormData((prevData) => ({ ...prevData, zipCode: updatedValue }));
+        onProfileChange({ ...formData, zipCode: updatedValue });
         if (updatedValue.length === 5) {
           handleZipCodeChange(updatedValue);
         }
