@@ -107,14 +107,14 @@ const LocalPlay = () => {
           </div>
         ) : (
 
-          <p>
+          <p className="justify-center">
             {error === 'No matches found' ? (
               <>
                 <strong>No profiles found. Check back soon!</strong>
                 <br />
+                <br />
+                <br />
                 <div className="justify-center p-5 text-black text-center bg-gray-300 rounded-3xl shadow-2xl">
-                  <br />
-                  <br />
                   <span>
                     <strong><big>Want to see more profiles? Spread the word!</big></strong>
                     <br />
