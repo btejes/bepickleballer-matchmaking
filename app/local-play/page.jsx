@@ -106,10 +106,25 @@ const LocalPlay = () => {
             </div>
           </div>
         ) : (
-          <p>
-            {error === 'No matches found'
-              ? 'Want More Pickleball Matches?\n\nGet more matches sooner by sharing bepickleballer.com in your Pickleball Facebook Group or community groups. More shares = More players = More matches for you!\n\nThank you for your support!'
-              : error || 'Loading...'}
+          
+          <p className="justify-center">
+            {error === 'No matches found' ? (
+              <>
+                <strong>No matches found. Check back soon!</strong>
+                <br />
+                <br />
+                <span>
+                  See new profiles sooner by sharing <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer">bepickleballer.com</a> in your Pickleball Facebook Group or messaging groups.
+                  <br />
+                  <strong>More shares = More players = More matches for you!</strong>
+                </span>
+                <br />
+                <br />
+                <span>Thank you for your support!</span>
+              </>
+            ) : (
+              error || 'Loading...'
+            )}
           </p>
 
         )}
