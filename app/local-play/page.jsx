@@ -124,7 +124,7 @@ const LocalPlay = () => {
                     <strong><big>Want to see more profiles? Spread the word!</big></strong>
                     <br />
                     <br />
-                    Share <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0000EE', fontStyle: 'italic' }}><strong>BePickleBaller.com</strong></a>
+                    Share <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0000EE', fontStyle: 'italic' }}><strong><big>BePickleBaller.com</big></strong></a>
                     <button onClick={copyToClipboard} style={{ marginLeft: '10px', cursor: 'pointer', color: '#0000EE' }}>
                       📋
                     </button>
