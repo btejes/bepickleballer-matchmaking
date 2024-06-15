@@ -110,17 +110,18 @@ const LocalPlay = () => {
           <p className="justify-center p-4 text-black text-center bg-white rounded-3xl shadow-2xl">
             {error === 'No matches found' ? (
               <>
-                <strong><big>No profiles found. Check back soon!</big></strong>
+                No profiles found. Check back soon!
                 <br />
                 <br />
                 <br />
                 <span>
                   <strong><big>Want to see more profiles? Spread the word!</big></strong>
                   <br />
+                  <br />
                   Share <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer"><strong>BePickleBaller.com</strong></a> in all your favorite online pickleball groups!
                   <br />
                   <br />
-                  <strong>More shares = More players = More potential matches for you!</strong>
+                  More shares = More players = More potential matches for you!
                 </span>
               </>
             ) : (
