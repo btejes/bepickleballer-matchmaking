@@ -132,7 +132,7 @@ const LocalPlay = () => {
                     <br />with all your favorite pickleball groups!
                     <br />
                     <br />
-                    More shares = More players = More potential matches for you!
+                    <strong>More shares = More players = More potential matches for you!</strong>
                   </span>
                 </div>
               </>
