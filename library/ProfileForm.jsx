@@ -111,21 +111,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     onProfileChange({ ...formData, [name]: updatedValue });
   };
 
-  const handleKeyPress = (e, name) => {
-    const charCode = e.which ? e.which : e.keyCode;
-    const charStr = String.fromCharCode(charCode);
-
-    if (name === 'zipCode' || name === 'phone') {
-      if (!/^\d$/.test(charStr)) {
-        e.preventDefault();
-      }
-    } else if (name === 'duprRating') {
-      if (!/^\d$/.test(charStr) && charStr !== '.') {
-        e.preventDefault();
-      }
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
@@ -169,7 +154,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             name="duprRating"
             value={formData.duprRating || ''}
             onChange={handleChange}
-            onKeyPress={(e) => handleKeyPress(e, 'duprRating')}
             min="2.0"
             max="8.0"
             step="0.01"
@@ -183,7 +167,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             name="zipCode"
             value={formData.zipCode || ''}
             onChange={handleChange}
-            onKeyPress={(e) => handleKeyPress(e, 'zipCode')}
             maxLength="5"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           />
@@ -292,7 +275,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             name="phone"
             value={formData.phone || ''}
             onChange={handleChange}
-            onKeyPress={(e) => handleKeyPress(e, 'phone')}
             maxLength="10"
             className="mt-1 block border border-gray-300 rounded-md shadow-sm p-1 text-center"
             style={{ width: '12ch' }}
