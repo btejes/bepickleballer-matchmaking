@@ -1,4 +1,3 @@
-// src/app/local-play/page.js
 'use client';
 
 import Navbar from '@/components/Navbar';
@@ -16,6 +15,7 @@ const LocalPlay = () => {
 
   const [currentMatch, setCurrentMatch] = useState(null);
   const [error, setError] = useState(null);
+  const [copySuccess, setCopySuccess] = useState('');
 
   useEffect(() => {
     fetchNextMatch();
@@ -81,6 +81,12 @@ const LocalPlay = () => {
     }
   };
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText('https://bepickleballer.com');
+    setCopySuccess('Link copied to clipboard!');
+    setTimeout(() => setCopySuccess(''), 3000); // Clear the message after 3 seconds
+  };
+
   return (
     <div className="flex flex-col items-center h-screen">
       <div className="w-full">
@@ -106,12 +112,10 @@ const LocalPlay = () => {
             </div>
           </div>
         ) : (
-
           <p className="justify-center">
             {error === 'No matches found' ? (
               <>
                 <strong>No profiles found. Check back soon!</strong>
-                <br />
                 <br />
                 <br />
                 <div className="justify-center p-5 text-black text-center bg-gray-300 rounded-3xl shadow-2xl">
@@ -119,7 +123,12 @@ const LocalPlay = () => {
                     <strong><big>Want to see more profiles? Spread the word!</big></strong>
                     <br />
                     <br />
-                    Share  <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer " style={{ color: '#0000EE', fontStyle: 'italic' }}><strong><italic></italic>BePickleBaller.com</strong></a> <br></br>with all your favorite pickleball groups!
+                    Share <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0000EE', fontStyle: 'italic' }}><strong>BePickleBaller.com</strong></a>
+                    <button onClick={copyToClipboard} style={{ marginLeft: '10px', cursor: 'pointer', color: '#0000EE' }}>
+                      📋
+                    </button>
+                    {copySuccess && <span style={{ marginLeft: '10px', color: 'green' }}>{copySuccess}</span>}
+                    <br />with all your favorite pickleball groups!
                     <br />
                     <br />
                     More shares = More players = More potential matches for you!
@@ -130,7 +139,6 @@ const LocalPlay = () => {
               error || 'Loading...'
             )}
           </p>
-
         )}
       </div>
       <div className="w-full text-black h-auto bg-white p-2 flex justify-between">
