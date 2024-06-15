@@ -84,7 +84,7 @@ const LocalPlay = () => {
   const copyToClipboard = () => {
     navigator.clipboard.writeText('https://bepickleballer.com');
     setCopySuccess('Link copied to clipboard!');
-    setTimeout(() => setCopySuccess(''), 3000); // Clear the message after 3 seconds
+    setTimeout(() => setCopySuccess(''), 5000); // Clear the message after 3 seconds
   };
 
   return (
@@ -112,7 +112,7 @@ const LocalPlay = () => {
             </div>
           </div>
         ) : (
-          <p className="justify-center">
+          <p className="text-center">
             {error === 'No matches found' ? (
               <>
                 <strong>No profiles found. Check back soon!</strong>
