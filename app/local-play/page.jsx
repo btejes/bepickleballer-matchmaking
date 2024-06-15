@@ -118,6 +118,7 @@ const LocalPlay = () => {
                 <strong>No profiles found. Check back soon!</strong>
                 <br />
                 <br />
+                <br />
                 <div className="justify-center p-5 text-black text-center bg-gray-300 rounded-3xl shadow-2xl">
                   <span>
                     <strong><big>Want to see more profiles? Spread the word!</big></strong>
