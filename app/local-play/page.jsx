@@ -113,12 +113,13 @@ const LocalPlay = () => {
                 <strong><big>No profiles found. Check back soon!</big></strong>
                 <br />
                 <br />
-                <br />
                 <span>
-                  See new profiles sooner by sharing <strong> <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer">BePickleBaller.com</a> in your Pickleball Facebook Group or messaging groups. </strong>
+                  <strong>Want to see more profiles?</strong>
+                  <br />
+                  Spread the word by sharing <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer"><strong>BePickleBaller.com</strong></a> in all your favorite online pickleball groups!
                   <br />
                   <br />
-                  <strong> More shares = More players = More matches for you! </strong>
+                  <strong>More shares = More players = More potential matches for you!</strong>
                 </span>
                 <br />
                 <br />
