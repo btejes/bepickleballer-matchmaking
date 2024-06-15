@@ -107,22 +107,24 @@ const LocalPlay = () => {
           </div>
         ) : (
 
-          <p className="justify-center p-5 text-black text-center bg-gray-300 rounded-3xl shadow-2xl">
+          <p>
             {error === 'No matches found' ? (
               <>
                 <strong>No profiles found. Check back soon!</strong>
                 <br />
-                <br />
-                <br />
-                <span>
-                  <strong><big>Want to see more profiles? Spread the word!</big></strong>
+                <div className="justify-center p-5 text-black text-center bg-gray-300 rounded-3xl shadow-2xl">
                   <br />
                   <br />
-                  Share  <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer " style={{ color: '#0000EE', fontStyle: 'italic' }}><strong><italic></italic>BePickleBaller.com</strong></a> <br></br>with all your favorite pickleball groups!
-                  <br />
-                  <br />
-                  More shares = More players = More potential matches for you!
-                </span>
+                  <span>
+                    <strong><big>Want to see more profiles? Spread the word!</big></strong>
+                    <br />
+                    <br />
+                    Share  <a href="https://bepickleballer.com" target="_blank" rel="noopener noreferrer " style={{ color: '#0000EE', fontStyle: 'italic' }}><strong><italic></italic>BePickleBaller.com</strong></a> <br></br>with all your favorite pickleball groups!
+                    <br />
+                    <br />
+                    More shares = More players = More potential matches for you!
+                  </span>
+                </div>
               </>
             ) : (
               error || 'Loading...'
