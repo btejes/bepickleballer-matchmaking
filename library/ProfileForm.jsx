@@ -34,6 +34,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     }
   }, [message]);
 
+  // Watch zipCode in formData and make API call when it reaches 5 digits
   useEffect(() => {
     const zipCode = formData.zipCode;
     if (/^\d{5}$/.test(zipCode)) {
@@ -68,6 +69,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
       } else {
         const data = await response.json();
         if (data.city) {
+          // Update only the city without affecting the zipCode
           setFormData((prevData) => ({ ...prevData, city: data.city }));
         }
       }
@@ -114,21 +116,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     setFormData((prevData) => ({ ...prevData, [name]: updatedValue }));
   };
 
-  const handleKeyPress = (e, name) => {
-    const charCode = e.which ? e.which : e.keyCode;
-    const charStr = String.fromCharCode(charCode);
-
-    if (name === 'zipCode' || name === 'phone') {
-      if (!/^\d$/.test(charStr)) {
-        e.preventDefault();
-      }
-    } else if (name === 'duprRating') {
-      if (!/^\d$/.test(charStr) && charStr !== '.') {
-        e.preventDefault();
-      }
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
@@ -172,7 +159,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             name="duprRating"
             value={formData.duprRating || ''}
             onChange={handleChange}
-            onKeyPress={(e) => handleKeyPress(e, 'duprRating')}
             min="2.0"
             max="8.0"
             step="0.01"
@@ -186,13 +172,10 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             name="zipCode"
             value={formData.zipCode || ''}
             onChange={handleChange}
-            onKeyPress={(e) => handleKeyPress(e, 'zipCode')}
             maxLength="5"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           />
           {errors.zipCode && <span className="text-red-500 text-sm">{errors.zipCode}</span>}
-        </div>
-        <div className="w-1/2 p-2">
           <label htmlFor="ageRange">Age Range</label>
           <select
             id="ageRange"
@@ -224,6 +207,8 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="Intermediate">Intermediate</option>
             <option value="Advanced">Advanced</option>
           </select>
+        </div>
+        <div className="w-1/2 p-2">
           <label htmlFor="openForMatches">Open For Matches</label>
           <select
             id="openForMatches"
@@ -260,6 +245,31 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="indoor">Indoor</option>
             <option value="both">Both</option>
           </select>
+          <label htmlFor="phone">Phone</label>
+          <input
+            type="text"
+            id="phone"
+            name="phone"
+            value={formData.phone || ''}
+            onChange={handleChange}
+            maxLength="10"
+            className="mt-1 block border border-gray-300 rounded-md shadow-sm p-1 text-center"
+            style={{ width: '12ch' }}
+            autoComplete="off"
+          />
+          {errors.phone && <span className="text-red-500 text-sm">{errors.phone}</span>}
+          <label htmlFor="email">Email</label>
+          <input
+            type="text"
+            id="email"
+            name="email"
+            value={formData.email || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 mb-4 text-center"
+            style={{ width: '30ch' }}
+            autoComplete="off"
+          />
+          {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
         </div>
       </div>
 
@@ -285,35 +295,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           <small className="text-gray-500">
             Only accepted matches see phone and email below
           </small>
-        </div>
-        <div className="col-span-1 flex flex-row items-center space-x-4">
-          <label htmlFor="phone" className="w-1/3">Phone</label>
-          <input
-            type="text"
-            id="phone"
-            name="phone"
-            value={formData.phone || ''}
-            onChange={handleChange}
-            maxLength="10"
-            className="mt-1 block border border-gray-300 rounded-md shadow-sm p-1 text-center"
-            style={{ width: '12ch' }}
-            autoComplete="off"
-          />
-          {errors.phone && <span className="text-red-500 text-sm">{errors.phone}</span>}
-        </div>
-        <div className="col-span-1 flex flex-row items-center space-x-4">
-          <label htmlFor="email" className="w-1/3">Email</label>
-          <input
-            type="text"
-            id="email"
-            name="email"
-            value={formData.email || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 mb-4 text-center"
-            style={{ width: '30ch' }}
-            autoComplete="off"
-          />
-          {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
         </div>
       </div>
 
