@@ -176,6 +176,8 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           />
           {errors.zipCode && <span className="text-red-500 text-sm">{errors.zipCode}</span>}
+        </div>
+        <div className="w-1/2 p-2">
           <label htmlFor="ageRange">Age Range</label>
           <select
             id="ageRange"
@@ -207,8 +209,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="Intermediate">Intermediate</option>
             <option value="Advanced">Advanced</option>
           </select>
-        </div>
-        <div className="w-1/2 p-2">
           <label htmlFor="openForMatches">Open For Matches</label>
           <select
             id="openForMatches"
@@ -245,31 +245,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="indoor">Indoor</option>
             <option value="both">Both</option>
           </select>
-          <label htmlFor="phone">Phone</label>
-          <input
-            type="text"
-            id="phone"
-            name="phone"
-            value={formData.phone || ''}
-            onChange={handleChange}
-            maxLength="10"
-            className="mt-1 block border border-gray-300 rounded-md shadow-sm p-1 text-center"
-            style={{ width: '12ch' }}
-            autoComplete="off"
-          />
-          {errors.phone && <span className="text-red-500 text-sm">{errors.phone}</span>}
-          <label htmlFor="email">Email</label>
-          <input
-            type="text"
-            id="email"
-            name="email"
-            value={formData.email || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 mb-4 text-center"
-            style={{ width: '30ch' }}
-            autoComplete="off"
-          />
-          {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
         </div>
       </div>
 
@@ -291,10 +266,40 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             </small>
           </div>
         </div>
+        <br></br>
         <div className="col-span-2 flex justify-left">
           <small className="text-gray-500">
             Only accepted matches see phone and email below
           </small>
+        </div>
+        <div className="col-span-1 flex flex-row items-center space-x-4">
+          <label htmlFor="phone" className="w-1/3">Phone</label>
+          <input
+            type="text"
+            id="phone"
+            name="phone"
+            value={formData.phone || ''}
+            onChange={handleChange}
+            maxLength="10"
+            className="mt-1 block border border-gray-300 rounded-md shadow-sm p-1 text-center"
+            style={{ width: '12ch' }}
+            autoComplete="off"
+          />
+          {errors.phone && <span className="text-red-500 text-sm">{errors.phone}</span>}
+        </div>
+        <div className="col-span-1 flex flex-row items-center space-x-4">
+          <label htmlFor="email" className="w-1/3">Email</label>
+          <input
+            type="text"
+            id="email"
+            name="email"
+            value={formData.email || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 mb-4 text-center"
+            style={{ width: '30ch' }}
+            autoComplete="off"
+          />
+          {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
         </div>
       </div>
 
