@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import debounce from 'lodash.debounce';
+import React, { useState, useEffect } from 'react';
 
 const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
   const [formData, setFormData] = useState(profile);
@@ -35,10 +34,9 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     }
   }, [message]);
 
-  const debouncedHandleZipCodeChange = useCallback(debounce(async (zipCode) => {
+  const handleZipCodeChange = async (zipCode) => {
     const basePath = '/matchmaking';
     if (/^\d{5}$/.test(zipCode)) {
-      console.log("\nDebounced Zipcode:", zipCode, "\n");
       try {
         const response = await fetch(`${basePath}/api/get-city-by-zipcode`, {
           method: 'POST',
@@ -48,8 +46,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
           },
           body: JSON.stringify({ zipCode }),
         });
-
-        console.log("\nResponse Status:", response.status, "\n");
 
         if (response.status === 404) {
           setErrors((prevErrors) => ({ ...prevErrors, zipCode: 'City not found for the provided ZIP code' }));
@@ -70,19 +66,19 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
         console.error('Error fetching city:', error);
       }
     }
-  }, 500), [formData]);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
-    console.log("\nUpdated Value:", updatedValue, "\n");
     let error = '';
 
     if (name === 'zipCode') {
-      setFormData((prevData) => ({ ...prevData, zipCode: updatedValue }));
-      console.log("\nZipcode value:", updatedValue, "\n");
-      if (updatedValue.length === 5) {
-        debouncedHandleZipCodeChange(updatedValue);
+      if (/^\d{0,5}$/.test(updatedValue)) {
+        setFormData((prevData) => ({ ...prevData, zipCode: updatedValue }));
+        if (updatedValue.length === 5) {
+          handleZipCodeChange(updatedValue);
+        }
       }
     } else if (name === 'duprRating') {
       if (updatedValue === '' || (/^(2(\.\d{1,2})?|[3-7](\.\d{1,2})?|8(\.0{0,2})?)$/.test(updatedValue))) {
@@ -225,7 +221,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="Advanced">Advanced</option>
           </select>
           <label htmlFor="openForMatches">Open For Matches</label>
-         
           <select
             id="openForMatches"
             name="openForMatches"
