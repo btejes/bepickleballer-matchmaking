@@ -114,6 +114,21 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
     onProfileChange({ ...formData, [name]: updatedValue });
   };
 
+  const handleKeyPress = (e, name) => {
+    const charCode = e.which ? e.which : e.keyCode;
+    const charStr = String.fromCharCode(charCode);
+
+    if (name === 'zipCode' || name === 'phone') {
+      if (!/^\d$/.test(charStr)) {
+        e.preventDefault();
+      }
+    } else if (name === 'duprRating') {
+      if (!/^\d$/.test(charStr) && charStr !== '.') {
+        e.preventDefault();
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
@@ -138,15 +153,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             onChange={handleChange}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           />
-          <label htmlFor="lastName">Last Name</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          />
           <label htmlFor="gender">Gender</label>
           <select
             id="gender"
@@ -158,9 +164,35 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="">Unselected</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
-            <option value="Non-binary">Non-binary</option>
-            <option value="Prefer not to say">Prefer not to say</option>
           </select>
+          <label htmlFor="duprRating">DUPR Rating</label>
+          <input
+            type="number"
+            id="duprRating"
+            name="duprRating"
+            value={formData.duprRating || ''}
+            onChange={handleChange}
+            onKeyPress={(e) => handleKeyPress(e, 'duprRating')}
+            min="2.0"
+            max="8.0"
+            step="0.01"
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+          />
+          {errors.duprRating && <span className="text-red-500 text-sm">{errors.duprRating}</span>}
+          <label htmlFor="zipCode">Zip Code</label>
+          <input
+            type="text"
+            id="zipCode"
+            name="zipCode"
+            value={formData.zipCode || ''}
+            onChange={handleChange}
+            onKeyPress={(e) => handleKeyPress(e, 'zipCode')}
+            maxLength="5"
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+          />
+          {errors.zipCode && <span className="text-red-500 text-sm">{errors.zipCode}</span>}
+        </div>
+        <div className="w-1/2 p-2">
           <label htmlFor="ageRange">Age Range</label>
           <select
             id="ageRange"
@@ -177,44 +209,8 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             <option value="60-69">60-69</option>
             <option value="70-79">70-79</option>
             <option value="80-89">80-89</option>
-            <option value="90+">90+</option>
+            <option value="99+">99+</option>
           </select>
-          <label htmlFor="duprRating">DUPR Rating</label>
-          <input
-            type="number"
-            id="duprRating"
-            name="duprRating"
-            value={formData.duprRating || ''}
-            onChange={handleChange}
-            min="2.0"
-            max="8.0"
-            step="0.01"
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          />
-          {errors.duprRating && <span className="text-red-500 text-sm">{errors.duprRating}</span>}
-          <label htmlFor="zipCode">Zip Code</label>
-          <input
-            type="text"
-            id="zipCode"
-            name="zipCode"
-            value={formData.zipCode || ''}
-            onChange={handleChange}
-            maxLength="5"
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          />
-          {errors.zipCode && <span className="text-red-500 text-sm">{errors.zipCode}</span>}
-          <label htmlFor="city">City</label>
-          <input
-            type="text"
-            id="city"
-            name="city"
-            value={formData.city || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-            disabled
-          />
-        </div>
-        <div className="w-1/2 p-2">
           <label htmlFor="skillLevel">Skill Level</label>
           <select
             id="skillLevel"
@@ -286,6 +282,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             </small>
           </div>
         </div>
+        <br></br>
         <div className="col-span-2 flex justify-left">
           <small className="text-gray-500">
             Only accepted matches see phone and email below
@@ -299,6 +296,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
             name="phone"
             value={formData.phone || ''}
             onChange={handleChange}
+            onKeyPress={(e) => handleKeyPress(e, 'phone')}
             maxLength="10"
             className="mt-1 block border border-gray-300 rounded-md shadow-sm p-1 text-center"
             style={{ width: '12ch' }}
