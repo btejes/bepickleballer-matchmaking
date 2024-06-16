@@ -12,35 +12,16 @@ const LocalPlay = () => {
     preferredDUPRRating: '',
   });
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-
+  
   const [currentMatch, setCurrentMatch] = useState(null);
   const [error, setError] = useState(null);
   const [copySuccess, setCopySuccess] = useState('');
   const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
-    fetchUserProfile();
     fetchNextMatch();
+    fetchUserProfile();
   }, []);
-
-  const fetchUserProfile = async () => {
-    try {
-      const response = await fetch(`${basePath}/api/profile`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Cache-Control': 'no-store', // Ensure the response is not cached
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch user profile');
-      }
-      const profileData = await response.json();
-      setUserProfile(profileData);
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-    }
-  };
 
   const fetchNextMatch = async () => {
     try {
@@ -67,6 +48,29 @@ const LocalPlay = () => {
       setError('No matches found');
       setCurrentMatch(null);
     }
+  };
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch(`${basePath}/api/profile`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Cache-Control': 'no-store', // Ensure the response is not cached
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch user profile');
+      }
+      const data = await response.json();
+      setUserProfile(data);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  };
+
+  const capitalizeCity = (city) => {
+    return city.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
   const handlePreferenceChange = (e) => {
@@ -105,15 +109,7 @@ const LocalPlay = () => {
   const copyToClipboard = () => {
     navigator.clipboard.writeText('https://bepickleballer.com');
     setCopySuccess('Link copied to clipboard!');
-    setTimeout(() => setCopySuccess(''), 5000); // Clear the message after 5 seconds
-  };
-
-  const formatCityName = (city) => {
-    return city
-      .toLowerCase()
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+    setTimeout(() => setCopySuccess(''), 5000); // Clear the message after 3 seconds
   };
 
   return (
@@ -121,6 +117,11 @@ const LocalPlay = () => {
       <div className="w-full">
         <Navbar />
       </div>
+      {userProfile && (
+        <div className="w-full text-center text-black font-semibold mt-4">
+          Looking for matches in {capitalizeCity(userProfile.city)}
+        </div>
+      )}
       <div className="flex-grow w-full flex flex-col items-center justify-center overflow-hidden">
         {currentMatch ? (
           <div className="flex flex-col items-center justify-center h-full">
@@ -234,13 +235,6 @@ const LocalPlay = () => {
           <option value="7.0">7.0</option>
           <option value="8.0">8.0</option>
         </select>
-      </div>
-      <div className="w-full text-black h-auto bg-white p-2 flex justify-center">
-        {userProfile ? (
-          <p>Looking for matches in {formatCityName(userProfile.city)}</p>
-        ) : (
-          <p>Loading city...</p>
-        )}
       </div>
     </div>
   );
