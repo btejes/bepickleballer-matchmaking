@@ -18,7 +18,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
     if (profile.userId) {
       fetchAverageRating(profile.userId);
     }
-  }, []); // This effect runs only once when the component mounts
+  }, [profile.userId]); // This effect runs when profile.userId changes
 
   useEffect(() => {
     if (statusMessage) {
@@ -39,13 +39,15 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
   const fetchAverageRating = async (userId) => {
     try {
-      const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`);
+      const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`, {
+        credentials: 'include', // Include credentials (cookies) in the request
+      });
       if (response.ok) {
         const data = await response.json();
         setAverageRating(data.averageRating);
       } else {
         setAverageRating('N/A');
-        console.log("\nNot an erorr just default NA\n");
+        console.log("\nNot an error just default NA\n");
       }
     } catch (error) {
       console.error('Error fetching average rating:', error);
@@ -56,7 +58,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // Check if file is larger than 1MB
+      if (file.size > 5 * 1024 * 1024) { // Check if file is larger than 5MB
         setStatusMessage("File size should not exceed 5MB");
         setFadeOut(false);
         return;
@@ -85,7 +87,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
         }
 
         const url = signedUrlResult.url;
-        
+
         const uploadResponse = await fetch(url, {
           method: "PUT",
           body: file,
