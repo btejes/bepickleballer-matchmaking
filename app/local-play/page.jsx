@@ -16,10 +16,31 @@ const LocalPlay = () => {
   const [currentMatch, setCurrentMatch] = useState(null);
   const [error, setError] = useState(null);
   const [copySuccess, setCopySuccess] = useState('');
+  const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
+    fetchUserProfile();
     fetchNextMatch();
   }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch(`${basePath}/api/profile`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Cache-Control': 'no-store', // Ensure the response is not cached
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch user profile');
+      }
+      const profileData = await response.json();
+      setUserProfile(profileData);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  };
 
   const fetchNextMatch = async () => {
     try {
@@ -205,6 +226,13 @@ const LocalPlay = () => {
           <option value="7.0">7.0</option>
           <option value="8.0">8.0</option>
         </select>
+      </div>
+      <div className="w-full text-black h-auto bg-white p-2 flex justify-center">
+        {userProfile ? (
+          <p>Looking for matches in {userProfile.city}</p>
+        ) : (
+          <p>Loading city...</p>
+        )}
       </div>
     </div>
   );
