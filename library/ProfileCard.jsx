@@ -45,6 +45,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
         setAverageRating(data.averageRating);
       } else {
         setAverageRating('N/A');
+        console.log("\nNot an erorr just default NA\n");
       }
     } catch (error) {
       console.error('Error fetching average rating:', error);
@@ -55,8 +56,8 @@ const ProfileCard = ({ profile, isProfilePage }) => {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 1 * 1024 * 1024) { // Check if file is larger than 1MB
-        setStatusMessage("File size should not exceed 1MB");
+      if (file.size > 5 * 1024 * 1024) { // Check if file is larger than 1MB
+        setStatusMessage("File size should not exceed 5MB");
         setFadeOut(false);
         return;
       }
