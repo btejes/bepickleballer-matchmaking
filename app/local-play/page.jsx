@@ -105,7 +105,15 @@ const LocalPlay = () => {
   const copyToClipboard = () => {
     navigator.clipboard.writeText('https://bepickleballer.com');
     setCopySuccess('Link copied to clipboard!');
-    setTimeout(() => setCopySuccess(''), 5000); // Clear the message after 3 seconds
+    setTimeout(() => setCopySuccess(''), 5000); // Clear the message after 5 seconds
+  };
+
+  const formatCityName = (city) => {
+    return city
+      .toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   };
 
   return (
@@ -229,7 +237,7 @@ const LocalPlay = () => {
       </div>
       <div className="w-full text-black h-auto bg-white p-2 flex justify-center">
         {userProfile ? (
-          <p>Looking for matches in {userProfile.city}</p>
+          <p>Looking for matches in {formatCityName(userProfile.city)}</p>
         ) : (
           <p>Loading city...</p>
         )}
