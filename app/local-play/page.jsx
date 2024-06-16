@@ -118,8 +118,8 @@ const LocalPlay = () => {
         <Navbar />
       </div>
       {userProfile && (
-        <div className="w-full text-center text-white font-semibold mt-4 mb-4">
-          Local Play:  <strong>{capitalizeCity(userProfile.city)}</strong>
+        <div className="w-full text-center text-white font-semibold mt-8">
+          Local Play:  <strong><big>{capitalizeCity(userProfile.city)}</big></strong>
         </div>
       )}
       <div className="flex-grow w-full flex flex-col items-center justify-center overflow-hidden">
