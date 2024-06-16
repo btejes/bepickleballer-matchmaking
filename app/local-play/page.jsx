@@ -118,8 +118,8 @@ const LocalPlay = () => {
         <Navbar />
       </div>
       {userProfile && (
-        <div className="w-full text-center text-black font-semibold mt-4">
-          Looking for matches in {capitalizeCity(userProfile.city)}
+        <div className="w-full text-center text-white font-semibold mt-4 mb-4">
+          <strong>Local Play:  {capitalizeCity(userProfile.city)}</strong>
         </div>
       )}
       <div className="flex-grow w-full flex flex-col items-center justify-center overflow-hidden">
