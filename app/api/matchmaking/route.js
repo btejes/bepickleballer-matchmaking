@@ -34,6 +34,13 @@ export async function POST(request) {
     const query = {
       city: currentUserProfile.city,
       userId: { $ne: decoded._id },
+      profileImage: { $exists: true, $ne: null },
+      firstName: { $exists: true, $ne: null },
+      gender: { $exists: true, $ne: null },
+      age: { $exists: true, $ne: null },
+      skillLevel: { $exists: true, $ne: null },
+      aboutYou: { $exists: true, $ne: null },
+      openForMatches: { $ne: "no" }
     };
 
     if (filters.preferredGender) {
@@ -42,7 +49,7 @@ export async function POST(request) {
 
     if (filters.preferredAgeRange) {
       const [minAge, maxAge] = filters.preferredAgeRange.split('-').map(Number);
-      query.ageRange = { $gte: minAge, $lte: maxAge };
+      query.age = { $gte: minAge, $lte: maxAge };
     }
 
     if (filters.preferredSkillLevel) {
