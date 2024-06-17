@@ -138,7 +138,9 @@ const LocalPlay = () => {
             >
               No
             </button>
-            <ProfileCard profile={currentMatch} className="order-1 lg:order-2" />
+            <div className="order-1 lg:order-2 flex justify-center w-full lg:w-auto">
+              <ProfileCard profile={currentMatch} />
+            </div>
             <button
               onClick={() => handleDecision('yes')}
               className="bg-green-500 text-white py-3 px-6 rounded-full lg:order-3 order-2 lg:self-center w-1/2 lg:w-auto"
