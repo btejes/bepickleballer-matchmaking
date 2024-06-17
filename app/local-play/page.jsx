@@ -129,23 +129,23 @@ const LocalPlay = () => {
           Local Play:  <strong><big>{capitalizeCity(userProfile.city)}</big></strong>
         </div>
       )}
-      <div className="flex-grow w-full flex flex-col lg:flex-row items-center justify-center">
+      <div className="flex-grow w-full flex flex-col items-center justify-center px-4 space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4">
         {currentMatch ? (
-          <div className="flex flex-col items-center justify-center h-full w-full px-4 space-y-4 lg:space-y-0 lg:flex-row lg:items-center lg:justify-center lg:space-x-4">
+          <>
             <button
               onClick={() => handleDecision('no')}
-              className="bg-red-500 text-white py-3 px-6 rounded-full order-2 lg:order-1 lg:mr-4"
+              className="bg-red-500 text-white py-3 px-6 rounded-full order-2 lg:order-1 lg:mr-4 lg:self-center w-1/2 lg:w-auto"
             >
               No
             </button>
-            <ProfileCard profile={currentMatch} />
+            <ProfileCard profile={currentMatch} className="order-1 lg:order-2" />
             <button
               onClick={() => handleDecision('yes')}
-              className="bg-green-500 text-white py-3 px-6 rounded-full order-2 lg:order-3 lg:ml-4"
+              className="bg-green-500 text-white py-3 px-6 rounded-full order-2 lg:order-3 lg:ml-4 lg:self-center w-1/2 lg:w-auto"
             >
               Yes
             </button>
-          </div>
+          </>
         ) : (
           <p className="text-center">
             {error === 'No matches found' ? (
