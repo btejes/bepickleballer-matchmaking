@@ -131,17 +131,17 @@ const LocalPlay = () => {
       )}
       <div className="flex-grow w-full flex flex-col lg:flex-row items-center justify-center">
         {currentMatch ? (
-          <div className="flex flex-col lg:flex-row items-center justify-center h-full w-full px-4 space-y-4 lg:space-y-0 lg:space-x-4">
+          <div className="flex flex-col items-center justify-center h-full w-full px-4 space-y-4 lg:space-y-0 lg:flex-row lg:items-center lg:justify-center lg:space-x-4">
             <button
               onClick={() => handleDecision('no')}
-              className="bg-red-500 text-white py-3 px-6 rounded-full lg:order-1 order-2 lg:mr-4 lg:self-center w-1/2 lg:w-auto"
+              className="bg-red-500 text-white py-3 px-6 rounded-full order-2 lg:order-1 lg:mr-4"
             >
               No
             </button>
             <ProfileCard profile={currentMatch} />
             <button
               onClick={() => handleDecision('yes')}
-              className="bg-green-500 text-white py-3 px-6 rounded-full lg:order-3 order-2 lg:ml-4 lg:self-center w-1/2 lg:w-auto"
+              className="bg-green-500 text-white py-3 px-6 rounded-full order-2 lg:order-3 lg:ml-4"
             >
               Yes
             </button>
