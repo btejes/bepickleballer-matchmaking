@@ -129,12 +129,11 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
   return (
     <div className="w-full max-w-xs bg-white border border-gray-300 rounded-3xl shadow-md mx-auto overflow-hidden">
-      <div className="relative w-full h-48 md:h-56 lg:h-64 rounded-t-3xl overflow-hidden flex-shrink-0">
+      <div className="relative w-full h-48 rounded-t-3xl overflow-hidden">
         <img
           src={image || `${apiBasePath}/blank-profile-picture.svg`}
           alt="Profile"
           className={`w-full h-full object-cover object-center ${!isProfilePage && (!image && 'blur-sm grayscale')} ${isProfilePage ? 'cursor-pointer' : ''}`}
-          style={{ objectFit: 'cover' }}
           onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
           onClick={isProfilePage ? () => document.getElementById('imageUpload').click() : null}
         />
@@ -147,7 +146,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
           />
         )}
       </div>
-      <div className="p-4 h-48 md:h-56 lg:h-64 overflow-hidden">
+      <div className="p-4 h-48 overflow-hidden">
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-center">
             <p className="text-sm font-bold text-black">{profile.firstName}</p>
