@@ -18,18 +18,18 @@ const ProfileCard = ({ profile, isProfilePage }) => {
     if (profile.userId) {
       fetchAverageRating(profile.userId);
     }
-  }, [profile.userId]); // This effect runs when profile.userId changes
+  }, [profile.userId]);
 
   useEffect(() => {
     if (statusMessage) {
-      setFadeOut(false); // Reset fade out before starting the timer
+      setFadeOut(false);
       const timer1 = setTimeout(() => {
         setFadeOut(true);
-      }, 3000); // Wait for 3 seconds before starting to fade out
+      }, 3000);
       const timer2 = setTimeout(() => {
         setStatusMessage('');
         setFadeOut(false);
-      }, 4000); // Wait for 4 seconds before clearing the message (1 second for the fade out duration)
+      }, 4000);
       return () => {
         clearTimeout(timer1);
         clearTimeout(timer2);
@@ -40,7 +40,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
   const fetchAverageRating = async (userId) => {
     try {
       const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`, {
-        credentials: 'include', // Include credentials (cookies) in the request
+        credentials: 'include',
       });
       if (response.ok) {
         const data = await response.json();
@@ -58,7 +58,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // Check if file is larger than 5MB
+      if (file.size > 5 * 1024 * 1024) {
         setStatusMessage("File size should not exceed 5MB");
         setFadeOut(false);
         return;
@@ -100,7 +100,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
           throw new Error('Failed to upload file');
         }
 
-        const imageUrl = url.split('?')[0]; // Remove query parameters
+        const imageUrl = url.split('?')[0];
         setImage(imageUrl);
 
         const profileResponse = await fetch(`${apiBasePath}/api/profile`, {
@@ -129,14 +129,13 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
   return (
     <div className="w-full max-w-xs bg-white border border-gray-300 rounded-3xl shadow-md mx-auto overflow-hidden">
-      <div className="relative w-full h-48 rounded-t-3xl overflow-hidden">
+      <div className="relative w-full h-48 md:h-56 lg:h-64 rounded-t-3xl overflow-hidden">
         <img
           src={image || `${apiBasePath}/blank-profile-picture.svg`}
           alt="Profile"
           className={`w-full h-full object-cover ${!isProfilePage && (!image && 'blur-sm grayscale')} ${isProfilePage ? 'cursor-pointer' : ''}`}
           onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
           onClick={isProfilePage ? () => document.getElementById('imageUpload').click() : null}
-          style={{ maxHeight: '192px', objectFit: 'cover' }} // Ensuring the image fits within the card
         />
         {isProfilePage && (
           <input
