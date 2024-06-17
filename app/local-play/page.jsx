@@ -179,7 +179,7 @@ const LocalPlay = () => {
           </p>
         )}
       </div>
-      <div className="w-full text-black h-auto bg-white p-2 flex justify-center space-x-4">
+      <div className="w-full text-black h-auto p-2 flex justify-center space-x-5">
         <select
           name="preferredGender"
           value={filters.preferredGender}
@@ -187,7 +187,7 @@ const LocalPlay = () => {
           className="ml-2 p-1 border rounded"
         >
           <option value="">
-            Preferred Gender
+            Gender
           </option>
           <option value="Male">Male</option>
           <option value="Female">Female</option>
@@ -199,7 +199,7 @@ const LocalPlay = () => {
           className="ml-2 p-1 border rounded"
         >
           <option value="">
-            Preferred Age Range
+            Age Range
           </option>
           <option value="18-29">18-29</option>
           <option value="30-39">30-39</option>
@@ -217,7 +217,7 @@ const LocalPlay = () => {
           className="ml-2 p-1 border rounded"
         >
           <option value="">
-            Preferred Skill Level
+            Skill Level
           </option>
           <option value="Beginner">Beginner</option>
           <option value="Intermediate">Intermediate</option>
@@ -230,7 +230,7 @@ const LocalPlay = () => {
           className="ml-2 p-1 border rounded"
         >
           <option value="">
-            Preferred Minimum DUPR Rating
+            Min DUPR Rating
           </option>
           <option value="1.0">1.0</option>
           <option value="2.0">2.0</option>
