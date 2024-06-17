@@ -116,7 +116,7 @@ const LocalPlay = () => {
   const copyToClipboard = () => {
     navigator.clipboard.writeText('https://bepickleballer.com');
     setCopySuccess('Link copied to clipboard!');
-    setTimeout(() => setCopySuccess(''), 5000); // Clear the message after 3 seconds
+    setTimeout(() => setCopySuccess(''), 5000); // Clear the message after 5 seconds
   };
 
   return (
