@@ -189,9 +189,9 @@ const LocalPlay = () => {
           <option value="" disabled>
             Preferred Gender
           </option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Other</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
         </select>
         <select
           name="preferredAgeRange"
@@ -220,9 +220,9 @@ const LocalPlay = () => {
           <option value="" disabled>
             Preferred Skill Level
           </option>
-          <option value="beginner">Beginner</option>
-          <option value="intermediate">Intermediate</option>
-          <option value="advanced">Advanced</option>
+          <option value="Beginner">Beginner</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Advanced">Advanced</option>
         </select>
         <select
           name="preferredDUPRRating"
