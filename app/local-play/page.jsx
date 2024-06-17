@@ -191,7 +191,6 @@ const LocalPlay = () => {
           </option>
           <option value="Male">Male</option>
           <option value="Female">Female</option>
-          <option value="Other">Other</option>
         </select>
         <select
           name="preferredAgeRange"
@@ -231,7 +230,7 @@ const LocalPlay = () => {
           className="ml-2 p-1 border rounded"
         >
           <option value="">
-            Preferred DUPR Rating
+            Preferred Minimum DUPR Rating
           </option>
           <option value="1.0">1.0</option>
           <option value="2.0">2.0</option>
