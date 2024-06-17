@@ -128,9 +128,9 @@ const ProfileCard = ({ profile, isProfilePage }) => {
   };
 
   return (
-    <div className="max-w-xs bg-white rounded-3xl shadow-md mx-auto">
+    <div className="max-w-xs bg-white rounded-3xl shadow-md mx-auto overflow-hidden">
 
-      <div className="relative w-full rounded-t-3xl overflow-hidden">
+      <div className="relative w-full">
         <img
           src={image || `${apiBasePath}/blank-profile-picture.svg`}
           alt="Profile"
