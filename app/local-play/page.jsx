@@ -129,7 +129,7 @@ const LocalPlay = () => {
           Local Play:  <strong><big>{capitalizeCity(userProfile.city)}</big></strong>
         </div>
       )}
-      <div className="flex-grow w-full flex flex-col items-center justify-center overflow-hidden">
+      <div className="flex-grow w-full flex flex-col items-center justify-center">
         {currentMatch ? (
           <div className="flex flex-col items-center justify-center h-full w-full px-4">
             <ProfileCard profile={currentMatch} />
