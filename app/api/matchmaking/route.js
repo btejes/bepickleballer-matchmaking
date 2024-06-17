@@ -49,7 +49,7 @@ export async function POST(request) {
 
     if (filters.preferredAgeRange) {
       const [minAge, maxAge] = filters.preferredAgeRange.split('-').map(Number);
-      query.age = { $gte: minAge, $lte: maxAge };
+      query.ageRange = { $gte: minAge, $lte: maxAge };
     }
 
     if (filters.preferredSkillLevel) {
