@@ -30,7 +30,7 @@ export async function GET(request) {
 
     console.log("Current user profile found:", currentUserProfile);
     const potentialMatches = await Profile.find({
-      zipCode: currentUserProfile.zipCode,
+      city: currentUserProfile.city,
       userId: { $ne: decoded._id },
     });
 
