@@ -131,8 +131,8 @@ const LocalPlay = () => {
       )}
       <div className="flex-grow w-full flex flex-col items-center justify-center overflow-hidden">
         {currentMatch ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="flex items-center justify-center space-x-4">
+          <div className="flex flex-col items-center justify-center h-full w-full">
+            <div className="flex items-center justify-center space-x-4 w-full px-4">
               <button
                 onClick={() => handleDecision('no')}
                 className="bg-red-500 text-white py-3 px-6 rounded-full"
@@ -179,7 +179,7 @@ const LocalPlay = () => {
           </p>
         )}
       </div>
-      <div className="w-full text-black h-auto p-2 flex justify-center space-x-5">
+      <div className="w-full text-black h-auto p-2 flex justify-center space-x-5 flex-wrap">
         <select
           name="preferredGender"
           value={filters.preferredGender}
