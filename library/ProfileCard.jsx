@@ -133,9 +133,10 @@ const ProfileCard = ({ profile, isProfilePage }) => {
         <img
           src={image || `${apiBasePath}/blank-profile-picture.svg`}
           alt="Profile"
-          className={`w-full h-full object-cover ${!isProfilePage && (!image && 'blur-sm grayscale') } ${isProfilePage ? 'cursor-pointer' : ''}`}
+          className={`w-full h-full object-cover ${!isProfilePage && (!image && 'blur-sm grayscale')} ${isProfilePage ? 'cursor-pointer' : ''}`}
           onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
           onClick={isProfilePage ? () => document.getElementById('imageUpload').click() : null}
+          style={{ maxHeight: '192px', objectFit: 'cover' }} // Ensuring the image fits within the card
         />
         {isProfilePage && (
           <input
