@@ -34,13 +34,13 @@ export async function POST(request) {
     const query = {
       city: currentUserProfile.city,
       userId: { $ne: decoded._id },
-      profileImage: { $exists: true, $ne: null },
-      firstName: { $exists: true, $ne: null },
-      gender: { $exists: true, $ne: null },
-      ageRange: { $exists: true, $ne: null },
-      skillLevel: { $exists: true, $ne: null },
-      aboutYou: { $exists: true, $ne: null },
-      openForMatches: { $ne: "no" }
+      profileImage: { $exists: true, $ne: null, $ne: '' },
+      firstName: { $exists: true, $ne: null, $ne: '' },
+      gender: { $exists: true, $ne: null, $ne: '' },
+      ageRange: { $exists: true, $ne: null, $ne: '' },
+      skillLevel: { $exists: true, $ne: null, $ne: '' },
+      aboutYou: { $exists: true, $ne: null, $ne: '' },
+      openForMatches: { $ne: "no", $ne: '' }
     };
 
     if (filters.preferredGender) {
