@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request) {
+export async function POST(request) {
   await connectToDatabase();
   console.log("Connected to database.");
 
@@ -28,11 +28,34 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }
 
-    console.log("Current user profile found:", currentUserProfile);
-    const potentialMatches = await Profile.find({
+    const filters = await request.json();
+    console.log("Filters received:", filters);
+
+    const query = {
       city: currentUserProfile.city,
       userId: { $ne: decoded._id },
-    });
+    };
+
+    if (filters.preferredGender) {
+      query.gender = filters.preferredGender;
+    }
+
+    if (filters.preferredAgeRange) {
+      const [minAge, maxAge] = filters.preferredAgeRange.split('-').map(Number);
+      query.ageRange = { $gte: minAge, $lte: maxAge };
+    }
+
+    if (filters.preferredSkillLevel) {
+      query.skillLevel = filters.preferredSkillLevel;
+    }
+
+    if (filters.preferredDUPRRating) {
+      query.duprRating = { $gte: parseFloat(filters.preferredDUPRRating) };
+    }
+
+    console.log("Query built:", query);
+
+    const potentialMatches = await Profile.find(query);
 
     const validMatches = [];
     for (const match of potentialMatches) {

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import ProfileCard from '@/library/ProfileCard';
 
 const LocalPlay = () => {
-  const [preferences, setPreferences] = useState({
+  const [filters, setFilters] = useState({
     preferredGender: '',
     preferredAgeRange: '',
     preferredSkillLevel: '',
@@ -19,18 +19,25 @@ const LocalPlay = () => {
   const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
-    fetchNextMatch();
     fetchUserProfile();
   }, []);
 
-  const fetchNextMatch = async () => {
+  useEffect(() => {
+    if (userProfile) {
+      fetchNextMatch(filters);
+    }
+  }, [filters, userProfile]);
+
+  const fetchNextMatch = async (filters) => {
     try {
       const response = await fetch(`${basePath}/api/matchmaking`, {
-        method: 'GET',
+        method: 'POST',
         credentials: 'include',
         headers: {
+          'Content-Type': 'application/json',
           'Cache-Control': 'no-store', // Ensure the response is not cached
         },
+        body: JSON.stringify(filters),
       });
       if (!response.ok) {
         throw new Error('Failed to fetch matchmaking data');
@@ -73,10 +80,10 @@ const LocalPlay = () => {
     return city.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
-  const handlePreferenceChange = (e) => {
+  const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setPreferences((prevPreferences) => ({
-      ...prevPreferences,
+    setFilters((prevFilters) => ({
+      ...prevFilters,
       [name]: value,
     }));
   };
@@ -100,7 +107,7 @@ const LocalPlay = () => {
         throw new Error('Failed to update matchmaking decision');
       }
 
-      await fetchNextMatch(); // Fetch next match after decision
+      await fetchNextMatch(filters); // Fetch next match after decision
     } catch (error) {
       console.error('Error updating matchmaking decision:', error);
     }
@@ -175,8 +182,8 @@ const LocalPlay = () => {
       <div className="w-full text-black h-auto bg-white p-2 flex justify-between">
         <select
           name="preferredGender"
-          value={preferences.preferredGender}
-          onChange={handlePreferenceChange}
+          value={filters.preferredGender}
+          onChange={handleFilterChange}
           className="ml-2 p-1 border rounded"
         >
           <option value="" disabled>
@@ -188,8 +195,8 @@ const LocalPlay = () => {
         </select>
         <select
           name="preferredAgeRange"
-          value={preferences.preferredAgeRange}
-          onChange={handlePreferenceChange}
+          value={filters.preferredAgeRange}
+          onChange={handleFilterChange}
           className="ml-2 p-1 border rounded"
         >
           <option value="" disabled>
@@ -206,8 +213,8 @@ const LocalPlay = () => {
         </select>
         <select
           name="preferredSkillLevel"
-          value={preferences.preferredSkillLevel}
-          onChange={handlePreferenceChange}
+          value={filters.preferredSkillLevel}
+          onChange={handleFilterChange}
           className="ml-2 p-1 border rounded"
         >
           <option value="" disabled>
@@ -219,8 +226,8 @@ const LocalPlay = () => {
         </select>
         <select
           name="preferredDUPRRating"
-          value={preferences.preferredDUPRRating}
-          onChange={handlePreferenceChange}
+          value={filters.preferredDUPRRating}
+          onChange={handleFilterChange}
           className="ml-2 p-1 border rounded"
         >
           <option value="" disabled>
