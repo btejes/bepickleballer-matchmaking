@@ -322,7 +322,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
       {message && (
         <div
-          className={`text-center p-2 rounded ${fadeOut ? 'opacity-0 transition-opacity duration-1000' : 'opacity-100'}`}
+          className={`text-center rounded ${fadeOut ? 'opacity-0 transition-opacity duration-1000' : 'opacity-100'}`}
           style={{
             color: message.startsWith('Error') ? 'red' : 'green',
             transition: 'opacity 1s ease-in-out',
