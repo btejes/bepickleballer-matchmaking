@@ -132,7 +132,7 @@ const LocalPlay = () => {
       <div className="flex-grow w-full flex flex-col items-center justify-center overflow-hidden">
         {currentMatch ? (
           <div className="flex flex-col items-center justify-center h-full w-full px-4">
-            <ProfileCard profile={currentMatch} className="max-w-xs w-full"/>
+            <ProfileCard profile={currentMatch} />
             <div className="flex space-x-4 mt-4">
               <button
                 onClick={() => handleDecision('no')}
