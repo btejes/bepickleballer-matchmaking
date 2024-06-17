@@ -36,6 +36,9 @@ const ProfilePage = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
         },
         credentials: 'include', // Include credentials
         body: JSON.stringify(updatedProfile),
@@ -69,7 +72,12 @@ const ProfilePage = () => {
       try {
         const response = await fetch(`${basePath}/api/profile`, {
           method: 'GET',
-          credentials: 'include' // Include credentials
+          credentials: 'include', // Include credentials
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+          },
         });
         if (!response.ok) {
           throw new Error('Error fetching profile');
