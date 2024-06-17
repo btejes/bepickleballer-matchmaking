@@ -128,12 +128,12 @@ const ProfileCard = ({ profile, isProfilePage }) => {
   };
 
   return (
-    <div className="w-full max-w-xs bg-white border border-gray-300 rounded-3xl shadow-md mx-auto">
-      <div className="relative w-full h-[60%] rounded-t-3xl overflow-hidden">
+    <div className="w-full max-w-xs h-auto bg-white border border-gray-300 rounded-3xl shadow-md mx-auto">
+      <div className="relative w-full h-[40%] rounded-t-3xl overflow-hidden">
         <img
           src={image || `${apiBasePath}/blank-profile-picture.svg`}
           alt="Profile"
-          className={`object-cover w-full h-full ${!isProfilePage && (!image && 'blur-sm grayscale')} ${isProfilePage ? 'cursor-pointer' : ''}`}
+          className={`object-cover w-full h-full rounded-t-3xl ${!isProfilePage && (!image && 'blur-sm grayscale')} ${isProfilePage ? 'cursor-pointer' : ''}`}
           onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
           onClick={isProfilePage ? () => document.getElementById('imageUpload').click() : null}
         />
