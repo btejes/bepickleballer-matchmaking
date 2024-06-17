@@ -186,7 +186,7 @@ const LocalPlay = () => {
           onChange={handleFilterChange}
           className="ml-2 p-1 border rounded"
         >
-          <option value="" disabled>
+          <option value="">
             Preferred Gender
           </option>
           <option value="Male">Male</option>
@@ -199,7 +199,7 @@ const LocalPlay = () => {
           onChange={handleFilterChange}
           className="ml-2 p-1 border rounded"
         >
-          <option value="" disabled>
+          <option value="">
             Preferred Age Range
           </option>
           <option value="18-29">18-29</option>
@@ -217,7 +217,7 @@ const LocalPlay = () => {
           onChange={handleFilterChange}
           className="ml-2 p-1 border rounded"
         >
-          <option value="" disabled>
+          <option value="">
             Preferred Skill Level
           </option>
           <option value="Beginner">Beginner</option>
@@ -230,7 +230,7 @@ const LocalPlay = () => {
           onChange={handleFilterChange}
           className="ml-2 p-1 border rounded"
         >
-          <option value="" disabled>
+          <option value="">
             Preferred DUPR Rating
           </option>
           <option value="1.0">1.0</option>
