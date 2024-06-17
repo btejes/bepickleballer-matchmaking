@@ -179,7 +179,7 @@ const LocalPlay = () => {
           </p>
         )}
       </div>
-      <div className="w-full text-black h-auto bg-white p-2 flex justify-between">
+      <div className="w-full text-black h-auto bg-white p-2 flex justify-center space-x-4">
         <select
           name="preferredGender"
           value={filters.preferredGender}
