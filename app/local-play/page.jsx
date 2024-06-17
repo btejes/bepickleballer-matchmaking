@@ -131,7 +131,7 @@ const LocalPlay = () => {
       )}
       <div className="flex-grow w-full flex flex-col items-center justify-center">
         {currentMatch ? (
-          <div className="flex flex-col items-center justify-center h-full w-full px-4">
+          <div className="aspect-[16/9] flex flex-col items-center justify-center w-full px-4">
             <ProfileCard profile={currentMatch} />
             <div className="flex space-x-4 mt-4">
               <button
