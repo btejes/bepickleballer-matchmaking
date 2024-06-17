@@ -132,20 +132,22 @@ const LocalPlay = () => {
       <div className="flex-grow w-full flex flex-col items-center justify-center overflow-hidden">
         {currentMatch ? (
           <div className="flex flex-col items-center justify-center h-full w-full">
-            <div className="flex flex-col items-center w-full px-4 sm:flex-row sm:space-x-4 sm:justify-center">
-              <button
-                onClick={() => handleDecision('no')}
-                className="bg-red-500 text-white py-3 px-6 rounded-full mb-4 sm:mb-0"
-              >
-                No
-              </button>
+            <div className="flex flex-col items-center w-full px-4">
               <ProfileCard profile={currentMatch} />
-              <button
-                onClick={() => handleDecision('yes')}
-                className="bg-green-500 text-white py-3 px-6 rounded-full mt-4 sm:mt-0"
-              >
-                Yes
-              </button>
+              <div className="flex space-x-4 mt-4">
+                <button
+                  onClick={() => handleDecision('no')}
+                  className="bg-red-500 text-white py-3 px-6 rounded-full"
+                >
+                  No
+                </button>
+                <button
+                  onClick={() => handleDecision('yes')}
+                  className="bg-green-500 text-white py-3 px-6 rounded-full"
+                >
+                  Yes
+                </button>
+              </div>
             </div>
           </div>
         ) : (
@@ -179,12 +181,12 @@ const LocalPlay = () => {
           </p>
         )}
       </div>
-      <div className="w-full text-black h-auto p-2 flex justify-center space-x-5 flex-wrap">
+      <div className="w-full text-black h-auto p-2 flex justify-center space-x-2 flex-wrap">
         <select
           name="preferredGender"
           value={filters.preferredGender}
           onChange={handleFilterChange}
-          className="p-1 border rounded w-40"
+          className="p-1 border rounded w-36"
         >
           <option value="">
             Gender
@@ -196,7 +198,7 @@ const LocalPlay = () => {
           name="preferredAgeRange"
           value={filters.preferredAgeRange}
           onChange={handleFilterChange}
-          className="p-1 border rounded w-40"
+          className="p-1 border rounded w-36"
         >
           <option value="">
             Age Range
@@ -214,7 +216,7 @@ const LocalPlay = () => {
           name="preferredSkillLevel"
           value={filters.preferredSkillLevel}
           onChange={handleFilterChange}
-          className="p-1 border rounded w-40"
+          className="p-1 border rounded w-36"
         >
           <option value="">
             Skill Level
@@ -227,7 +229,7 @@ const LocalPlay = () => {
           name="preferredDUPRRating"
           value={filters.preferredDUPRRating}
           onChange={handleFilterChange}
-          className="p-1 border rounded w-40"
+          className="p-1 border rounded w-36"
         >
           <option value="">
             Min DUPR Rating
