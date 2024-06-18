@@ -179,20 +179,22 @@ const LocalPlay = () => {
           </p>
         )}
       </div>
-      <div className="lg:hidden flex flex-row justify-center w-full mt-4 space-x-4">
-        <button
-          onClick={() => handleDecision('no')}
-          className="bg-red-500 text-white py-3 px-6 rounded-full"
-        >
-          No
-        </button>
-        <button
-          onClick={() => handleDecision('yes')}
-          className="bg-green-500 text-white py-3 px-6 rounded-full"
-        >
-          Yes
-        </button>
-      </div>
+      {currentMatch && (
+        <div className="lg:hidden flex flex-row justify-center w-full mt-4 space-x-4">
+          <button
+            onClick={() => handleDecision('no')}
+            className="bg-red-500 text-white py-3 px-6 rounded-full"
+          >
+            No
+          </button>
+          <button
+            onClick={() => handleDecision('yes')}
+            className="bg-green-500 text-white py-3 px-6 rounded-full"
+          >
+            Yes
+          </button>
+        </div>
+      )}
       <div className="w-full text-black h-auto p-2 flex justify-center space-x-2 flex-wrap">
         <select
           name="preferredGender"
