@@ -58,109 +58,76 @@ const ProfileCard = ({ profile, isProfilePage }) => {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
-
+  
     if (file) {
       if (!allowedTypes.includes(file.type)) {
         setStatusMessage(`${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC`);
         setFadeOut(false);
         return;
       }
-
+  
       if (file.size > 5 * 1024 * 1024) {
         setStatusMessage("File size should not exceed 5MB");
         setFadeOut(false);
         return;
       }
-
+  
       setStatusMessage("Uploading file");
       setLoading(true);
       setFadeOut(false);
-
+  
       try {
-        const response = await fetch(`${apiBasePath}/api/getSignedUrl`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-        });
-
-        const signedUrlResult = await response.json();
-
-        if (signedUrlResult.error) {
-          setStatusMessage("Failed to get signed URL");
-          setLoading(false);
-          setFadeOut(false);
-          return;
-        }
-
-        const url = signedUrlResult.url;
-
-        // Convert image to JPEG if necessary
-        const convertToJPEG = async (file) => {
-          const reader = new FileReader();
-          return new Promise((resolve, reject) => {
-            reader.onload = async () => {
-              const arrayBuffer = reader.result;
-              const sharp = require('sharp');
-
-              try {
-                const buffer = await sharp(arrayBuffer)
-                  .jpeg({ quality: 90 })
-                  .toBuffer();
-                resolve(new File([buffer], `${Date.now()}.jpeg`, { type: 'image/jpeg' }));
-              } catch (err) {
-                reject(err);
-              }
-            };
-            reader.onerror = reject;
-            reader.readAsArrayBuffer(file);
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = async () => {
+          const base64data = reader.result.split(',')[1];
+  
+          const response = await fetch(`${apiBasePath}/api/imageToJpeg/route`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ file: { type: file.type, buffer: base64data } }),
           });
+  
+          const uploadResult = await response.json();
+  
+          if (uploadResult.error) {
+            setStatusMessage(uploadResult.error);
+            setLoading(false);
+            setFadeOut(false);
+            return;
+          }
+  
+          const imageUrl = uploadResult.url;
+          setImage(imageUrl);
+  
+          const profileResponse = await fetch(`${apiBasePath}/api/profile`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ profileImage: imageUrl }),
+          });
+  
+          if (!profileResponse.ok) {
+            console.error('Error updating profile image:', await profileResponse.json());
+          }
+  
+          setStatusMessage("Finished");
         };
-
-        let fileToUpload = file;
-        if (file.type !== 'image/jpeg') {
-          fileToUpload = await convertToJPEG(file);
-        }
-
-        const uploadResponse = await fetch(url, {
-          method: "PUT",
-          body: fileToUpload,
-          headers: {
-            "Content-Type": 'image/jpeg',
-          },
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error('Failed to upload file');
-        }
-
-        const imageUrl = url.split('?')[0];
-        setImage(imageUrl);
-
-        const profileResponse = await fetch(`${apiBasePath}/api/profile`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({ profileImage: imageUrl }),
-        });
-
-        if (!profileResponse.ok) {
-          console.error('Error updating profile image:', await profileResponse.json());
-        }
-
-        setStatusMessage("Finished");
       } catch (error) {
         console.error('Error uploading image:', error);
         setStatusMessage("Error uploading image");
       }
-
+  
       setLoading(false);
       setFadeOut(false);
     }
   };
+  
 
   return (
     <div className="max-w-xs bg-white rounded-3xl shadow-md mx-auto overflow-hidden">
