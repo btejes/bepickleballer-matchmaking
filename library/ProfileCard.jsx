@@ -82,7 +82,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
         reader.onloadend = async () => {
           const base64data = reader.result.split(',')[1];
   
-          const response = await fetch(`${apiBasePath}/api/imageToJpeg/route`, {
+          const response = await fetch(`${apiBasePath}/api/imageToJpeg`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
