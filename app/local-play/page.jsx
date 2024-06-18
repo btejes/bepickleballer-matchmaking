@@ -3,7 +3,6 @@
 import Navbar from '@/components/Navbar';
 import { useState, useEffect } from 'react';
 import ProfileCard from '@/library/ProfileCard';
-import { useSwipeable } from 'react-swipeable';
 
 const LocalPlay = () => {
   const [filters, setFilters] = useState({
@@ -120,13 +119,6 @@ const LocalPlay = () => {
     setTimeout(() => setCopySuccess(''), 5000); // Clear the message after 5 seconds
   };
 
-  const handlers = useSwipeable({
-    onSwipedLeft: () => handleDecision('no'),
-    onSwipedRight: () => handleDecision('yes'),
-    preventDefaultTouchmoveEvent: true,
-    trackMouse: true
-  });
-
   return (
     <div className="flex flex-col items-center h-screen overflow-hidden">
       <div className="w-full">
@@ -146,7 +138,7 @@ const LocalPlay = () => {
             >
               No
             </button>
-            <div {...handlers} className="order-1 lg:order-2 flex justify-center w-full lg:w-auto">
+            <div className="order-1 lg:order-2 flex justify-center w-full lg:w-auto">
               <ProfileCard profile={currentMatch} />
             </div>
             <button
