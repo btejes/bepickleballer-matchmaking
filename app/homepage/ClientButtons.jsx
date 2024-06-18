@@ -86,7 +86,9 @@ const ClientButtons = () => {
     <div className="flex flex-col items-center justify-center space-y-4">
       <button
         onClick={handleLocalPlayClick}
-        className="w-48 bg-blue-500 text-white font-bold py-4 px-8 rounded-full shadow-full hover:bg-blue-600 transform hover:-translate-y-1 transition-all"
+        className={`w-48 font-bold py-4 px-8 rounded-full shadow-full transform transition-all ${
+          isLoading ? 'bg-gray-400 text-white cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600 hover:-translate-y-1'
+        }`}
         disabled={isLoading} // Disable button while loading
       >
         Local Play
@@ -94,7 +96,9 @@ const ClientButtons = () => {
 
       <button
         onClick={handleTournamentClick}
-        className="w-48 bg-yellow-500 text-black font-bold py-4 px-8 rounded-full shadow-full hover:bg-yellow-600 transform hover:-translate-y-1 transition-all"
+        className={`w-48 font-bold py-4 px-8 rounded-full shadow-full transform transition-all ${
+          isLoading ? 'bg-gray-400 text-black cursor-not-allowed' : 'bg-yellow-500 text-black hover:bg-yellow-600 hover:-translate-y-1'
+        }`}
         disabled={isLoading} // Disable button while loading
       >
         Tournaments
