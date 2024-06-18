@@ -3,6 +3,7 @@
 import Navbar from '@/components/Navbar';
 import { useState, useEffect } from 'react';
 import ProfileCard from '@/library/ProfileCard';
+import { useSwipeable } from 'react-swipeable';
 
 const LocalPlay = () => {
   const [filters, setFilters] = useState({
@@ -119,6 +120,13 @@ const LocalPlay = () => {
     setTimeout(() => setCopySuccess(''), 5000); // Clear the message after 5 seconds
   };
 
+  const handlers = useSwipeable({
+    onSwipedLeft: () => handleDecision('no'),
+    onSwipedRight: () => handleDecision('yes'),
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true
+  });
+
   return (
     <div className="flex flex-col items-center h-screen overflow-hidden">
       <div className="w-full">
@@ -131,23 +139,23 @@ const LocalPlay = () => {
       )}
       <div className="flex-grow w-full flex flex-col items-center justify-center px-4 space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4">
         {currentMatch ? (
-          <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 lg:space-x-0 lg:space-y-0">
-          <button
-            onClick={() => handleDecision('no')}
-            className="bg-red-500 text-white py-3 px-6 rounded-full lg:order-1 order-2 lg:self-start sm:order-1"
-          >
-            No
-          </button>
-          <div className="order-1 lg:order-2 flex justify-center w-full lg:w-auto">
-            <ProfileCard profile={currentMatch} />
+          <div className="flex flex-col items-center justify-center space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4">
+            <button
+              onClick={() => handleDecision('no')}
+              className="hidden lg:block bg-red-500 text-white py-3 px-6 rounded-full lg:order-1 lg:self-center w-auto lg:w-auto"
+            >
+              No
+            </button>
+            <div {...handlers} className="order-1 lg:order-2 flex justify-center w-full lg:w-auto">
+              <ProfileCard profile={currentMatch} />
+            </div>
+            <button
+              onClick={() => handleDecision('yes')}
+              className="hidden lg:block bg-green-500 text-white py-3 px-6 rounded-full lg:order-3 lg:self-center w-auto lg:w-auto"
+            >
+              Yes
+            </button>
           </div>
-          <button
-            onClick={() => handleDecision('yes')}
-            className="bg-green-500 text-white py-3 px-6 rounded-full lg:order-3 order-2 lg:self-end sm:order-3"
-          >
-            Yes
-          </button>
-        </div>
         ) : (
           <p className="text-center">
             {error === 'No matches found' ? (
@@ -178,6 +186,20 @@ const LocalPlay = () => {
             )}
           </p>
         )}
+      </div>
+      <div className="lg:hidden flex flex-row justify-center w-full mt-4 space-x-4">
+        <button
+          onClick={() => handleDecision('no')}
+          className="bg-red-500 text-white py-3 px-6 rounded-full"
+        >
+          No
+        </button>
+        <button
+          onClick={() => handleDecision('yes')}
+          className="bg-green-500 text-white py-3 px-6 rounded-full"
+        >
+          Yes
+        </button>
       </div>
       <div className="w-full text-black h-auto p-2 flex justify-center space-x-2 flex-wrap">
         <select
