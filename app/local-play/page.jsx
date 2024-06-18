@@ -246,7 +246,7 @@ const LocalPlay = () => {
           className="p-1 border rounded w-36"
         >
           <option value="">
-            Min DUPR Rating
+            Min DUPR
           </option>
           <option value="1.0">1.0</option>
           <option value="2.0">2.0</option>
