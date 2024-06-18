@@ -165,6 +165,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
   
   
   
+  
 
   return (
     <div className="max-w-xs bg-white rounded-3xl shadow-md mx-auto overflow-hidden">
