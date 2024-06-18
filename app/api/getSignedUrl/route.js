@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import connectToDatabase from '@/library/connectToDatabase';
 import Profile from '@/library/Profile';
+import sharp from 'sharp';
 
 const s3Client = new S3Client({
   region: process.env.AWS_BUCKET_REGION,
@@ -56,8 +57,8 @@ export async function POST() {
 
     const putObjectCommand = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `${userId}/${Date.now()}`,
-      ContentType: 'image/jpeg', // Optional: specify the content type if necessary
+      Key: `${userId}/${Date.now()}.jpeg`,
+      ContentType: 'image/jpeg',
     });
 
     console.log('PutObjectCommand created:', putObjectCommand);

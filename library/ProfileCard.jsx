@@ -57,7 +57,15 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
+
     if (file) {
+      if (!allowedTypes.includes(file.type)) {
+        setStatusMessage(`${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC`);
+        setFadeOut(false);
+        return;
+      }
+
       if (file.size > 5 * 1024 * 1024) {
         setStatusMessage("File size should not exceed 5MB");
         setFadeOut(false);
@@ -88,11 +96,38 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
         const url = signedUrlResult.url;
 
+        // Convert image to JPEG if necessary
+        const convertToJPEG = async (file) => {
+          const reader = new FileReader();
+          return new Promise((resolve, reject) => {
+            reader.onload = async () => {
+              const arrayBuffer = reader.result;
+              const sharp = require('sharp');
+
+              try {
+                const buffer = await sharp(arrayBuffer)
+                  .jpeg({ quality: 90 })
+                  .toBuffer();
+                resolve(new File([buffer], `${Date.now()}.jpeg`, { type: 'image/jpeg' }));
+              } catch (err) {
+                reject(err);
+              }
+            };
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(file);
+          });
+        };
+
+        let fileToUpload = file;
+        if (file.type !== 'image/jpeg') {
+          fileToUpload = await convertToJPEG(file);
+        }
+
         const uploadResponse = await fetch(url, {
           method: "PUT",
-          body: file,
+          body: fileToUpload,
           headers: {
-            "Content-Type": file.type || "",
+            "Content-Type": 'image/jpeg',
           },
         });
 
