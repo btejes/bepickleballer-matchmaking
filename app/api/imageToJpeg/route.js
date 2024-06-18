@@ -18,6 +18,7 @@ export async function POST(req) {
     const jwtToken = cookies().get('token')?.value;
 
     if (!jwtToken) {
+      console.log('No JWT token found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -26,13 +27,15 @@ export async function POST(req) {
 
     await connectToDatabase();
 
-    const { file } = req.body;
+    const { file } = await req.json(); // Parse JSON request body
     if (!file) {
+      console.log('No file uploaded');
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
     if (!allowedTypes.includes(file.type)) {
+      console.log(`File type ${file.type} not accepted`);
       return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
     }
 
@@ -53,11 +56,11 @@ export async function POST(req) {
     const putObjectCommand = new PutObjectCommand(params);
     await s3Client.send(putObjectCommand);
 
-    const signedUrl = await getSignedUrl(s3Client, putObjectCommand, { expiresIn: 60 });
-    const imageUrl = signedUrl.split('?')[0];
+    const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${userId}/${Date.now()}.jpeg`;
 
     return NextResponse.json({ url: imageUrl }, { status: 200 });
   } catch (error) {
+    console.error('Error processing the image upload:', error);
     return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
   }
 }
