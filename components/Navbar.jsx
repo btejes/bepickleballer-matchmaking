@@ -9,7 +9,7 @@ const Navbar = () => {
           <img
             src={`${basePath}/logo.png`}
             alt="Logo"
-            className="h-10 w-auto sm:h-16 sm:w-auto lg:h-20 lg:w-auto cursor-pointer"
+            className="h-10 w-auto sm:h-16 sm:w-auto lg:h-20 lg:w-auto cursor-pointer mr-2"
           />
         </Link>
       </div>
