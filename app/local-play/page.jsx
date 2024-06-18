@@ -180,7 +180,7 @@ const LocalPlay = () => {
         )}
       </div>
       {currentMatch && (
-        <div className="lg:hidden flex flex-row justify-center w-full space-x-4">
+        <div className="lg:hidden flex flex-row justify-center w-full mb-4 space-x-4">
           <button
             onClick={() => handleDecision('no')}
             className="bg-red-500 text-white py-3 px-6 rounded-full"
