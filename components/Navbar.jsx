@@ -13,7 +13,7 @@ const Navbar = () => {
           />
         </Link>
       </div>
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-2 sm:space-x-4">
         <Link href="/homepage" className="text-black hover:underline">
           <span className="block lg:hidden">Find</span>
           <span className="hidden lg:block">Find Match</span>
