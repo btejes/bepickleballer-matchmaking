@@ -1,17 +1,8 @@
 import { NextResponse } from 'next/server';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import connectToDatabase from '@/library/connectToDatabase';
 import sharp from 'sharp';
-
-const s3Client = new S3Client({
-  region: process.env.AWS_BUCKET_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
 
 export async function POST(req) {
   try {
@@ -46,21 +37,11 @@ export async function POST(req) {
       .jpeg({ quality: 90 })
       .toBuffer();
 
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `${userId}/${Date.now()}.jpeg`,
-      Body: jpegBuffer,
-      ContentType: 'image/jpeg',
-    };
+    const base64Image = jpegBuffer.toString('base64');
 
-    const putObjectCommand = new PutObjectCommand(params);
-    await s3Client.send(putObjectCommand);
-
-    const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${userId}/${Date.now()}.jpeg`;
-
-    return NextResponse.json({ url: imageUrl }, { status: 200 });
+    return NextResponse.json({ image: base64Image }, { status: 200 });
   } catch (error) {
     console.error('Error processing the image upload:', error);
-    return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to process image' }, { status: 500 });
   }
 }

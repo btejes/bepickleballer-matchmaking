@@ -82,7 +82,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
         reader.onloadend = async () => {
           const base64data = reader.result.split(',')[1];
   
-          const response = await fetch(`${apiBasePath}/api/imageToJpeg`, {
+          const response = await fetch(`${apiBasePath}/api/imageToJpeg/route`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -91,16 +91,51 @@ const ProfileCard = ({ profile, isProfilePage }) => {
             body: JSON.stringify({ file: { type: file.type, buffer: base64data } }),
           });
   
-          const uploadResult = await response.json();
+          const convertResult = await response.json();
   
-          if (uploadResult.error) {
-            setStatusMessage(uploadResult.error);
+          if (convertResult.error) {
+            setStatusMessage(convertResult.error);
             setLoading(false);
             setFadeOut(false);
             return;
           }
   
-          const imageUrl = uploadResult.url;
+          const convertedImage = convertResult.image;
+  
+          // Get a signed URL for uploading the image
+          const signedUrlResponse = await fetch(`${apiBasePath}/api/getSignedUrl`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          });
+  
+          const signedUrlResult = await signedUrlResponse.json();
+  
+          if (signedUrlResult.error) {
+            setStatusMessage("Failed to get signed URL");
+            setLoading(false);
+            setFadeOut(false);
+            return;
+          }
+  
+          const url = signedUrlResult.url;
+  
+          // Upload the converted image to S3
+          const uploadResponse = await fetch(url, {
+            method: "PUT",
+            body: Buffer.from(convertedImage, 'base64'),
+            headers: {
+              "Content-Type": 'image/jpeg',
+            },
+          });
+  
+          if (!uploadResponse.ok) {
+            throw new Error('Failed to upload file');
+          }
+  
+          const imageUrl = url.split('?')[0];
           setImage(imageUrl);
   
           const profileResponse = await fetch(`${apiBasePath}/api/profile`, {
@@ -127,6 +162,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
       setFadeOut(false);
     }
   };
+  
   
   
 
