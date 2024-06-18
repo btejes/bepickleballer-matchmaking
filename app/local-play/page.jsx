@@ -131,7 +131,7 @@ const LocalPlay = () => {
       )}
       <div className="flex-grow w-full flex flex-col items-center justify-center px-4 space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4">
         {currentMatch ? (
-          <div className="flex flex-col items-center justify-center space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4">
+          <div className="flex flex-col lg:flex-row items-center justify-center space-y-4 lg:space-y-0 lg:space-x-4">
             <button
               onClick={() => handleDecision('no')}
               className="bg-red-500 text-white py-3 px-6 rounded-full lg:order-1 order-2 lg:self-center w-auto lg:w-auto"
