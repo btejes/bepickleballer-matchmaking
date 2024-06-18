@@ -131,10 +131,10 @@ const LocalPlay = () => {
       )}
       <div className="flex-grow w-full flex flex-col items-center justify-center px-4 space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4">
         {currentMatch ? (
-          <div className="flex flex-col items-center justify-center space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4">
+          <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 lg:space-x-0 lg:space-y-0">
             <button
               onClick={() => handleDecision('no')}
-              className="bg-red-500 text-white py-3 px-6 rounded-full lg:order-1 order-2 lg:self-center w-auto lg:w-auto"
+              className="bg-red-500 text-white py-3 px-6 rounded-full lg:order-1 order-2 lg:self-start sm:order-1"
             >
               No
             </button>
@@ -143,11 +143,11 @@ const LocalPlay = () => {
             </div>
             <button
               onClick={() => handleDecision('yes')}
-              className="bg-green-500 text-white py-3 px-6 rounded-full lg:order-3 order-2 lg:self-center w-auto lg:w-auto"
+              className="bg-green-500 text-white py-3 px-6 rounded-full lg:order-3 order-2 lg:self-end sm:order-3"
             >
               Yes
             </button>
-          </div>
+        </div>
         ) : (
           <p className="text-center">
             {error === 'No matches found' ? (
