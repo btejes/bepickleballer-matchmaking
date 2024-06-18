@@ -3,39 +3,39 @@ import Link from 'next/link';
 const Navbar = () => {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   return (
-    <nav className="navbar bg-white px-4 py-2 shadow-md flex justify-between items-center">
+    <nav className="navbar bg-white px-2 py-1 shadow-md flex justify-between items-center">
       <div className="flex items-center">
         <Link href="https://bepickleballer.com">
           <img
             src={`${basePath}/logo.png`}
             alt="Logo"
-            className="h-12 w-auto sm:h-16 sm:w-auto lg:h-20 lg:w-auto cursor-pointer"
+            className="h-10 w-auto sm:h-16 sm:w-auto lg:h-20 lg:w-auto cursor-pointer"
           />
         </Link>
       </div>
       <div className="flex items-center space-x-2 sm:space-x-4">
-        <Link href="/homepage" className="text-black hover:underline">
+        <Link href="/homepage" className="text-black hover:underline text-sm sm:text-base">
           <span className="block lg:hidden">Find</span>
           <span className="hidden lg:block">Find Match</span>
         </Link>
-        <Link href="/matches" className="text-black hover:underline">
+        <Link href="/matches" className="text-black hover:underline text-sm sm:text-base">
           <span className="block lg:hidden">Matches</span>
           <span className="hidden lg:block">My Matches</span>
         </Link>
         <Link href="/faq" className="text-black hover:underline">
-          <div className="flex items-center justify-center w-8 h-8 rounded-full border border-black">
+          <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-black">
             ?
           </div>
         </Link>
         <Link href="/profile" className="text-black hover:underline">
-          <div className="flex items-center justify-center w-8 h-8 rounded-full border border-black">
+          <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-black">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth="1.5"
               stroke="currentColor"
-              className="w-6 h-6"
+              className="w-4 h-4 sm:w-6 sm:h-6"
             >
               <path
                 strokeLinecap="round"
