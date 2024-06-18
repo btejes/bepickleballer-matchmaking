@@ -8,6 +8,7 @@ const ClientButtons = () => {
   const [missingFields, setMissingFields] = useState([]);
   const [isLocalPlayModalOpen, setIsLocalPlayModalOpen] = useState(false);
   const [isTournamentModalOpen, setIsTournamentModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // New state to track loading
   const router = useRouter();
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
@@ -27,6 +28,8 @@ const ClientButtons = () => {
       } catch (error) {
         console.error('Error fetching profile:', error);
         setProfile(null);
+      } finally {
+        setIsLoading(false); // Set loading to false after the fetch is complete
       }
     };
 
@@ -84,6 +87,7 @@ const ClientButtons = () => {
       <button
         onClick={handleLocalPlayClick}
         className="w-48 bg-blue-500 text-white font-bold py-4 px-8 rounded-full shadow-full hover:bg-blue-600 transform hover:-translate-y-1 transition-all"
+        disabled={isLoading} // Disable button while loading
       >
         Local Play
       </button>
@@ -91,6 +95,7 @@ const ClientButtons = () => {
       <button
         onClick={handleTournamentClick}
         className="w-48 bg-yellow-500 text-black font-bold py-4 px-8 rounded-full shadow-full hover:bg-yellow-600 transform hover:-translate-y-1 transition-all"
+        disabled={isLoading} // Disable button while loading
       >
         Tournaments
       </button>
