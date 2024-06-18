@@ -134,7 +134,7 @@ const LocalPlay = () => {
           <div className="flex flex-col lg:flex-row items-center justify-center space-y-4 lg:space-y-0 lg:space-x-4">
             <button
               onClick={() => handleDecision('no')}
-              className="bg-red-500 text-white py-3 px-6 rounded-full lg:order-1 order-2 lg:self-center w-auto lg:w-auto"
+              className="bg-red-500 text-white py-3 px-6 rounded-full order-2 lg:order-1 lg:self-center w-auto lg:w-auto"
             >
               No
             </button>
@@ -143,7 +143,7 @@ const LocalPlay = () => {
             </div>
             <button
               onClick={() => handleDecision('yes')}
-              className="bg-green-500 text-white py-3 px-6 rounded-full lg:order-3 order-2 lg:self-center w-auto lg:w-auto"
+              className="bg-green-500 text-white py-3 px-6 rounded-full order-2 lg:order-3 lg:self-center w-auto lg:w-auto"
             >
               Yes
             </button>
@@ -178,6 +178,20 @@ const LocalPlay = () => {
             )}
           </p>
         )}
+      </div>
+      <div className="flex flex-row justify-center w-full lg:flex-row lg:space-x-4 order-2 lg:order-3 space-x-4 lg:self-center w-auto lg:w-auto mt-4 lg:mt-0">
+        <button
+          onClick={() => handleDecision('no')}
+          className="bg-red-500 text-white py-3 px-6 rounded-full w-auto"
+        >
+          No
+        </button>
+        <button
+          onClick={() => handleDecision('yes')}
+          className="bg-green-500 text-white py-3 px-6 rounded-full w-auto"
+        >
+          Yes
+        </button>
       </div>
       <div className="w-full text-black h-auto p-2 flex justify-center space-x-2 flex-wrap">
         <select
