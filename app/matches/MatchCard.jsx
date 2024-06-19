@@ -2,6 +2,7 @@
 import React from 'react';
 
 const MatchCard = ({ match, onClick }) => {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   console.log("Match profile image URL:", match.profileImage); 
   return (
     <div className="bg-white border text-black border-gray-300 rounded-3xl p-4 shadow-md w-full max-w-2xl mb-4 cursor-pointer" onClick={onClick}>
@@ -11,7 +12,7 @@ const MatchCard = ({ match, onClick }) => {
             src={match.profileImage} 
             alt=""
             className={`w-full h-full object-cover ${!match.profileImage && 'blur-sm grayscale bg-gray-300'}`}
-            onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
+            onError={(e) => { e.target.src = `${basePath}/blank-profile-picture.svg`; }}
           />
         </div>
         <div className="flex-grow text-center md:text-left">
