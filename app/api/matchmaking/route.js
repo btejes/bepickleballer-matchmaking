@@ -108,13 +108,15 @@ export async function POST(request) {
       return NextResponse.json({ error: 'No matches found' }, { status: 404 });
     }
 
-    const randomMatch = combinedMatches[Math.floor(Math.random() * combinedMatches.length)];
-    return NextResponse.json(randomMatch, { status: 200 });
+    // Show pending matches first, if any
+    const matchToShow = pendingMatches.length > 0 ? pendingMatches[0] : combinedMatches[Math.floor(Math.random() * combinedMatches.length)];
+    return NextResponse.json(matchToShow, { status: 200 });
   } catch (error) {
     console.error('Internal Server Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
 
 
 export async function PUT(request) {
