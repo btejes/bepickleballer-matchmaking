@@ -8,6 +8,8 @@ export const metadata = {
   description: 'Pickleball Matchmaking Platform',
 };
 
+export const fetchCache = 'force-no-store';
+
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 // Main layout component
