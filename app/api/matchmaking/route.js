@@ -89,9 +89,12 @@ export async function POST(request) {
         ) {
           pendingMatches.push(match);
         } else if (
-          (existingEntry.user1Id.equals(decoded._id) && existingEntry.user2Decision !== 'no') ||
-          (existingEntry.user2Id.equals(decoded._id) && existingEntry.user1Decision !== 'no')
+          existingEntry.user1Decision === 'yes' &&
+          existingEntry.user2Decision === 'yes'
         ) {
+          // Both users have said "yes", skip these matches
+          continue;
+        } else {
           randomMatches.push(match);
         }
       } else {
@@ -102,20 +105,24 @@ export async function POST(request) {
     console.log("Pending matches found:", pendingMatches.length);
     console.log("Random matches found:", randomMatches.length);
 
-    const combinedMatches = [...pendingMatches, ...randomMatches];
-
-    if (combinedMatches.length === 0) {
+    if (pendingMatches.length > 0) {
+      // Always return the first pending match until the user interacts with it
+      const pendingMatch = pendingMatches[0];
+      return NextResponse.json(pendingMatch, { status: 200 });
+    } else if (randomMatches.length > 0) {
+      // No pending matches, fallback to random matches
+      const randomMatch = randomMatches[Math.floor(Math.random() * randomMatches.length)];
+      return NextResponse.json(randomMatch, { status: 200 });
+    } else {
+      // No matches found
       return NextResponse.json({ error: 'No matches found' }, { status: 404 });
     }
-
-    // Show pending matches first, if any
-    const matchToShow = pendingMatches.length > 0 ? pendingMatches[0] : combinedMatches[Math.floor(Math.random() * combinedMatches.length)];
-    return NextResponse.json(matchToShow, { status: 200 });
   } catch (error) {
     console.error('Internal Server Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
 
 
 
