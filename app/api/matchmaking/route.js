@@ -31,8 +31,8 @@ export async function POST(request) {
     const filters = await request.json();
     console.log("Filters received:", filters);
 
-    const baseQuery = {
-      city: currentUserProfile.city,
+    const query = {
+      city: currentUserProfile.city,  // Ensures city requirement
       userId: { $ne: decoded._id },
       profileImage: { $exists: true, $ne: null, $ne: '' },
       firstName: { $exists: true, $ne: null, $ne: '' },
@@ -44,38 +44,29 @@ export async function POST(request) {
     };
 
     if (filters.preferredGender) {
-      baseQuery.gender = filters.preferredGender;
+      query.gender = filters.preferredGender;
     }
 
     if (filters.preferredAgeRange) {
       const [minAge, maxAge] = filters.preferredAgeRange.split('-').map(Number);
-      baseQuery.ageRange = { $gte: minAge, $lte: maxAge };
+      query.ageRange = { $gte: minAge, $lte: maxAge };
     }
 
     if (filters.preferredSkillLevel) {
-      baseQuery.skillLevel = filters.preferredSkillLevel;
+      query.skillLevel = filters.preferredSkillLevel;
     }
 
     if (filters.preferredDUPRRating) {
-      baseQuery.duprRating = { $gte: parseFloat(filters.preferredDUPRRating) };
+      query.duprRating = { $gte: parseFloat(filters.preferredDUPRRating) };
     }
 
-    console.log("Base query built:", baseQuery);
+    console.log("Query built:", query);
 
-    // Fetch users who have already said "yes" to the logged-in user
-    const yesToCurrentUser = await Matchmaking.find({
-      user2Id: decoded._id,
-      user2Decision: 'yes',
-      user1Decision: { $ne: 'no' },
-    });
+    const potentialMatches = await Profile.find(query);
 
-    const yesUserIds = yesToCurrentUser.map(match => match.user1Id);
-    const prioritizedMatches = await Profile.find({ ...baseQuery, userId: { $in: yesUserIds } });
+    const pendingMatches = [];
+    const randomMatches = [];
 
-    // Fetch other potential matches
-    const potentialMatches = await Profile.find(baseQuery).where('userId').nin(yesUserIds);
-
-    const validMatches = [];
     for (const match of potentialMatches) {
       const existingEntry = await Matchmaking.findOne({
         $or: [
@@ -84,30 +75,47 @@ export async function POST(request) {
         ],
       });
 
-      if (!existingEntry ||
-          (existingEntry.user1Id.equals(decoded._id) && existingEntry.user1Decision === 'pending' && existingEntry.user2Decision !== 'no') ||
-          (existingEntry.user2Id.equals(decoded._id) && existingEntry.user2Decision === 'pending' && existingEntry.user1Decision !== 'no')) {
-        validMatches.push(match);
+      if (existingEntry) {
+        if (
+          existingEntry.user1Id.equals(decoded._id) &&
+          existingEntry.user1Decision === 'pending' &&
+          existingEntry.user2Decision === 'yes'
+        ) {
+          pendingMatches.push(match);
+        } else if (
+          existingEntry.user2Id.equals(decoded._id) &&
+          existingEntry.user2Decision === 'pending' &&
+          existingEntry.user1Decision === 'yes'
+        ) {
+          pendingMatches.push(match);
+        } else if (
+          (existingEntry.user1Id.equals(decoded._id) && existingEntry.user2Decision !== 'no') ||
+          (existingEntry.user2Id.equals(decoded._id) && existingEntry.user1Decision !== 'no')
+        ) {
+          randomMatches.push(match);
+        }
+      } else {
+        randomMatches.push(match);
       }
     }
 
-    console.log("Valid matches found:", validMatches.length);
+    console.log("Pending matches found:", pendingMatches.length);
+    console.log("Random matches found:", randomMatches.length);
 
-    // Combine prioritized matches with other valid matches
-    const allMatches = [...prioritizedMatches, ...validMatches];
+    const combinedMatches = [...pendingMatches, ...randomMatches];
 
-    if (allMatches.length === 0) {
+    if (combinedMatches.length === 0) {
       return NextResponse.json({ error: 'No matches found' }, { status: 404 });
     }
 
-    // Pick a random match from the combined list
-    const randomMatch = allMatches[Math.floor(Math.random() * allMatches.length)];
+    const randomMatch = combinedMatches[Math.floor(Math.random() * combinedMatches.length)];
     return NextResponse.json(randomMatch, { status: 200 });
   } catch (error) {
     console.error('Internal Server Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
 
 export async function PUT(request) {
   await connectToDatabase();
