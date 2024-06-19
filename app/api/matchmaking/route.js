@@ -31,7 +31,7 @@ export async function POST(request) {
     const filters = await request.json();
     console.log("Filters received:", filters);
 
-    const query = {
+    const baseQuery = {
       city: currentUserProfile.city,
       userId: { $ne: decoded._id },
       profileImage: { $exists: true, $ne: null, $ne: '' },
@@ -44,23 +44,23 @@ export async function POST(request) {
     };
 
     if (filters.preferredGender) {
-      query.gender = filters.preferredGender;
+      baseQuery.gender = filters.preferredGender;
     }
 
     if (filters.preferredAgeRange) {
       const [minAge, maxAge] = filters.preferredAgeRange.split('-').map(Number);
-      query.ageRange = { $gte: minAge, $lte: maxAge };
+      baseQuery.ageRange = { $gte: minAge, $lte: maxAge };
     }
 
     if (filters.preferredSkillLevel) {
-      query.skillLevel = filters.preferredSkillLevel;
+      baseQuery.skillLevel = filters.preferredSkillLevel;
     }
 
     if (filters.preferredDUPRRating) {
-      query.duprRating = { $gte: parseFloat(filters.preferredDUPRRating) };
+      baseQuery.duprRating = { $gte: parseFloat(filters.preferredDUPRRating) };
     }
 
-    console.log("Query built:", query);
+    console.log("Base query built:", baseQuery);
 
     // Fetch users who have already said "yes" to the logged-in user
     const yesToCurrentUser = await Matchmaking.find({
@@ -70,10 +70,10 @@ export async function POST(request) {
     });
 
     const yesUserIds = yesToCurrentUser.map(match => match.user1Id);
-    const prioritizedMatches = await Profile.find({ userId: { $in: yesUserIds } });
+    const prioritizedMatches = await Profile.find({ ...baseQuery, userId: { $in: yesUserIds } });
 
     // Fetch other potential matches
-    const potentialMatches = await Profile.find(query).where('userId').nin(yesUserIds);
+    const potentialMatches = await Profile.find(baseQuery).where('userId').nin(yesUserIds);
 
     const validMatches = [];
     for (const match of potentialMatches) {
