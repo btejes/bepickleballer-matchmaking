@@ -27,7 +27,7 @@ const Navbar = () => {
           </a>
         </Link>
       </div>
-      <div className="flex items-center space-x-2 sm:space-x-4">
+      <div className="flex items-center space-x-4 sm:space-x-6">
         <Link href="/homepage">
           <a className="text-black hover:underline text-sm sm:text-base">
             <span className="block lg:hidden">Find</span>
