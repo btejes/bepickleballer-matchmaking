@@ -28,7 +28,7 @@ const Navbar = () => {
         </Link>
       </div>
       <div className="flex items-center space-x-4 sm:space-x-6">
-        <Link href="/homepage">
+        <Link href="/findmatch">
           <a className="text-black hover:underline text-base sm:text-lg">
             <span className="block lg:hidden">Find</span>
             <span className="hidden lg:block">Find Match</span>

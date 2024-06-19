@@ -50,10 +50,10 @@ export async function GET(request) {
   user.lastVerifiedLogin = new Date();
   await user.save();
 
-  // Redirect user to the homepage with the JWT set in a secure, HttpOnly cookie
-  console.log("\nAbout to route to homepage from auth verify api\n");
-  console.log("\nAteemtping to redirect to this path: ", `${process.env.BASE_URL}${apiBasePath}/homepage`, "\n");
-  const response = NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/homepage`);
+  // Redirect user to the Find Match with the JWT set in a secure, HttpOnly cookie
+  console.log("\nAbout to route to Find Match from auth verify api\n");
+  console.log("\nAteemtping to redirect to this path: ", `${process.env.BASE_URL}${apiBasePath}/findmatch`, "\n");
+  const response = NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/findmatch`);
   response.cookies.set('token', jwtToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

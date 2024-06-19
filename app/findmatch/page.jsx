@@ -6,7 +6,7 @@ export const metadata = {
   description: 'Find your Pickleball match',
 };
 console.log("\nEntered Home Page Front End\n");
-const Homepage = () => {
+const FindMatch = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
@@ -20,4 +20,4 @@ const Homepage = () => {
   );
 };
 
-export default Homepage;
+export default FindMatch;
