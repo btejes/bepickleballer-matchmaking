@@ -21,8 +21,6 @@ const Navbar = () => {
               src={`${basePath}/logo.png`}
               alt="Desktop Logo"
               className="hidden sm:block h-10 sm:h-16 lg:h-20 cursor-pointer mr-2"
-              width={200}  // Adjust the width to the appropriate size for the logo
-              height={60}  // Adjust the height to the appropriate size for the logo
               quality={100}
               priority
             />
