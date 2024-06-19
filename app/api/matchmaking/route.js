@@ -76,26 +76,27 @@ export async function POST(request) {
       });
 
       if (existingEntry) {
-        if (
-          existingEntry.user1Id.equals(decoded._id) &&
-          existingEntry.user1Decision === 'pending' &&
-          existingEntry.user2Decision === 'yes'
-        ) {
-          pendingMatches.push(match);
-        } else if (
-          existingEntry.user2Id.equals(decoded._id) &&
-          existingEntry.user2Decision === 'pending' &&
-          existingEntry.user1Decision === 'yes'
-        ) {
-          pendingMatches.push(match);
-        } else if (
-          existingEntry.user1Decision === 'yes' &&
-          existingEntry.user2Decision === 'yes'
-        ) {
-          // Both users have said "yes", skip these matches
-          continue;
-        } else {
-          randomMatches.push(match);
+        // Check if the logged-in user is user1
+        if (existingEntry.user1Id.equals(decoded._id)) {
+          if (existingEntry.user1Decision === 'pending' && existingEntry.user2Decision === 'yes') {
+            pendingMatches.push(match);
+          } else if (existingEntry.user1Decision === 'yes' && existingEntry.user2Decision === 'yes') {
+            // Both users have said "yes", skip these matches
+            continue;
+          } else {
+            randomMatches.push(match);
+          }
+        } 
+        // Check if the logged-in user is user2
+        else if (existingEntry.user2Id.equals(decoded._id)) {
+          if (existingEntry.user2Decision === 'pending' && existingEntry.user1Decision === 'yes') {
+            pendingMatches.push(match);
+          } else if (existingEntry.user1Decision === 'yes' && existingEntry.user2Decision === 'yes') {
+            // Both users have said "yes", skip these matches
+            continue;
+          } else {
+            randomMatches.push(match);
+          }
         }
       } else {
         randomMatches.push(match);
@@ -122,6 +123,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
 
 
 
