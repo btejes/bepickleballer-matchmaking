@@ -4,7 +4,7 @@ import Image from 'next/image';
 const Navbar = () => {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   return (
-    <nav className="navbar bg-white px-2 sm:p-3 py-1 shadow-md flex justify-between items-center">
+    <nav className="navbar bg-white px-2 sm:p-4 py-1 shadow-md flex justify-between items-center">
       <div className="flex items-center">
         <Link href="https://bepickleballer.com">
           <a>
