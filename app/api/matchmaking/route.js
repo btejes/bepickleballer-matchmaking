@@ -62,7 +62,18 @@ export async function POST(request) {
 
     console.log("Query built:", query);
 
-    const potentialMatches = await Profile.find(query);
+    // Fetch users who have already said "yes" to the logged-in user
+    const yesToCurrentUser = await Matchmaking.find({
+      user2Id: decoded._id,
+      user2Decision: 'yes',
+      user1Decision: { $ne: 'no' },
+    });
+
+    const yesUserIds = yesToCurrentUser.map(match => match.user1Id);
+    const prioritizedMatches = await Profile.find({ userId: { $in: yesUserIds } });
+
+    // Fetch other potential matches
+    const potentialMatches = await Profile.find(query).where('userId').nin(yesUserIds);
 
     const validMatches = [];
     for (const match of potentialMatches) {
@@ -81,11 +92,16 @@ export async function POST(request) {
     }
 
     console.log("Valid matches found:", validMatches.length);
-    if (validMatches.length === 0) {
+
+    // Combine prioritized matches with other valid matches
+    const allMatches = [...prioritizedMatches, ...validMatches];
+
+    if (allMatches.length === 0) {
       return NextResponse.json({ error: 'No matches found' }, { status: 404 });
     }
 
-    const randomMatch = validMatches[Math.floor(Math.random() * validMatches.length)];
+    // Pick a random match from the combined list
+    const randomMatch = allMatches[Math.floor(Math.random() * allMatches.length)];
     return NextResponse.json(randomMatch, { status: 200 });
   } catch (error) {
     console.error('Internal Server Error:', error);
