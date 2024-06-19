@@ -73,8 +73,8 @@ const MatchesPage = () => {
         ) : (
           <div className="text-center bg-white text-gray-800 p-6 rounded-lg shadow-md">
             <p className="text-lg font-semibold">
-              If you've approved a match, we will reach out to them to approve the match as well. 
-              Check back later to see if they've accepted the match.
+              If you&apos;ve approved a match, we will reach out to them to approve the match as well. 
+              Check back later to see if they&apos;ve accepted the match.
             </p>
           </div>
         )}
