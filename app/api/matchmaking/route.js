@@ -80,8 +80,20 @@ export async function POST(request) {
         if (existingEntry.user1Id.equals(decoded._id)) {
           if (existingEntry.user1Decision === 'pending' && existingEntry.user2Decision === 'yes') {
             pendingMatches.push(match);
-          } else if (existingEntry.user1Decision === 'yes' && existingEntry.user2Decision === 'yes') {
+          } else if (
+            existingEntry.user1Decision === 'yes' &&
+            existingEntry.user2Decision === 'pending'
+          ) {
+            // This match is pending for the other user
+            continue;
+          } else if (
+            existingEntry.user1Decision === 'yes' &&
+            existingEntry.user2Decision === 'yes'
+          ) {
             // Both users have said "yes", skip these matches
+            continue;
+          } else if (existingEntry.user2Decision === 'no') {
+            // Skip if the other user has said "no"
             continue;
           } else {
             randomMatches.push(match);
@@ -91,8 +103,20 @@ export async function POST(request) {
         else if (existingEntry.user2Id.equals(decoded._id)) {
           if (existingEntry.user2Decision === 'pending' && existingEntry.user1Decision === 'yes') {
             pendingMatches.push(match);
-          } else if (existingEntry.user1Decision === 'yes' && existingEntry.user2Decision === 'yes') {
+          } else if (
+            existingEntry.user2Decision === 'yes' &&
+            existingEntry.user1Decision === 'pending'
+          ) {
+            // This match is pending for the other user
+            continue;
+          } else if (
+            existingEntry.user1Decision === 'yes' &&
+            existingEntry.user2Decision === 'yes'
+          ) {
             // Both users have said "yes", skip these matches
+            continue;
+          } else if (existingEntry.user1Decision === 'no') {
+            // Skip if the other user has said "no"
             continue;
           } else {
             randomMatches.push(match);
@@ -123,6 +147,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
 
 
 
