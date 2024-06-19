@@ -29,20 +29,20 @@ const Navbar = () => {
       </div>
       <div className="flex items-center space-x-4 sm:space-x-6">
         <Link href="/homepage">
-          <a className="text-black hover:underline text-sm sm:text-base">
+          <a className="text-black hover:underline text-base sm:text-lg">
             <span className="block lg:hidden">Find</span>
             <span className="hidden lg:block">Find Match</span>
           </a>
         </Link>
         <Link href="/matches">
-          <a className="text-black hover:underline text-sm sm:text-base">
+          <a className="text-black hover:underline text-base sm:text-lg">
             <span className="block lg:hidden">Matches</span>
             <span className="hidden lg:block">My Matches</span>
           </a>
         </Link>
         <Link href="/faq">
           <a className="text-black hover:underline">
-            <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-black">
+            <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-black text-lg">
               ?
             </div>
           </a>
@@ -56,7 +56,7 @@ const Navbar = () => {
                 viewBox="0 0 24 24"
                 strokeWidth="1.5"
                 stroke="currentColor"
-                className="w-4 h-4 sm:w-6 sm:h-6"
+                className="w-5 h-5 sm:w-7 sm:h-7"
               >
                 <path
                   strokeLinecap="round"
