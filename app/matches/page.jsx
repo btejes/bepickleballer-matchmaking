@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
 import MatchCard from './MatchCard';
 import Modal from './Modal';
@@ -13,12 +13,7 @@ const MatchesPage = () => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
-  useEffect(() => {
-    console.log('\nUSE EFFECT CALLED\n');
-    fetchMatches();
-  }, []);
-
-  const fetchMatches = async () => {
+  const fetchMatches = useCallback(async () => {
     try {
       const response = await fetch(`${basePath}/api/matches`, {
         headers: {
@@ -39,7 +34,12 @@ const MatchesPage = () => {
       setError('No matches found');
       setMatches([]);
     }
-  };
+  }, [basePath]);
+
+  useEffect(() => {
+    console.log('\nUSE EFFECT CALLED\n');
+    fetchMatches();
+  }, [fetchMatches]);
 
   const handleMatchClick = (match) => {
     console.log('Match clicked:', match); // Debug log

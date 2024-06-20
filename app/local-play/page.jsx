@@ -1,7 +1,7 @@
 'use client';
 
 import Navbar from '@/components/Navbar';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ProfileCard from '@/library/ProfileCard';
 
 const LocalPlay = () => {
@@ -11,24 +11,38 @@ const LocalPlay = () => {
     preferredSkillLevel: '',
     preferredDUPRRating: '',
   });
+
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-  
+
   const [currentMatch, setCurrentMatch] = useState(null);
   const [error, setError] = useState(null);
   const [copySuccess, setCopySuccess] = useState('');
   const [userProfile, setUserProfile] = useState(null);
 
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      const response = await fetch(`${basePath}/api/profile`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Cache-Control': 'no-store', // Ensure the response is not cached
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch user profile');
+      }
+      const data = await response.json();
+      setUserProfile(data);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  }, [basePath]);
+
   useEffect(() => {
     fetchUserProfile();
-  }, []);
+  }, [fetchUserProfile]);
 
-  useEffect(() => {
-    if (userProfile) {
-      fetchNextMatch(filters);
-    }
-  }, [filters, userProfile]);
-
-  const fetchNextMatch = async (filters) => {
+  const fetchNextMatch = useCallback(async (filters) => {
     try {
       const response = await fetch(`${basePath}/api/matchmaking`, {
         method: 'POST',
@@ -55,26 +69,13 @@ const LocalPlay = () => {
       setError('No matches found');
       setCurrentMatch(null);
     }
-  };
+  }, [basePath]);
 
-  const fetchUserProfile = async () => {
-    try {
-      const response = await fetch(`${basePath}/api/profile`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Cache-Control': 'no-store', // Ensure the response is not cached
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch user profile');
-      }
-      const data = await response.json();
-      setUserProfile(data);
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
+  useEffect(() => {
+    if (userProfile) {
+      fetchNextMatch(filters);
     }
-  };
+  }, [filters, userProfile, fetchNextMatch]);
 
   const capitalizeCity = (city) => {
     return city.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
