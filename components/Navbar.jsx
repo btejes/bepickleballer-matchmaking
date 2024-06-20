@@ -19,7 +19,8 @@ const Navbar = () => {
           <Image
             src={`${basePath}/logo.png`}
             alt="Desktop Logo"
-            className="hidden sm:block h-10 sm:h-16 lg:h-32 cursor-pointer mr-2"
+            className="hidden sm:block cursor-pointer mr-2"
+            style={{ maxWidth: '400px', height: 'auto' }}
             width={634}
             height={117}
             quality={100}
