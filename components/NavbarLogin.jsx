@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 const NavbarBasicLogo = () => {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
@@ -7,7 +8,7 @@ const NavbarBasicLogo = () => {
     <nav className="w-full bg-white px-4 py-2 shadow-md flex justify-between items-center">
       <div className="flex items-center">
         <Link href="https://bepickleballer.com">
-          <img
+          <Image
             src={`${basePath}/logo.png`}
             alt="Logo"
             className="h-12 w-auto sm:h-16 sm:w-auto lg:h-20 lg:w-auto cursor-pointer"
