@@ -20,7 +20,13 @@ const MatchesPage = () => {
 
   const fetchMatches = async () => {
     try {
-      const response = await fetch(`${basePath}/api/matches`);
+      const response = await fetch(`${basePath}/api/matches`, {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch matches');
       }
