@@ -7,57 +7,67 @@ const Navbar = () => {
     <nav className="navbar bg-white px-2 sm:p-4 py-1 shadow-md flex justify-between items-center">
       <div className="flex items-center">
         <Link href="https://bepickleballer.com">
-          <Image
-            src={`${basePath}/favicon-logo.png`}
-            alt="Mobile Logo"
-            className="h-8 w-8 sm:hidden cursor-pointer mr-2"
-            width={32}
-            height={32}
-            quality={100}
-            priority
-          />
-          <Image
-            src={`${basePath}/logo.png`}
-            alt="Desktop Logo"
-            className="hidden sm:block h-10 sm:h-16 lg:h-20 cursor-pointer mr-2"
-            width={634}
-            height={117}
-            quality={100}
-            priority
-          />
+          <a>
+            <div className="relative h-8 w-8 sm:hidden cursor-pointer mr-2">
+              <Image
+                src={`${basePath}/favicon-logo.png`}
+                alt="Mobile Logo"
+                layout="fill"
+                objectFit="contain"
+                priority
+              />
+            </div>
+            <div className="relative hidden sm:block h-16 w-[127px] lg:h-20 lg:w-[158px] cursor-pointer mr-6 lg:mr-12">
+              <Image
+                src={`${basePath}/logo.png`}
+                alt="Desktop Logo"
+                layout="fill"
+                objectFit="contain"
+                priority
+              />
+            </div>
+          </a>
         </Link>
       </div>
       <div className="flex items-center space-x-4 sm:space-x-6">
-        <Link href="/findmatch" className="text-black hover:underline text-base sm:text-lg">
-          <span className="block lg:hidden">Find</span>
-          <span className="hidden lg:block">Find Match</span>
+        <Link href="/findmatch">
+          <a className="text-black hover:underline text-base sm:text-lg">
+            <span className="block lg:hidden">Find</span>
+            <span className="hidden lg:block">Find Match</span>
+          </a>
         </Link>
-        <Link href="/matches" className="text-black hover:underline text-base sm:text-lg">
-          <span className="block lg:hidden">Matches</span>
-          <span className="hidden lg:block">My Matches</span>
+        <Link href="/matches">
+          <a className="text-black hover:underline text-base sm:text-lg">
+            <span className="block lg:hidden">Matches</span>
+            <span className="hidden lg:block">My Matches</span>
+          </a>
         </Link>
-        <Link href="/faq" className="text-black hover:underline">
-          <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-black text-lg">
-            ?
-          </div>
+        <Link href="/faq">
+          <a className="text-black hover:underline">
+            <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-black text-lg">
+              ?
+            </div>
+          </a>
         </Link>
-        <Link href="/profile" className="text-black hover:underline">
-          <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-black">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-5 h-5 sm:w-7 sm:h-7"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM16 14H8c-2.21 0-4 1.79-4 4v1h16v-1c0-2.21-1.79-4-4-4z"
-              />
-            </svg>
-          </div>
+        <Link href="/profile">
+          <a className="text-black hover:underline">
+            <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-black">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-5 h-5 sm:w-7 sm:h-7"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM16 14H8c-2.21 0-4 1.79-4 4v1h16v-1c0-2.21-1.79-4-4-4z"
+                />
+              </svg>
+            </div>
+          </a>
         </Link>
       </div>
     </nav>
