@@ -3,27 +3,34 @@ import Image from 'next/image';
 
 const Navbar = () => {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
   return (
     <nav className="navbar bg-white px-2 sm:p-4 py-1 shadow-md flex justify-between items-center">
       <div className="flex items-center">
         <Link href="https://bepickleballer.com">
           <a>
-            <Image
-              src={`${basePath}/favicon-logo.png`}
-              alt="Mobile Logo"
-              className="h-8 w-8 sm:hidden cursor-pointer mr-2"
-              width={32}
-              height={32}
-              quality={100}
-              priority
-            />
-            <Image
-              src={`${basePath}/logo.png`}
-              alt="Desktop Logo"
-              className="hidden sm:block h-10 sm:h-16 lg:h-20 cursor-pointer mr-2"
-              quality={100}
-              priority
-            />
+            <div className="h-8 w-8 sm:hidden cursor-pointer mr-2 relative">
+              <Image
+                src={`${basePath}/favicon-logo.png`}
+                alt="Mobile Logo"
+                layout="responsive"
+                width={32}
+                height={32}
+                quality={100}
+                priority
+              />
+            </div>
+            <div className="hidden sm:block cursor-pointer mr-2 relative" style={{ maxWidth: '200px', width: '100%' }}>
+              <Image
+                src={`${basePath}/logo.png`}
+                alt="Desktop Logo"
+                layout="responsive"
+                width={634}
+                height={117}
+                quality={100}
+                priority
+              />
+            </div>
           </a>
         </Link>
       </div>
