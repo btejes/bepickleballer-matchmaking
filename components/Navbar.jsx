@@ -17,7 +17,7 @@ const Navbar = () => {
                 priority
               />
             </div>
-            <div className="relative hidden sm:block h-16 w-[127px] lg:h-20 lg:w-[158px] cursor-pointer mr-6 lg:mr-12">
+            <div className="relative hidden lg:h-32 lg:w-[158px] cursor-pointer mr-2">
               <Image
                 src={`${basePath}/logo.png`}
                 alt="Desktop Logo"
