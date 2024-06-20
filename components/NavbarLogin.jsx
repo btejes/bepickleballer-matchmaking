@@ -8,17 +8,16 @@ const NavbarBasicLogo = () => {
     <nav className="w-full bg-white px-4 py-2 shadow-md flex justify-between items-center">
       <div className="flex items-center">
         <Link href="https://bepickleballer.com">
-          <div className="relative lg:h-32 lg:w-[158px] cursor-pointer mr-2">
-            <Image
-              src={`${basePath}/logo.png`}
-              alt="Logo"
-              width={634}
-              height={117}
-              quality={100}
-              priority
-              className="cursor-pointer"
-            />
-          </div>
+          <Image
+            src={`${basePath}/logo.png`}
+            alt="Desktop Logo"
+            className="hidden sm:block cursor-pointer mr-2"
+            style={{ maxWidth: '400px', height: 'auto' }}
+            width={634}
+            height={117}
+            quality={100}
+            priority
+          />
         </Link>
       </div>
       <div className="flex items-center space-x-4">
