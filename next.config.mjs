@@ -31,6 +31,9 @@ const nextConfig = {
       },
     ];
   },
+  images: {
+    domains: ['cdn.pixabay.com', 'bepickleballerbucket.s3.us-west-1.amazonaws.com'],
+  },
 };
 
 export default nextConfig;
