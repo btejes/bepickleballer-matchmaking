@@ -4,8 +4,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import connectToDatabase from '@/library/connectToDatabase';
-import Profile from '@/library/Profile';
-import sharp from 'sharp';
+
 
 const s3Client = new S3Client({
   region: process.env.AWS_BUCKET_REGION,
