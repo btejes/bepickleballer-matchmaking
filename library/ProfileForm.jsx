@@ -272,7 +272,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
             <option value="">Unselected</option>
             <option value="indoor">Indoor</option>
             <option value="outdoor">Outdoor</option>
-            <option value="both">Both</option>
+            <option value="Indoor/Outdoor">Both</option>
           </select>
         </div>
       </div>
