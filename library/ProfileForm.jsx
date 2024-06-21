@@ -191,6 +191,19 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
           />
           {errors.zipCode && <span className="text-red-500 text-sm">{errors.zipCode}</span>}
+          <label htmlFor="rightieLeftie">Rightie/Leftie</label>
+          <select
+            id="rightieLeftie"
+            name="rightieLeftie"
+            value={formData.rightieLeftie || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+          >
+            <option value="">Unselected</option>
+            <option value="Rightie">Rightie</option>
+            <option value="Leftie">Leftie</option>
+            <option value="Both">Both</option>
+          </select>
         </div>
         <div className="w-1/2 p-2">
           <label htmlFor="ageRange">Age Range</label>
