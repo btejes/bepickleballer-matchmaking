@@ -227,8 +227,8 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
             <p className="text-sm font-medium text-black">{profile.casualCompetitive}</p>
           </div>
         </div>
-        <div>
-          <p className="text-sm font-medium text-black mt-2">{profile.rightieLeftie}</p>
+        <div className="mt-auto">
+          <p className="text-sm font-medium text-black">{profile.rightieLeftie}</p>
           <p className="text-sm font-medium text-black mt-2" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
             {profile.aboutYou}
           </p>
