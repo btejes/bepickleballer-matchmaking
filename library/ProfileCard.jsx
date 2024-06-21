@@ -57,7 +57,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image.heic'];
 
     if (file) {
       if (!allowedTypes.includes(file.type)) {
@@ -194,10 +194,10 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
         )}
       </div>
 
-      <div className="p-4 h-[40%]">
-        <div className="flex flex-col h-full">
+      <div className="p-4 h-[40%] flex flex-col justify-between">
+        <div>
           <div className="flex justify-between items-center">
-            <big><p className="text-sm font-bold text-black">{profile.firstName}</p></big>
+            <p className="text-lg font-bold text-black">{profile.firstName}</p>
             <div className="flex items-center">
               <svg
                 width="24"
@@ -226,14 +226,13 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
             <p className="text-sm font-medium text-black">{profile.outdoorIndoor}</p>
             <p className="text-sm font-medium text-black">{profile.casualCompetitive}</p>
           </div>
-          <div className="flex justify-between mt-2">
-            <p className="text-sm font-medium text-black">{profile.rightieLeftie}</p>
-          </div>
+        </div>
+        <div>
+          <p className="text-sm font-medium text-black mt-2">{profile.rightieLeftie}</p>
           <p className="text-sm font-medium text-black mt-2" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
             {profile.aboutYou}
           </p>
         </div>
-
         {statusMessage && (
           <div
             className={`text-center p-2 rounded ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
