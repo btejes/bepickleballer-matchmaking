@@ -10,8 +10,9 @@ const TextFirework = ({ char, style }) => (
   </span>
 );
 
-const SimpleMatchModal = ({ isOpen, onClose, basePath }) => {
+const SimpleMatchModal = ({ isOpen, onClose }) => {
   const [fireworks, setFireworks] = useState([]);
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   useEffect(() => {
     if (isOpen) {
