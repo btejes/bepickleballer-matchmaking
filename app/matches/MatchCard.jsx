@@ -12,6 +12,8 @@ const MatchCard = ({ match, onClick }) => {
           <Image 
             src={match.profileImage} 
             alt=""
+            width={96}
+            height={96}
             className={`w-full h-full object-cover ${!match.profileImage && 'blur-sm grayscale bg-gray-300'}`}
             onError={(e) => { e.target.src = `${basePath}/blank-profile-picture.svg`; }}
           />
