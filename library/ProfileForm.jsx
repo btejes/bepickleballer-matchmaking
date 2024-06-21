@@ -202,7 +202,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
             <option value="">Unselected</option>
             <option value="Rightie">Rightie</option>
             <option value="Leftie">Leftie</option>
-            <option value="Both">Both</option>
+            <option value="Right & Leftie">Both</option>
           </select>
         </div>
         <div className="w-1/2 p-2">
