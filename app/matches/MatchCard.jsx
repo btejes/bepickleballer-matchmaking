@@ -1,16 +1,16 @@
-// src/app/matches/MatchCard.jsx
 import React from 'react';
 import Image from 'next/image';
 
 const MatchCard = ({ match, onClick }) => {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   console.log("Match profile image URL:", match.profileImage); 
+
   return (
     <div className="bg-white border text-black border-gray-300 rounded-3xl p-4 shadow-md w-full max-w-2xl mb-4 cursor-pointer" onClick={onClick}>
       <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
         <div className="w-24 h-24 rounded-full overflow-hidden mr-5">
           <Image 
-            src={match.profileImage} 
+            src={match.profileImage || `${basePath}/blank-profile-picture.svg`}
             alt=""
             width={96}
             height={96}
