@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 const MatchCard = ({ match, onClick }) => {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
@@ -19,13 +20,16 @@ const MatchCard = ({ match, onClick }) => {
     <div className="bg-white border text-black border-gray-300 rounded-3xl p-4 shadow-md w-full max-w-2xl mb-4 cursor-pointer" onClick={onClick}>
       <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
         <div className="w-24 h-24 rounded-full overflow-hidden mr-5">
-          <img 
-            src={imgSrc}
+          <Image 
+            src={imgSrc} 
             alt="Profile Image"
             width={96}
             height={96}
             className={`w-full h-full object-cover ${!match.profileImage && 'blur-sm grayscale bg-gray-300'}`}
-            onError={handleError}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              handleError();
+            }}
           />
         </div>
         <div className="flex-grow text-center md:text-left">
