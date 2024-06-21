@@ -220,7 +220,17 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
           </div>
           <div className="flex justify-between mt-2">
             <p className="text-sm font-medium text-black">DUPR: {profile.duprRating}</p>
-            <p className="text-sm font-medium text-black">{profile.skillLevel}</p>
+            <div className="flex flex-col items-end">
+              <div className="h-6"></div> {/* Empty spot for alignment */}
+              <p className="text-sm font-medium text-black">{profile.skillLevel}</p>
+              <p className="text-sm font-medium text-black mt-2">{profile.casualCompetitive}</p>
+            </div>
+          </div>
+          <div className="flex justify-between mt-2">
+            <p className="text-sm font-medium text-black">{profile.outdoorIndoor}</p>
+          </div>
+          <div className="flex justify-between mt-2">
+            <p className="text-sm font-medium text-black">{profile.rightieLeftie}</p>
           </div>
           <p className="text-sm font-medium text-black mt-2" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
             {profile.aboutYou}
