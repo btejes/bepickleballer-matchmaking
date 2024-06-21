@@ -3,6 +3,7 @@
 import Navbar from '@/components/Navbar';
 import { useState, useEffect, useCallback } from 'react';
 import ProfileCard from '@/library/ProfileCard';
+import SimpleMatchModal from '@/local-play/SimpleMatchModal';
 
 const LocalPlay = () => {
   const [filters, setFilters] = useState({
@@ -18,6 +19,7 @@ const LocalPlay = () => {
   const [error, setError] = useState(null);
   const [copySuccess, setCopySuccess] = useState('');
   const [userProfile, setUserProfile] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchUserProfile = useCallback(async () => {
     try {
@@ -108,7 +110,11 @@ const LocalPlay = () => {
         throw new Error('Failed to update matchmaking decision');
       }
 
-      await fetchNextMatch(filters); // Fetch next match after decision
+      if (decision === 'yes') {
+        setIsModalOpen(true);
+      } else {
+        await fetchNextMatch(filters); // Fetch next match after decision
+      }
     } catch (error) {
       console.error('Error updating matchmaking decision:', error);
     }
@@ -118,6 +124,11 @@ const LocalPlay = () => {
     navigator.clipboard.writeText('https://bepickleballer.com');
     setCopySuccess('Link copied to clipboard!');
     setTimeout(() => setCopySuccess(''), 5000); // Clear the message after 5 seconds
+  };
+
+  const handleModalClose = async () => {
+    setIsModalOpen(false);
+    await fetchNextMatch(filters); // Fetch next match after closing the modal
   };
 
   return (
@@ -259,6 +270,7 @@ const LocalPlay = () => {
           <option value="8.0">8.0</option>
         </select>
       </div>
+      <SimpleMatchModal isOpen={isModalOpen} onClose={handleModalClose} />
     </div>
   );
 };
