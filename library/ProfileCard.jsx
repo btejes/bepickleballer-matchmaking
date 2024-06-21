@@ -155,11 +155,13 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
             console.error('Error updating profile image:', await profileResponse.json());
           }
 
+          
+          // Update the parent state with the new image URL
+          profile.profileImage = imageUrl;
+
           setStatusMessage("Finished");
           setLoading(false);
           setIsUploading(false);
-          // Update the parent state with the new image URL
-          profile.profileImage = imageUrl;
         };
       } catch (error) {
         console.error('Error uploading image:', error);
