@@ -131,10 +131,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isUploading) {
-      setMessage('Please wait until the image upload is complete.');
-      return;
-    }
     setIsSaving(true);
     const result = await onProfileSave(formData);
     if (result.status !== 200) {

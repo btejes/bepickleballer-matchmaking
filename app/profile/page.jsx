@@ -34,9 +34,7 @@ const ProfilePage = () => {
   const handleProfileSave = async (updatedProfile) => {
     try {
       // Remove the profileImage field if it exists
-      console.log("\nupdatedProfil with imageurl: ", updatedProfile, "\n");
       delete updatedProfile.profileImage;
-      console.log("\nupdatedProfil without imageurl: ", updatedProfile, "\n");
 
       const response = await fetch(`${basePath}/api/profile`, {
         method: 'PUT',

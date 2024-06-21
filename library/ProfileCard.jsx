@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const ProfileCard = ({ profile, isProfilePage }) => {
+const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
   const [image, setImage] = useState(null);
   const [averageRating, setAverageRating] = useState(null);
   const [statusMessage, setStatusMessage] = useState("");
@@ -47,7 +47,6 @@ const ProfileCard = ({ profile, isProfilePage }) => {
         setAverageRating(data.averageRating);
       } else {
         setAverageRating('N/A');
-        console.log("\nNot an error just default NA\n");
       }
     } catch (error) {
       console.error('Error fetching average rating:', error);
@@ -74,6 +73,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
       setStatusMessage("Uploading file");
       setLoading(true);
+      setIsUploading(true);
       setFadeOut(false);
 
       try {
@@ -96,6 +96,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
           if (convertResult.error) {
             setStatusMessage(convertResult.error);
             setLoading(false);
+            setIsUploading(false);
             setFadeOut(false);
             return;
           } else {
@@ -118,6 +119,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
           if (signedUrlResult.error) {
             setStatusMessage("Failed to get signed URL");
             setLoading(false);
+            setIsUploading(false);
             setFadeOut(false);
             return;
           }
@@ -155,6 +157,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
 
           setStatusMessage("Finished");
           setLoading(false);
+          setIsUploading(false);
           // Update the parent state with the new image URL
           profile.profileImage = imageUrl;
         };
@@ -162,6 +165,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
         console.error('Error uploading image:', error);
         setStatusMessage("Error uploading image");
         setLoading(false);
+        setIsUploading(false);
       }
     }
   };
