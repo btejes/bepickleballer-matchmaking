@@ -67,8 +67,6 @@ export async function PUT(request) {
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const updatedData = await request.json();
 
-    // Remove the profileImage field if it exists
-    delete updatedData.profileImage;
 
     const profile = await Profile.findOneAndUpdate(
       { userId: decoded._id },

@@ -55,6 +55,8 @@ const ProfileCard = ({ profile, isProfilePage }) => {
     }
   };
 
+
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
@@ -91,6 +93,7 @@ const ProfileCard = ({ profile, isProfilePage }) => {
             body: JSON.stringify({ file: { type: file.type, buffer: base64data } }),
           });
   
+
           const convertResult = await response.json();
   
           if (convertResult.error) {
@@ -98,6 +101,8 @@ const ProfileCard = ({ profile, isProfilePage }) => {
             setLoading(false);
             setFadeOut(false);
             return;
+          } else {
+            setStatusMessage("Converted file!");
           }
   
           const convertedImage = convertResult.image;
