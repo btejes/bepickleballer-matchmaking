@@ -21,7 +21,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
   }, [profile.userId]);
 
   useEffect(() => {
-    if (statusMessage && !statusMessage.startsWith("Uploading") && statusMessage !== "Converted file!" && statusMessage !== "Saving file!") {
+    if (statusMessage && !statusMessage.startsWith("Uploading") && statusMessage !== "Saving file") {
       setFadeOut(false);
       const timer1 = setTimeout(() => {
         setFadeOut(true);
@@ -100,7 +100,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
             setFadeOut(false);
             return;
           } else {
-            setStatusMessage("Converted file!");
+            setStatusMessage("Saving file");
           }
 
           const convertedImage = convertResult.image;
@@ -122,8 +122,6 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
             setIsUploading(false);
             setFadeOut(false);
             return;
-          } else {
-            setStatusMessage("Saving file!");
           }
 
           const url = signedUrlResult.url;
@@ -231,7 +229,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
           <div
             className={`text-center p-2 rounded ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
             style={{
-              color: statusMessage.startsWith('Uploading') || statusMessage === 'Finished' || statusMessage === 'Converted file!' || statusMessage === 'Saving file!' ? 'green' : 'red',
+              color: statusMessage.startsWith('Uploading') || statusMessage === 'Finished' || statusMessage === 'Saving file' ? 'green' : 'red',
               transition: 'opacity 1s ease-in-out',
             }}
           >
