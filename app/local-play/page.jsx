@@ -112,6 +112,7 @@ const LocalPlay = () => {
 
       if (decision === 'yes') {
         setIsModalOpen(true);
+        await fetchNextMatch(filters); // Fetch next match after closing the modal
       } else {
         await fetchNextMatch(filters); // Fetch next match after decision
       }
@@ -128,7 +129,6 @@ const LocalPlay = () => {
 
   const handleModalClose = async () => {
     setIsModalOpen(false);
-    await fetchNextMatch(filters); // Fetch next match after closing the modal
   };
 
   return (
