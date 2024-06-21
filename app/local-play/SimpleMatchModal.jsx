@@ -72,7 +72,7 @@ const SimpleMatchModal = ({ isOpen, onClose, basePath }) => {
       }}>
         <h2 style={{ color: 'green', marginBottom: '10px' }}>CONGRATULATIONS!</h2>
         <p style={{ color: 'black', marginBottom: '20px' }}>You both approved this match. Check "Your Matches" to get your match's contact information.</p>
-        <a href={`/matches`} style={{
+        <a href={`${basePath}/matches`} style={{
           backgroundColor: 'blue',
           color: 'white',
           padding: '10px',
