@@ -21,7 +21,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
   }, [profile.userId]);
 
   useEffect(() => {
-    if (statusMessage) {
+    if (statusMessage && !statusMessage.startsWith("Uploading") && statusMessage !== "Converted file!") {
       setFadeOut(false);
       const timer1 = setTimeout(() => {
         setFadeOut(true);
@@ -155,7 +155,6 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
             console.error('Error updating profile image:', await profileResponse.json());
           }
 
-          
           // Update the parent state with the new image URL
           profile.profileImage = imageUrl;
 
@@ -230,7 +229,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
           <div
             className={`text-center p-2 rounded ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
             style={{
-              color: statusMessage.startsWith('Uploading') || statusMessage === 'Finished' ? 'green' : 'red',
+              color: statusMessage.startsWith('Uploading') || statusMessage === 'Finished' || statusMessage === 'Converted file!' ? 'green' : 'red',
               transition: 'opacity 1s ease-in-out',
             }}
           >
