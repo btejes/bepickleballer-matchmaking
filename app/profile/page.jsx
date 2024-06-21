@@ -23,6 +23,7 @@ const ProfilePage = () => {
     profileImage: '',
     casualCompetitive: '',
     outdoorIndoor: '',
+    rightieLeftie: '',
   });
   const [message, setMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);

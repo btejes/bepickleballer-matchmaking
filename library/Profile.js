@@ -12,10 +12,11 @@ const ProfileSchema = new mongoose.Schema({
   openForMatches: { type: String, default: '' },
   aboutYou: { type: String, default: '' },
   phone: { type: String, default: '' },
-  email: { type: String, default: '' },  // This is the matchmaking contact email
+  email: { type: String, default: '' },  
   profileImage: { type: String, default: '' },
-  casualCompetitive: { type: String, default: '' }, // Added field
-  outdoorIndoor: { type: String, default: '' } // Added field
+  casualCompetitive: { type: String, default: '' }, 
+  outdoorIndoor: { type: String, default: '' },
+  rightieLeftie: { type: String, default: '' } 
 });
 
 export default mongoose.models.Profile || mongoose.model('Profile', ProfileSchema);
