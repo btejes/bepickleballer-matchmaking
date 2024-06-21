@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
   const [image, setImage] = useState(null);
@@ -174,11 +175,12 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
   return (
     <div className="max-w-xs bg-white rounded-3xl shadow-md mx-auto overflow-hidden">
       <div className="relative w-80 h-80 overflow-hidden">
-        <img
+        <Image
           src={image || `${apiBasePath}/blank-profile-picture.svg`}
           alt="Profile"
           className={`object-cover object-center w-full h-full ${!isProfilePage && (!image && 'blur-sm grayscale')} ${isProfilePage ? 'cursor-pointer' : ''}`}
-          style={{ width: '320px', height: '320px' }}
+          width={320}
+          height={320}
           onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
           onClick={isProfilePage ? () => document.getElementById('imageUpload').click() : null}
         />
