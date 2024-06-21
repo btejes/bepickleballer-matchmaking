@@ -174,24 +174,26 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
 
   return (
     <div className="max-w-xs bg-white rounded-3xl shadow-md mx-auto overflow-hidden">
-      <div className="relative w-80 h-80 overflow-hidden">
-        <Image
-          src={image || `${apiBasePath}/blank-profile-picture.svg`}
-          alt="Profile"
-          className={`object-cover object-center w-full h-full ${!isProfilePage && (!image && 'blur-sm grayscale')} ${isProfilePage ? 'cursor-pointer' : ''}`}
-          width={320}
-          height={320}
-          onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
-          onClick={isProfilePage ? () => document.getElementById('imageUpload').click() : null}
-        />
-        {isProfilePage && (
-          <input
-            id="imageUpload"
-            type="file"
-            onChange={handleImageUpload}
-            className="hidden"
+      <div className="flex justify-center w-full">
+        <div className="relative w-80 h-80 overflow-hidden">
+          <Image
+            src={image || `${apiBasePath}/blank-profile-picture.svg`}
+            alt="Profile"
+            className={`object-cover object-center w-full h-full ${!isProfilePage && (!image && 'blur-sm grayscale')} ${isProfilePage ? 'cursor-pointer' : ''}`}
+            width={320}
+            height={320}
+            onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
+            onClick={isProfilePage ? () => document.getElementById('imageUpload').click() : null}
           />
-        )}
+          {isProfilePage && (
+            <input
+              id="imageUpload"
+              type="file"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          )}
+        </div>
       </div>
 
       <div className="p-4 h-[40%] flex flex-col justify-between">
