@@ -197,7 +197,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
       <div className="p-4 h-[40%]">
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-center">
-            <p className="text-sm font-bold text-black">{profile.firstName}</p>
+            <big><p className="text-sm font-bold text-black">{profile.firstName}</p></big>
             <div className="flex items-center">
               <svg
                 width="24"
