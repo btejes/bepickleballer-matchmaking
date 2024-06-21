@@ -1,21 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 
 const MatchCard = ({ match, onClick }) => {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-  console.log("Match profile image URL:", match.profileImage); 
+  const [imgSrc, setImgSrc] = useState(match.profileImage || `${basePath}/blank-profile-picture.svg`);
+
+  const handleError = () => {
+    setImgSrc(`${basePath}/blank-profile-picture.svg`);
+  };
 
   return (
     <div className="bg-white border text-black border-gray-300 rounded-3xl p-4 shadow-md w-full max-w-2xl mb-4 cursor-pointer" onClick={onClick}>
       <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
         <div className="w-24 h-24 rounded-full overflow-hidden mr-5">
           <Image 
-            src={match.profileImage || `${basePath}/blank-profile-picture.svg`}
+            src={imgSrc} 
             alt=""
             width={96}
             height={96}
             className={`w-full h-full object-cover ${!match.profileImage && 'blur-sm grayscale bg-gray-300'}`}
-            onError={(e) => { e.target.src = `${basePath}/blank-profile-picture.svg`; }}
+            onError={handleError}
           />
         </div>
         <div className="flex-grow text-center md:text-left">
