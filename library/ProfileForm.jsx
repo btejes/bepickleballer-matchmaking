@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
+const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) => {
   const [formData, setFormData] = useState(profile);
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
@@ -131,6 +131,10 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isUploading) {
+      setMessage('Please wait until the image upload is complete.');
+      return;
+    }
     setIsSaving(true);
     const result = await onProfileSave(formData);
     if (result.status !== 200) {
@@ -335,10 +339,10 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave }) => {
       <div className="flex justify-center">
         <button
           type="submit"
-          disabled={!isFormReady || isSaving}
+          disabled={!isFormReady || isSaving || isUploading}
           style={{
             width: '50%',
-            backgroundColor: !isFormReady || isSaving ? 'grey' : 'blue',
+            backgroundColor: !isFormReady || isSaving || isUploading ? 'grey' : 'blue',
             color: 'white',
             padding: '10px',
             borderRadius: '25px',
