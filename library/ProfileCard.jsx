@@ -198,6 +198,10 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
         <div>
           <div className="flex justify-between items-center">
             <p className="text-lg font-bold text-black">{profile.firstName}</p>
+            
+          </div>
+          <div className="flex justify-between mt-2">
+            <p className="text-sm font-medium text-black">{profile.gender}</p>
             <div className="flex items-center">
               <svg
                 width="24"
@@ -213,22 +217,24 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
                 {typeof averageRating === 'number' ? averageRating.toFixed(1) : 'N/A'}
               </p>
             </div>
-          </div>
-          <div className="flex justify-between mt-2">
-            <p className="text-sm font-medium text-black">{profile.gender}</p>
-            <p className="text-sm font-medium text-black">{profile.ageRange}</p>
+            
           </div>
           <div className="flex justify-between mt-2">
             <p className="text-sm font-medium text-black">DUPR: {profile.duprRating}</p>
-            <p className="text-sm font-medium text-black">{profile.skillLevel}</p>
+            <p className="text-sm font-medium text-black">{profile.ageRange}</p>
+            
           </div>
           <div className="flex justify-between mt-2">
             <p className="text-sm font-medium text-black">{profile.outdoorIndoor}</p>
+            <p className="text-sm font-medium text-black">{profile.skillLevel}</p>
+            
+          </div>
+          <div className="flex justify-between mt-2">
+            <p className="text-sm font-medium text-black">{profile.rightieLeftie}</p>
             <p className="text-sm font-medium text-black">{profile.casualCompetitive}</p>
           </div>
         </div>
         <div className="mt-auto">
-          <p className="text-sm font-medium text-black">{profile.rightieLeftie}</p>
           <p className="text-sm font-medium text-black mt-2" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
             {profile.aboutYou}
           </p>
