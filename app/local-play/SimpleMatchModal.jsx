@@ -4,36 +4,45 @@ const TextFirework = ({ char, style }) => (
   <span style={{ 
     position: 'absolute', 
     ...style,
-    transition: 'all 1s ease-out',
+    transition: 'all 0.5s ease-out',
   }}>
     {char}
   </span>
 );
 
-const SimpleMatchModal = ({ isOpen, onClose }) => {
+const SimpleMatchModal = ({ isOpen, onClose, basePath }) => {
   const [fireworks, setFireworks] = useState([]);
 
   useEffect(() => {
     if (isOpen) {
-      const newFireworks = [];
-      for (let i = 0; i < 20; i++) {
-        newFireworks.push({
-          char: ['✨', '🎉', '🎊', '💥'][Math.floor(Math.random() * 4)],
-          style: {
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            fontSize: `${Math.random() * 20 + 10}px`,
-            opacity: 1,
-          }
-        });
-      }
-      setFireworks(newFireworks);
-      
-      const timer = setTimeout(() => {
-        setFireworks(fw => fw.map(f => ({ ...f, style: { ...f.style, opacity: 0 } })));
-      }, 100);
+      const createFireworks = () => {
+        const newFireworks = [];
+        for (let i = 0; i < 20; i++) {
+          newFireworks.push({
+            char: ['✨', '🎉', '🎊', '💥'][Math.floor(Math.random() * 4)],
+            style: {
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              fontSize: `${Math.random() * 20 + 10}px`,
+              opacity: 1,
+            }
+          });
+        }
+        setFireworks(newFireworks);
+        
+        setTimeout(() => {
+          setFireworks(fw => fw.map(f => ({ ...f, style: { ...f.style, opacity: 0 } })));
+        }, 800);
+      };
 
-      return () => clearTimeout(timer);
+      createFireworks(); // Initial fireworks
+
+      const fireworksInterval = setInterval(createFireworks, 1000);
+
+      return () => {
+        clearInterval(fireworksInterval);
+        setFireworks([]);
+      };
     }
   }, [isOpen]);
 
@@ -52,7 +61,7 @@ const SimpleMatchModal = ({ isOpen, onClose }) => {
       justifyContent: 'center',
     }}>
       {fireworks.map((fw, index) => (
-        <TextFirework key={index} {...fw} />
+        <TextFirework key={`${index}-${fw.style.top}-${fw.style.left}`} {...fw} />
       ))}
       <div style={{
         backgroundColor: 'white',
@@ -63,7 +72,7 @@ const SimpleMatchModal = ({ isOpen, onClose }) => {
       }}>
         <h2 style={{ color: 'green', marginBottom: '10px' }}>CONGRATULATIONS!</h2>
         <p style={{ marginBottom: '20px' }}>You both approved this match. Check "Your Matches" to get your match's contact information.</p>
-        <button style={{
+        <a href={`${basePath}/matches`} style={{
           backgroundColor: 'blue',
           color: 'white',
           padding: '10px',
@@ -72,9 +81,11 @@ const SimpleMatchModal = ({ isOpen, onClose }) => {
           marginBottom: '10px',
           width: '100%',
           cursor: 'pointer',
+          textDecoration: 'none',
+          display: 'inline-block'
         }}>
           Go to My Matches
-        </button>
+        </a>
         <button onClick={onClose} style={{
           backgroundColor: 'lightgray',
           padding: '10px',

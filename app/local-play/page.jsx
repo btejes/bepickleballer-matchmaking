@@ -3,7 +3,7 @@
 import Navbar from '@/components/Navbar';
 import { useState, useEffect, useCallback } from 'react';
 import ProfileCard from '@/library/ProfileCard';
-import SimpleMatchModal from '@/local-play/SimpleMatchModal';
+import SimpleMatchModal from './SimpleMatchModal';
 
 const LocalPlay = () => {
   const [filters, setFilters] = useState({
