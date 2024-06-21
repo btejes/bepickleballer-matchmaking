@@ -30,7 +30,7 @@ export async function POST(req) {
     const jpegBuffer = await sharp(imageBuffer)
       .resize({ width: 800, height: 800 })
       .toFormat('jpeg')
-      .jpeg({ quality: 90 })
+      .jpeg({ quality: 80 })
       .toBuffer();
 
     const base64Image = jpegBuffer.toString('base64');
