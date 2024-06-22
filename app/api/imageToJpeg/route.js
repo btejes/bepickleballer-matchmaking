@@ -26,10 +26,9 @@ export async function POST(req) {
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
-    console.log("\nfile type:", file.type, "\n");
+
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
     if (!allowedTypes.includes(file.type)) {
-      console.log("\nfile type:", file.type, "\n");
       return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
     }
 
@@ -45,7 +44,7 @@ export async function POST(req) {
     // Use FFmpeg to convert the image
     await new Promise((resolve, reject) => {
       ffmpeg(inputPath)
-        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease'])
+        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease,format=yuv420p', '-c:v', 'libx264', '-profile:v', 'baseline', '-pix_fmt', 'yuv420p'])
         .output(outputPath)
         .on('end', resolve)
         .on('error', reject)
