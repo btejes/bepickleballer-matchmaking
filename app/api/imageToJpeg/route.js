@@ -9,15 +9,16 @@ import { execSync } from 'child_process';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
-// Function to get dimensions of HEIC images using ffmpeg
+// Function to get dimensions and rotation of HEIC images using ffmpeg
 async function getHEICDimensions(filePath) {
   try {
-    const output = execSync(`ffmpeg -i "${filePath}" -v quiet -print_format json -show_entries stream=width,height -of default=noprint_wrappers=1`).toString().trim();
+    const output = execSync(`ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=width,height,rotation -of json "${filePath}"`).toString().trim();
     const metadata = JSON.parse(output);
-    const dimensions = metadata.streams[0];
+    const stream = metadata.streams[0];
     return {
-      width: dimensions.width,
-      height: dimensions.height
+      width: stream.width,
+      height: stream.height,
+      rotation: stream.tags && stream.tags.rotation ? parseInt(stream.tags.rotation) : 0
     };
   } catch (error) {
     console.error('Error getting HEIC image dimensions:', error);
@@ -33,7 +34,7 @@ async function processHEICImage(file, userId) {
   console.log(`Image buffer size: ${imageBuffer.length} bytes`);
 
   const tempDir = os.tmpdir();
-  const inputPath = path.join(tempDir, `input_${Date.now()}`);
+  const inputPath = path.join(tempDir, `input_${Date.now()}.heic`);
   const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
   console.log(`Input path: ${inputPath}`);
   console.log(`Output path: ${outputPath}`);
@@ -45,14 +46,16 @@ async function processHEICImage(file, userId) {
   
   let filterComplex = '';
   if (dimensions) {
-    const isVertical = dimensions.height > dimensions.width;
-    console.log(`Image orientation: ${isVertical ? 'Vertical' : 'Horizontal'}`);
+    const { width, height, rotation } = dimensions;
+    console.log(`Image dimensions: ${width}x${height}, Rotation: ${rotation}`);
     
-    if (isVertical) {
-      console.log("Applying transpose for vertical image");
-      filterComplex = 'transpose=1,';
-    } else {
-      console.log("No transpose needed for horizontal image");
+    // Handle rotation
+    if (rotation === 90 || rotation === 270) {
+      console.log("Applying transpose to correct rotation");
+      filterComplex += `transpose=${rotation === 90 ? '1' : '2'},`;
+    } else if (rotation === 180) {
+      console.log("Applying 180-degree rotation");
+      filterComplex += 'hflip,vflip,';
     }
   } else {
     console.log("Could not determine image dimensions, proceeding without orientation check");
