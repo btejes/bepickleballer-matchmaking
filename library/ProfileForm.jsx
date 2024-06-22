@@ -143,7 +143,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
   return (
     <form onSubmit={handleSubmit} className="bg-white p-4 rounded-3xl shadow-md text-black max-w-2xl mx-auto">
       <div className="flex flex-row">
-        <div className="w-1/2 p-2">
+        <div className="flex-1 p-2">
           <label htmlFor="firstName">First Name</label>
           <input
             type="text"
@@ -205,7 +205,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
             <option value="Right & Leftie">Both</option>
           </select>
         </div>
-        <div className="w-1/2 p-2">
+        <div className="flex-1 p-2">
           <label htmlFor="ageRange">Age Range</label>
           <select
             id="ageRange"
@@ -362,7 +362,8 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
       </div>
   </form>
 
-    );
-  };
 
-  export default ProfileForm;
+      );
+    };
+
+    export default ProfileForm;
