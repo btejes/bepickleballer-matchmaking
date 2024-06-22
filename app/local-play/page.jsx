@@ -17,7 +17,7 @@ const LocalPlay = () => {
   });
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-  const filtersDisplayed = process.env.NEXT_PUBLIC_FILTERS_DISPLAYED === 'true';
+  const filtersDisplayed = process.env.NEXT_PUBLIC_LOCAL_PLAY_FILTERS_DISPLAYED === 'true';
 
   const [currentMatch, setCurrentMatch] = useState(null);
   const [error, setError] = useState(null);
@@ -136,7 +136,7 @@ const LocalPlay = () => {
   };
 
   return (
-    <div className="flex flex-col items-center h-screen overflow-hidden">
+    <div className="flex flex-col items-center min-h-screen overflow-y-auto">
       <div className="w-full">
         <Navbar />
       </div>
@@ -145,7 +145,7 @@ const LocalPlay = () => {
           Local Play:  <strong><big>{capitalizeCity(userProfile.city)}</big></strong>
         </div>
       )}
-      <div className="flex-grow w-full flex flex-col items-center justify-center px-4 space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4 overflow-y-auto">
+      <div className="flex-grow w-full flex flex-col items-center justify-center px-4 space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4">
         {currentMatch ? (
           <div className="flex flex-col items-center justify-center space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4">
             <button
