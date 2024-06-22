@@ -293,9 +293,9 @@ const LocalPlay = () => {
           <option value="">
             Court Type
           </option>
-          <option value="Outdoor">Outdoor</option>
           <option value="Indoor">Indoor</option>
-          <option value="Indoor/Outdoor">OuIndoor/Outdoortdoor</option>
+          <option value="Outdoor">Outdoor</option>
+          <option value="Indoor/Outdoor">Indoor/Outdoor</option>
         </select>
         <select
           name="preferredPlayStyle"
