@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
@@ -16,7 +15,12 @@ const execPromise = util.promisify(exec);
 // Function to get dimensions and rotation of HEIC images using ffmpeg
 async function getHEICDimensions(filePath) {
   try {
-    const { stdout } = await execPromise(`ffmpeg -i "${filePath}" -v quiet -select_streams v:0 -count_packets -show_entries stream=width,height,side_data_list -of json`);
+    const { stdout, stderr } = await execPromise(`ffmpeg -i "${filePath}" -v quiet -select_streams v:0 -show_entries stream=width,height,side_data_list -of json`);
+    
+    if (stderr) {
+      throw new Error(stderr);
+    }
+
     const metadata = JSON.parse(stdout);
     console.log('Extracted metadata:', metadata);
 
@@ -34,7 +38,8 @@ async function getHEICDimensions(filePath) {
         if (matrix[0] === 0 && matrix[4] === 0) {
           rotation = (matrix[1] === 1 && matrix[3] === -1) ? 90 : 270;
         } else if (matrix[0] === -1 && matrix[4] === -1) {
-          rot        }
+          rotation = 180;
+        }
       }
     }
 
@@ -42,7 +47,12 @@ async function getHEICDimensions(filePath) {
 
     // If dimensions are suspiciously small, try to get actual dimensions
     if (width <= 512 || height <= 512) {
-      const { stdout: ffmpegOutput } = await execPromise(`ffmpeg -i "${filePath}" -v error -select_streams v:0 -count_packets -show_entries stream=width,height -of csv=p=0`);
+      const { stdout: ffmpegOutput, stderr: ffmpegError } = await execPromise(`ffmpeg -i "${filePath}" -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0`);
+      
+      if (ffmpegError) {
+        throw new Error(ffmpegError);
+      }
+
       const [actualWidth, actualHeight] = ffmpegOutput.trim().split(',').map(Number);
       if (actualWidth > width || actualHeight > height) {
         width = actualWidth;
