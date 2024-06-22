@@ -13,10 +13,10 @@ ffmpeg.setFfmpegPath('ffmpeg');
 
 const execPromise = util.promisify(exec);
 
-// Function to get dimensions and rotation of HEIC images using ffprobe
+// Function to get dimensions and rotation of HEIC images using ffmpeg
 async function getHEICDimensions(filePath) {
   try {
-    const { stdout } = await execPromise(`ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=width,height,side_data_list -of json "${filePath}"`);
+    const { stdout } = await execPromise(`ffmpeg -i "${filePath}" -v quiet -select_streams v:0 -count_packets -show_entries stream=width,height,side_data_list -of json`);
     const metadata = JSON.parse(stdout);
     console.log('Extracted metadata:', metadata);
 
@@ -34,12 +34,22 @@ async function getHEICDimensions(filePath) {
         if (matrix[0] === 0 && matrix[4] === 0) {
           rotation = (matrix[1] === 1 && matrix[3] === -1) ? 90 : 270;
         } else if (matrix[0] === -1 && matrix[4] === -1) {
-          rotation = 180;
-        }
+          rot        }
       }
     }
 
-    console.log(`Raw dimensions: ${width}x${height}, Rotation: ${rotation}`);
+    console.log(`Raw dimensions from ffmpeg: ${width}x${height}, Rotation: ${rotation}`);
+
+    // If dimensions are suspiciously small, try to get actual dimensions
+    if (width <= 512 || height <= 512) {
+      const { stdout: ffmpegOutput } = await execPromise(`ffmpeg -i "${filePath}" -v error -select_streams v:0 -count_packets -show_entries stream=width,height -of csv=p=0`);
+      const [actualWidth, actualHeight] = ffmpegOutput.trim().split(',').map(Number);
+      if (actualWidth > width || actualHeight > height) {
+        width = actualWidth;
+        height = actualHeight;
+        console.log(`Corrected dimensions: ${width}x${height}`);
+      }
+    }
 
     // Swap width and height if rotated 90 or 270 degrees
     if (rotation === 90 || rotation === 270) {
