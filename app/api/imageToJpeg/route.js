@@ -26,40 +26,18 @@ export async function POST(req) {
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
-
-    console.log("\nFile object:", JSON.stringify(file, null, 2), "\n");
-
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
-    let fileExtension = '';
-
-    if (file.name) {
-      fileExtension = path.extname(file.name).toLowerCase();
-    } else if (file.type) {
-      // If no file name, try to infer extension from MIME type
-      const mimeToExt = {
-        'image/jpeg': '.jpg',
-        'image/jpg': '.jpg',
-        'image/png': '.png',
-        'image/webp': '.webp',
-        'image/heic': '.heic',
-        'image/heif': '.heif'
-      };
-      fileExtension = mimeToExt[file.type] || '';
-    }
-
-    const isAllowedType = allowedTypes.includes(file.type) || ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'].includes(fileExtension);
-
-    if (!isAllowedType) {
-      return NextResponse.json({ 
-        error: `File type ${file.type || 'unknown'} (${fileExtension || 'no extension'}) not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` 
-      }, { status: 400 });
+    console.log("\nfile type:", file.type, "\n");
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
+    if (!allowedTypes.includes(file.type)) {
+      console.log("\nfile type:", file.type, "\n");
+      return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
     }
 
     const imageBuffer = Buffer.from(file.buffer, 'base64');
 
     // Create temporary input and output files
     const tempDir = os.tmpdir();
-    const inputPath = path.join(tempDir, `input_${Date.now()}${fileExtension}`);
+    const inputPath = path.join(tempDir, `input_${Date.now()}`);
     const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
 
     await fs.writeFile(inputPath, imageBuffer);
@@ -67,17 +45,10 @@ export async function POST(req) {
     // Use FFmpeg to convert the image
     await new Promise((resolve, reject) => {
       ffmpeg(inputPath)
-        .outputOptions([
-          '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
-          '-auto-orient',  // Preserve original orientation
-          '-colorspace', 'srgb'  // Convert to sRGB color space
-        ])
+        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease'])
         .output(outputPath)
         .on('end', resolve)
-        .on('error', (err) => {
-          console.error('FFmpeg error:', err);
-          reject(err);
-        })
+        .on('error', reject)
         .run();
     });
 
@@ -92,6 +63,6 @@ export async function POST(req) {
     return NextResponse.json({ image: base64Image }, { status: 200 });
   } catch (error) {
     console.error('Error processing the image upload:', error);
-    return NextResponse.json({ error: 'Failed to process image: ' + error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to process image' }, { status: 500 });
   }
 }
