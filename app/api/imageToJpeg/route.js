@@ -49,15 +49,12 @@ export async function POST(req) {
       
       if (file.type === 'image/heic') {
         ffmpegCommand = ffmpegCommand
-          .inputOptions([
-            '-vsync', '0',
-            '-colorspace', 'bt709'  // Ensure correct color interpretation
-          ])
+          .inputOptions(['-ignore_minor_errors'])
           .outputOptions([
             '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
-            '-colorspace', 'bt709',  // Maintain color accuracy
+            '-q:v', '2',  // High quality setting
             '-pix_fmt', 'yuvj420p',  // Use full color range
-            '-metadata:s:v:0', 'rotate=0'  // Reset rotation metadata
+            '-auto-orient'  // Automatically orient the image based on metadata
           ]);
       } else {
         ffmpegCommand = ffmpegCommand
