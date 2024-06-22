@@ -11,6 +11,9 @@ const LocalPlay = () => {
     preferredAgeRange: '',
     preferredSkillLevel: '',
     preferredDUPRRating: '',
+    preferredHand: '',
+    preferredCourtType: '',
+    preferredPlayStyle: '',
   });
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
@@ -268,6 +271,42 @@ const LocalPlay = () => {
           <option value="6.0">6.0</option>
           <option value="7.0">7.0</option>
           <option value="8.0">8.0</option>
+        </select>
+        <select
+          name="preferredHand"
+          value={filters.preferredHand}
+          onChange={handleFilterChange}
+          className="p-1 border rounded w-36"
+        >
+          <option value="">
+            Preferred Hand
+          </option>
+          <option value="Right">Right</option>
+          <option value="Left">Left</option>
+        </select>
+        <select
+          name="preferredCourtType"
+          value={filters.preferredCourtType}
+          onChange={handleFilterChange}
+          className="p-1 border rounded w-36"
+        >
+          <option value="">
+            Court Type
+          </option>
+          <option value="Outdoor">Outdoor</option>
+          <option value="Indoor">Indoor</option>
+        </select>
+        <select
+          name="preferredPlayStyle"
+          value={filters.preferredPlayStyle}
+          onChange={handleFilterChange}
+          className="p-1 border rounded w-36"
+        >
+          <option value="">
+            Play Style
+          </option>
+          <option value="Casual">Casual</option>
+          <option value="Competitive">Competitive</option>
         </select>
       </div>
       <SimpleMatchModal isOpen={isModalOpen} onClose={handleModalClose} />

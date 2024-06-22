@@ -63,6 +63,18 @@ export async function POST(request) {
       query.duprRating = { $gte: parseFloat(filters.preferredDUPRRating) };
     }
 
+    if (filters.preferredHand) {
+      query.rightieLeftie = filters.preferredHand;
+    }
+
+    if (filters.preferredCourtType) {
+      query.outdoorIndoor = filters.preferredCourtType;
+    }
+
+    if (filters.preferredPlayStyle) {
+      query.casualCompetitive = filters.preferredPlayStyle;
+    }
+
     console.log("Query built:", query);
 
     const potentialMatches = await Profile.find(query);
@@ -150,6 +162,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
 
 
 
