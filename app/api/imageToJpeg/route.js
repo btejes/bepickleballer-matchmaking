@@ -27,17 +27,30 @@ export async function POST(req) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
-    if (!allowedTypes.includes(file.type)) {
-      console.log("\nfile type:", file.type, "\mn");
-      return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
+    const allowedTypes = [
+      'image/jpeg', 'image/jpg', 'image/png', 'image/webp',
+      'image/heic', 'image/heif',
+      'IMAGE/JPEG', 'IMAGE/JPG', 'IMAGE/PNG', 'IMAGE/WEBP',
+      'IMAGE/HEIC', 'IMAGE/HEIF'
+    ];
+    
+    // Check both MIME type and file extension
+    const fileExtension = path.extname(file.name).toLowerCase();
+    const isAllowedExtension = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'].includes(fileExtension);
+    
+    if (!allowedTypes.includes(file.type) && !isAllowedExtension) {
+      console.log("\nFile type:", file.type);
+      console.log("File extension:", fileExtension);
+      return NextResponse.json({ 
+        error: `${file.type} (${fileExtension}) not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` 
+      }, { status: 400 });
     }
 
     const imageBuffer = Buffer.from(file.buffer, 'base64');
 
     // Create temporary input and output files
     const tempDir = os.tmpdir();
-    const inputPath = path.join(tempDir, `input_${Date.now()}`);
+    const inputPath = path.join(tempDir, `input_${Date.now()}${fileExtension}`);
     const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
 
     await fs.writeFile(inputPath, imageBuffer);
