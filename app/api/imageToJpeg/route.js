@@ -29,7 +29,7 @@ export async function POST(req) {
   try {
     console.log("Starting image processing...");
 
-    // Authorization code
+    // Authorization code (unchanged)
     const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
       console.log("Unauthorized access attempt");
@@ -76,6 +76,7 @@ export async function POST(req) {
       if (dimensions) {
         const isVertical = dimensions.height > dimensions.width;
         console.log(`Image orientation: ${isVertical ? 'Vertical' : 'Horizontal'}`);
+        console.log(`Original dimensions: ${dimensions.width}x${dimensions.height}`);
         
         if (isVertical) {
           console.log("Applying transpose for vertical image");
@@ -83,11 +84,20 @@ export async function POST(req) {
         } else {
           console.log("No transpose needed for horizontal image");
         }
+
+        // Calculate scaling factors
+        const scaleWidth = 800 / dimensions.width;
+        const scaleHeight = 800 / dimensions.height;
+        const scaleFactor = Math.min(scaleWidth, scaleHeight, 1);  // Don't upscale if image is smaller
+
+        console.log(`Calculated scale factor: ${scaleFactor}`);
+
+        filterComplex += `scale=iw*${scaleFactor}:ih*${scaleFactor}`;
       } else {
-        console.log("Could not determine image dimensions, proceeding without orientation check");
+        console.log("Could not determine image dimensions, using default scaling");
+        filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease';
       }
 
-      filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease';
       console.log(`Final filter complex for HEIC: ${filterComplex}`);
 
       ffmpegCommand = ffmpegCommand
