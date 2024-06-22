@@ -141,7 +141,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-2 rounded-3xl shadow-md text-black max-w-2xl mx-auto">
+    <form onSubmit={handleSubmit} className="bg-white p-4 rounded-3xl shadow-md text-black max-w-2xl mx-auto">
       <div className="flex flex-row">
         <div className="w-1/2 p-2">
           <label htmlFor="firstName">First Name</label>
@@ -295,7 +295,6 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
             </small>
           </div>
         </div>
-        <br></br>
         <div className="col-span-2 flex justify-left">
           <small className="text-gray-500">
             Only accepted matches see phone and email below
@@ -361,8 +360,9 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
           Save Profile
         </button>
       </div>
-    </form>
-  );
-};
+  </form>
 
-export default ProfileForm;
+    );
+  };
+
+  export default ProfileForm;
