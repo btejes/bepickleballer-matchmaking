@@ -17,6 +17,7 @@ const LocalPlay = () => {
   });
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  const filtersDisplayed = process.env.NEXT_PUBLIC_FILTERS_DISPLAYED === 'true';
 
   const [currentMatch, setCurrentMatch] = useState(null);
   const [error, setError] = useState(null);
@@ -210,106 +211,108 @@ const LocalPlay = () => {
           </button>
         </div>
       )}
-      <div className="w-full text-black h-auto p-2 flex justify-center space-x-2 flex-wrap">
-        <select
-          name="preferredGender"
-          value={filters.preferredGender}
-          onChange={handleFilterChange}
-          className="p-1 border rounded w-36"
-        >
-          <option value="">
-            Gender
-          </option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
-        <select
-          name="preferredAgeRange"
-          value={filters.preferredAgeRange}
-          onChange={handleFilterChange}
-          className="p-1 border rounded w-36"
-        >
-          <option value="">
-            Age Range
-          </option>
-          <option value="18-29">18-29</option>
-          <option value="30-39">30-39</option>
-          <option value="40-49">40-49</option>
-          <option value="50-59">50-59</option>
-          <option value="60-69">60-69</option>
-          <option value="70-79">70-79</option>
-          <option value="80-89">80-89</option>
-          <option value="90+">90+</option>
-        </select>
-        <select
-          name="preferredSkillLevel"
-          value={filters.preferredSkillLevel}
-          onChange={handleFilterChange}
-          className="p-1 border rounded w-36"
-        >
-          <option value="">
-            Skill Level
-          </option>
-          <option value="Beginner">Beginner</option>
-          <option value="Intermediate">Intermediate</option>
-          <option value="Advanced">Advanced</option>
-        </select>
-        <select
-          name="preferredDUPRRating"
-          value={filters.preferredDUPRRating}
-          onChange={handleFilterChange}
-          className="p-1 border rounded w-36"
-        >
-          <option value="">
-            Min DUPR
-          </option>
-          <option value="1.0">1.0</option>
-          <option value="2.0">2.0</option>
-          <option value="3.0">3.0</option>
-          <option value="4.0">4.0</option>
-          <option value="5.0">5.0</option>
-          <option value="6.0">6.0</option>
-          <option value="7.0">7.0</option>
-          <option value="8.0">8.0</option>
-        </select>
-        <select
-          name="preferredHand"
-          value={filters.preferredHand}
-          onChange={handleFilterChange}
-          className="p-1 border rounded w-36"
-        >
-          <option value="">
-            Preferred Hand
-          </option>
-          <option value="Rightie">Rightie</option>
-          <option value="Leftie">Leftie</option>
-        </select>
-        <select
-          name="preferredCourtType"
-          value={filters.preferredCourtType}
-          onChange={handleFilterChange}
-          className="p-1 border rounded w-36"
-        >
-          <option value="">
-            Court Type
-          </option>
-          <option value="Indoor">Indoor</option>
-          <option value="Outdoor">Outdoor</option>
-          <option value="Indoor/Outdoor">Indoor/Outdoor</option>
-        </select>
-        <select
-          name="preferredPlayStyle"
-          value={filters.preferredPlayStyle}
-          onChange={handleFilterChange}
-          className="p-1 border rounded w-36"
-        >
-          <option value="">
-            Play Style
-          </option>
-          <option value="Casual">Casual</option>
-          <option value="Competitive">Competitive</option>
-        </select>
-      </div>
+      {filtersDisplayed && (
+        <div className="w-full text-black h-auto p-2 flex justify-center space-x-2 flex-wrap">
+          <select
+            name="preferredGender"
+            value={filters.preferredGender}
+            onChange={handleFilterChange}
+            className="p-1 border rounded w-36"
+          >
+            <option value="">
+              Gender
+            </option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+          <select
+            name="preferredAgeRange"
+            value={filters.preferredAgeRange}
+            onChange={handleFilterChange}
+            className="p-1 border rounded w-36"
+          >
+            <option value="">
+              Age Range
+            </option>
+            <option value="18-29">18-29</option>
+            <option value="30-39">30-39</option>
+            <option value="40-49">40-49</option>
+            <option value="50-59">50-59</option>
+            <option value="60-69">60-69</option>
+            <option value="70-79">70-79</option>
+            <option value="80-89">80-89</option>
+            <option value="90+">90+</option>
+          </select>
+          <select
+            name="preferredSkillLevel"
+            value={filters.preferredSkillLevel}
+            onChange={handleFilterChange}
+            className="p-1 border rounded w-36"
+          >
+            <option value="">
+              Skill Level
+            </option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
+          <select
+            name="preferredDUPRRating"
+            value={filters.preferredDUPRRating}
+            onChange={handleFilterChange}
+            className="p-1 border rounded w-36"
+          >
+            <option value="">
+              Min DUPR
+            </option>
+            <option value="1.0">1.0</option>
+            <option value="2.0">2.0</option>
+            <option value="3.0">3.0</option>
+            <option value="4.0">4.0</option>
+            <option value="5.0">5.0</option>
+            <option value="6.0">6.0</option>
+            <option value="7.0">7.0</option>
+            <option value="8.0">8.0</option>
+          </select>
+          <select
+            name="preferredHand"
+            value={filters.preferredHand}
+            onChange={handleFilterChange}
+            className="p-1 border rounded w-36"
+          >
+            <option value="">
+              Preferred Hand
+            </option>
+            <option value="Rightie">Rightie</option>
+            <option value="Leftie">Leftie</option>
+          </select>
+          <select
+            name="preferredCourtType"
+            value={filters.preferredCourtType}
+            onChange={handleFilterChange}
+            className="p-1 border rounded w-36"
+          >
+            <option value="">
+              Court Type
+            </option>
+            <option value="Indoor">Indoor</option>
+            <option value="Outdoor">Outdoor</option>
+            <option value="Indoor/Outdoor">Indoor/Outdoor</option>
+          </select>
+          <select
+            name="preferredPlayStyle"
+            value={filters.preferredPlayStyle}
+            onChange={handleFilterChange}
+            className="p-1 border rounded w-36"
+          >
+            <option value="">
+              Play Style
+            </option>
+            <option value="Casual">Casual</option>
+            <option value="Competitive">Competitive</option>
+          </select>
+        </div>
+      )}
       <SimpleMatchModal isOpen={isModalOpen} onClose={handleModalClose} />
     </div>
   );
