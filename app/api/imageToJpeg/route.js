@@ -10,68 +10,6 @@ import ffmpeg from 'fluent-ffmpeg';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
-const execPromise = util.promisify(exec);
-
-// Function to get dimensions and rotation of HEIC images using ffmpeg
-async function getHEICDimensions(filePath) {
-  try {
-    const { stdout, stderr } = await execPromise(`ffmpeg -i "${filePath}" -v quiet -select_streams v:0 -show_entries stream=width,height,side_data_list -of json`);
-    
-    if (stderr) {
-      throw new Error(stderr);
-    }
-
-    const metadata = JSON.parse(stdout);
-    console.log('Extracted metadata:', metadata);
-
-    const stream = metadata.streams[0];
-    let width = stream.width;
-    let height = stream.height;
-    let rotation = 0;
-
-    // Check for rotation in side_data_list
-    if (stream.side_data_list && stream.side_data_list.length > 0) {
-      const rotationData = stream.side_data_list.find(data => data.side_data_type === 'Display Matrix');
-      if (rotationData) {
-        // Extract rotation from the display matrix
-        const matrix = rotationData.displaymatrix;
-        if (matrix[0] === 0 && matrix[4] === 0) {
-          rotation = (matrix[1] === 1 && matrix[3] === -1) ? 90 : 270;
-        } else if (matrix[0] === -1 && matrix[4] === -1) {
-          rotation = 180;
-        }
-      }
-    }
-
-    console.log(`Raw dimensions from ffmpeg: ${width}x${height}, Rotation: ${rotation}`);
-
-    // If dimensions are suspiciously small, try to get actual dimensions
-    if (width <= 512 || height <= 512) {
-      const { stdout: ffmpegOutput, stderr: ffmpegError } = await execPromise(`ffmpeg -i "${filePath}" -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0`);
-      
-      if (ffmpegError) {
-        throw new Error(ffmpegError);
-      }
-
-      const [actualWidth, actualHeight] = ffmpegOutput.trim().split(',').map(Number);
-      if (actualWidth > width || actualHeight > height) {
-        width = actualWidth;
-        height = actualHeight;
-        console.log(`Corrected dimensions: ${width}x${height}`);
-      }
-    }
-
-    // Swap width and height if rotated 90 or 270 degrees
-    if (rotation === 90 || rotation === 270) {
-      [width, height] = [height, width];
-    }
-
-    return { width, height, rotation };
-  } catch (error) {
-    console.error('Error getting HEIC image dimensions:', error);
-    return null;
-  }
-}
 
 // Function to process HEIC images
 async function processHEICImage(file, userId) {
@@ -89,27 +27,9 @@ async function processHEICImage(file, userId) {
   await fs.writeFile(inputPath, imageBuffer);
   console.log("Temporary input file created");
 
-  const dimensions = await getHEICDimensions(inputPath);
-  
-  let filterComplex = '';
-  if (dimensions) {
-    const { width, height, rotation } = dimensions;
-    console.log(`Corrected dimensions: ${width}x${height}, Rotation: ${rotation}`);
-    
-    // Handle rotation
-    if (rotation === 90) {
-      filterComplex += 'transpose=1,';
-    } else if (rotation === 180) {
-      filterComplex += 'transpose=2,transpose=2,';
-    } else if (rotation === 270) {
-      filterComplex += 'transpose=2,';
-    }
-  } else {
-    console.log("Could not determine image dimensions, proceeding without orientation check");
-  }
-
-  filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease';
-  console.log(`Final filter complex for HEIC: ${filterComplex}`);
+  // Use a filter to automatically rotate the image based on metadata
+  const filterComplex = 'scale=800:800:force_original_aspect_ratio=decrease,autorotate';
+  console.log(`Filter complex for HEIC: ${filterComplex}`);
 
   await new Promise((resolve, reject) => {
     ffmpeg(inputPath)
@@ -148,6 +68,8 @@ async function processHEICImage(file, userId) {
   console.log("HEIC image processing completed successfully");
   return NextResponse.json({ image: base64Image }, { status: 200 });
 }
+
+// ... (rest of the code remains the same)
 
 // Function to process normal images
 async function processNormalImage(file, userId) {
