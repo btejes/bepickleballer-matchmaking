@@ -142,8 +142,8 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-4 rounded-3xl shadow-md text-black max-w-2xl mx-auto">
-        <div className="columns-2">
-            <div className="p-2 box-border">
+        <div className="flex">
+            <div className="w-1/2 p-2 box-border">
                 <label htmlFor="firstName">First Name</label>
                 <input
                     type="text"
@@ -151,7 +151,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                     name="firstName"
                     value={formData.firstName || ''}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 box-border"
                 />
                 <label htmlFor="gender">Gender</label>
                 <select
@@ -159,7 +159,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                     name="gender"
                     value={formData.gender || ''}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 box-border"
                 >
                     <option value="">Unselected</option>
                     <option value="Male">Male</option>
@@ -176,7 +176,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                     min="2.0"
                     max="8.0"
                     step="0.01"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 box-border"
                 />
                 {errors.duprRating && <span className="text-red-500 text-sm">{errors.duprRating}</span>}
                 <label htmlFor="zipCode">Zip Code</label>
@@ -188,7 +188,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                     onChange={handleChange}
                     onKeyPress={(e) => handleKeyPress(e, 'zipCode')}
                     maxLength="5"
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 box-border"
                 />
                 {errors.zipCode && <span className="text-red-500 text-sm">{errors.zipCode}</span>}
                 <label htmlFor="rightieLeftie">Rightie/Leftie</label>
@@ -197,7 +197,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                     name="rightieLeftie"
                     value={formData.rightieLeftie || ''}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 box-border"
                 >
                     <option value="">Unselected</option>
                     <option value="Rightie">Rightie</option>
@@ -205,14 +205,14 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                     <option value="Right & Leftie">Both</option>
                 </select>
             </div>
-            <div className="p-2 box-border">
+            <div className="w-1/2 p-2 box-border">
                 <label htmlFor="ageRange">Age Range</label>
                 <select
                     id="ageRange"
                     name="ageRange"
                     value={formData.ageRange || ''}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 box-border"
                 >
                     <option value="">Unselected</option>
                     <option value="18-29">18-29</option>
@@ -230,7 +230,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                     name="skillLevel"
                     value={formData.skillLevel || ''}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 box-border"
                 >
                     <option value="">Unselected</option>
                     <option value="Beginner">Beginner</option>
@@ -243,7 +243,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                     name="openForMatches"
                     value={formData.openForMatches || ''}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 box-border"
                 >
                     <option value="">Unselected</option>
                     <option value="yes">Yes</option>
@@ -255,7 +255,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                     name="casualCompetitive"
                     value={formData.casualCompetitive || ''}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 box-border"
                 >
                     <option value="">Unselected</option>
                     <option value="casual">Casual</option>
@@ -267,7 +267,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                     name="outdoorIndoor"
                     value={formData.outdoorIndoor || ''}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 box-border"
                 >
                     <option value="">Unselected</option>
                     <option value="indoor">Indoor</option>
@@ -361,6 +361,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
             </button>
         </div>
     </form>
+
 
 
 
