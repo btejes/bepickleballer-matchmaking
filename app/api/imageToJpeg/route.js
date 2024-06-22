@@ -9,18 +9,144 @@ import { execSync } from 'child_process';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
-async function getImageDimensions(filePath) {
+// Function to get dimensions of HEIC images using ffmpeg
+async function getHEICDimensions(filePath) {
   try {
-    const output = execSync(`exiftool -ImageWidth -ImageHeight -j "${filePath}"`).toString().trim();
-    const metadata = JSON.parse(output)[0];
+    const output = execSync(`ffmpeg -i "${filePath}" -v quiet -print_format json -show_entries stream=width,height -of default=noprint_wrappers=1`).toString().trim();
+    const metadata = JSON.parse(output);
+    const dimensions = metadata.streams[0];
     return {
-      width: metadata.ImageWidth,
-      height: metadata.ImageHeight
+      width: dimensions.width,
+      height: dimensions.height
     };
   } catch (error) {
-    console.error('Error getting image dimensions:', error);
+    console.error('Error getting HEIC image dimensions:', error);
     return null;
   }
+}
+
+// Function to process HEIC images
+async function processHEICImage(file, userId) {
+  console.log("Processing HEIC image");
+
+  const imageBuffer = Buffer.from(file.buffer, 'base64');
+  console.log(`Image buffer size: ${imageBuffer.length} bytes`);
+
+  const tempDir = os.tmpdir();
+  const inputPath = path.join(tempDir, `input_${Date.now()}`);
+  const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
+  console.log(`Input path: ${inputPath}`);
+  console.log(`Output path: ${outputPath}`);
+
+  await fs.writeFile(inputPath, imageBuffer);
+  console.log("Temporary input file created");
+
+  const dimensions = await getHEICDimensions(inputPath);
+  
+  let filterComplex = '';
+  if (dimensions) {
+    const isVertical = dimensions.height > dimensions.width;
+    console.log(`Image orientation: ${isVertical ? 'Vertical' : 'Horizontal'}`);
+    
+    if (isVertical) {
+      console.log("Applying transpose for vertical image");
+      filterComplex = 'transpose=1,';
+    } else {
+      console.log("No transpose needed for horizontal image");
+    }
+  } else {
+    console.log("Could not determine image dimensions, proceeding without orientation check");
+  }
+
+  filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease';
+  console.log(`Final filter complex for HEIC: ${filterComplex}`);
+
+  await new Promise((resolve, reject) => {
+    ffmpeg(inputPath)
+      .outputOptions([
+        '-filter_complex', filterComplex,
+        '-q:v', '2',
+        '-pix_fmt', 'yuvj420p'
+      ])
+      .output(outputPath)
+      .on('start', (commandLine) => {
+        console.log('FFmpeg process started:', commandLine);
+      })
+      .on('progress', (progress) => {
+        console.log('Processing: ' + progress.percent + '% done');
+      })
+      .on('end', () => {
+        console.log('FFmpeg process completed');
+        resolve();
+      })
+      .on('error', (err) => {
+        console.error('Error during FFmpeg process:', err);
+        reject(err);
+      })
+      .run();
+  });
+
+  console.log("Reading converted image");
+  const convertedImageBuffer = await fs.readFile(outputPath);
+  const base64Image = convertedImageBuffer.toString('base64');
+  console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
+
+  console.log("Cleaning up temporary files");
+  await fs.unlink(inputPath);
+  await fs.unlink(outputPath);
+
+  console.log("HEIC image processing completed successfully");
+  return NextResponse.json({ image: base64Image }, { status: 200 });
+}
+
+// Function to process normal images
+async function processNormalImage(file, userId) {
+  console.log("Processing normal image");
+
+  const imageBuffer = Buffer.from(file.buffer, 'base64');
+  console.log(`Image buffer size: ${imageBuffer.length} bytes`);
+
+  const tempDir = os.tmpdir();
+  const inputPath = path.join(tempDir, `input_${Date.now()}`);
+  const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
+  console.log(`Input path: ${inputPath}`);
+  console.log(`Output path: ${outputPath}`);
+
+  await fs.writeFile(inputPath, imageBuffer);
+  console.log("Temporary input file created");
+
+  await new Promise((resolve, reject) => {
+    ffmpeg(inputPath)
+      .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease'])
+      .output(outputPath)
+      .on('start', (commandLine) => {
+        console.log('FFmpeg process started:', commandLine);
+      })
+      .on('progress', (progress) => {
+        console.log('Processing: ' + progress.percent + '% done');
+      })
+      .on('end', () => {
+        console.log('FFmpeg process completed');
+        resolve();
+      })
+      .on('error', (err) => {
+        console.error('Error during FFmpeg process:', err);
+        reject(err);
+      })
+      .run();
+  });
+
+  console.log("Reading converted image");
+  const convertedImageBuffer = await fs.readFile(outputPath);
+  const base64Image = convertedImageBuffer.toString('base64');
+  console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
+
+  console.log("Cleaning up temporary files");
+  await fs.unlink(inputPath);
+  await fs.unlink(outputPath);
+
+  console.log("Normal image processing completed successfully");
+  return NextResponse.json({ image: base64Image }, { status: 200 });
 }
 
 export async function POST(req) {
@@ -52,85 +178,11 @@ export async function POST(req) {
       return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
     }
 
-    const imageBuffer = Buffer.from(file.buffer, 'base64');
-    console.log(`Image buffer size: ${imageBuffer.length} bytes`);
-
-    const tempDir = os.tmpdir();
-    const inputPath = path.join(tempDir, `input_${Date.now()}`);
-    const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
-    console.log(`Input path: ${inputPath}`);
-    console.log(`Output path: ${outputPath}`);
-
-    await fs.writeFile(inputPath, imageBuffer);
-    console.log("Temporary input file created");
-
-    let ffmpegCommand = ffmpeg(inputPath);
-    let filterComplex = '';
-
     if (file.type === 'image/heic') {
-      console.log("Processing HEIC image");
-      const dimensions = await getImageDimensions(inputPath);
-      
-      if (dimensions) {
-        const isVertical = dimensions.height > dimensions.width;
-        console.log(`Image orientation: ${isVertical ? 'Vertical' : 'Horizontal'}`);
-        
-        if (isVertical) {
-          console.log("Applying transpose for vertical image");
-          filterComplex = 'transpose=1,';
-        } else {
-          console.log("No transpose needed for horizontal image");
-        }
-      } else {
-        console.log("Could not determine image dimensions, proceeding without orientation check");
-      }
-
-      filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease';
-      console.log(`Final filter complex for HEIC: ${filterComplex}`);
-
-      ffmpegCommand = ffmpegCommand
-        .outputOptions([
-          '-filter_complex', filterComplex,
-          '-q:v', '2',
-          '-pix_fmt', 'yuvj420p'
-        ]);
+      return await processHEICImage(file, userId);
     } else {
-      console.log("Processing non-HEIC image");
-      ffmpegCommand = ffmpegCommand
-        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease']);
+      return await processNormalImage(file, userId);
     }
-
-    console.log("Starting FFmpeg conversion");
-    await new Promise((resolve, reject) => {
-      ffmpegCommand.output(outputPath)
-        .on('start', (commandLine) => {
-          console.log('FFmpeg process started:', commandLine);
-        })
-        .on('progress', (progress) => {
-          console.log('Processing: ' + progress.percent + '% done');
-        })
-        .on('end', () => {
-          console.log('FFmpeg process completed');
-          resolve();
-        })
-        .on('error', (err) => {
-          console.error('Error during FFmpeg process:', err);
-          reject(err);
-        })
-        .run();
-    });
-
-    console.log("Reading converted image");
-    const convertedImageBuffer = await fs.readFile(outputPath);
-    const base64Image = convertedImageBuffer.toString('base64');
-    console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
-
-    console.log("Cleaning up temporary files");
-    await fs.unlink(inputPath);
-    await fs.unlink(outputPath);
-
-    console.log("Image processing completed successfully");
-    return NextResponse.json({ image: base64Image }, { status: 200 });
   } catch (error) {
     console.error('Error processing the image upload:', error);
     return NextResponse.json({ error: 'Failed to process image' }, { status: 500 });
