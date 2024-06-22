@@ -85,17 +85,10 @@ export async function POST(req) {
           console.log("No transpose needed for horizontal image");
         }
 
-        // Calculate scaling factors
-        const scaleWidth = 800 / dimensions.width;
-        const scaleHeight = 800 / dimensions.height;
-        const scaleFactor = Math.min(scaleWidth, scaleHeight, 1);  // Don't upscale if image is smaller
-
-        console.log(`Calculated scale factor: ${scaleFactor}`);
-
-        filterComplex += `scale=iw*${scaleFactor}:ih*${scaleFactor}`;
+        filterComplex += `crop='min(iw,ih)':'min(iw,ih)',scale=800:800`;
       } else {
         console.log("Could not determine image dimensions, using default scaling");
-        filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease';
+        filterComplex += `crop='min(iw,ih)':'min(iw,ih)',scale=800:800`;
       }
 
       console.log(`Final filter complex for HEIC: ${filterComplex}`);
@@ -109,7 +102,7 @@ export async function POST(req) {
     } else {
       console.log("Processing non-HEIC image");
       ffmpegCommand = ffmpegCommand
-        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease']);
+        .outputOptions(['-vf', `crop='min(iw,ih)':'min(iw,ih)',scale=800:800`]);
     }
 
     console.log("Starting FFmpeg conversion");
