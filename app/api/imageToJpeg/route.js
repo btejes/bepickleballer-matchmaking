@@ -11,10 +11,8 @@ ffmpeg.setFfmpegPath('ffmpeg');
 
 async function getImageDimensions(filePath) {
   try {
-    console.log(`Getting dimensions for file: ${filePath}`);
     const output = execSync(`exiftool -ImageWidth -ImageHeight -j "${filePath}"`).toString().trim();
     const metadata = JSON.parse(output)[0];
-    console.log(`Image dimensions: ${JSON.stringify(metadata)}`);
     return {
       width: metadata.ImageWidth,
       height: metadata.ImageHeight
