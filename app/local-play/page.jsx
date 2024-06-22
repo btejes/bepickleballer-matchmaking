@@ -17,7 +17,7 @@ const LocalPlay = () => {
   });
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-  const filtersDisplayed = process.env.NEXT_PUBLIC_LOCAL_PLAY_FILTERS_DISPLAYED === 'true';
+  const filtersDisplayed = process.env.NEXT_PUBLIC_FILTERS_DISPLAYED === 'true';
 
   const [currentMatch, setCurrentMatch] = useState(null);
   const [error, setError] = useState(null);
