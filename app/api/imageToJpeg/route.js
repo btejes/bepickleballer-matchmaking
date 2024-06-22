@@ -27,17 +27,31 @@ export async function POST(req) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    console.log("\nFile name:", file.name);
-    console.log("File type:", file.type);
-    console.log("File size:", file.size, "\n");
+    console.log("\nFile object:", JSON.stringify(file, null, 2), "\n");
 
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
-    const fileExtension = path.extname(file.name).toLowerCase();
-    const isAllowedExtension = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'].includes(fileExtension);
+    let fileExtension = '';
 
-    if (!allowedTypes.includes(file.type) && !isAllowedExtension) {
+    if (file.name) {
+      fileExtension = path.extname(file.name).toLowerCase();
+    } else if (file.type) {
+      // If no file name, try to infer extension from MIME type
+      const mimeToExt = {
+        'image/jpeg': '.jpg',
+        'image/jpg': '.jpg',
+        'image/png': '.png',
+        'image/webp': '.webp',
+        'image/heic': '.heic',
+        'image/heif': '.heif'
+      };
+      fileExtension = mimeToExt[file.type] || '';
+    }
+
+    const isAllowedType = allowedTypes.includes(file.type) || ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'].includes(fileExtension);
+
+    if (!isAllowedType) {
       return NextResponse.json({ 
-        error: `${file.type} (${fileExtension}) not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` 
+        error: `File type ${file.type || 'unknown'} (${fileExtension || 'no extension'}) not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` 
       }, { status: 400 });
     }
 
