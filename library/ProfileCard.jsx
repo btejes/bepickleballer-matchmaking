@@ -205,7 +205,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
             onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
             onClick={isProfilePage ? () => document.getElementById('imageUpload').click() : null}
           />
-          {isProfilePage && (
+          {isProfilePage && typeof window !== 'undefined' && (
             <input
               id="imageUpload"
               type="file"
