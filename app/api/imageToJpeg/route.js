@@ -85,7 +85,7 @@ export async function POST(req) {
         filterComplex += `scale=${scaledWidth}:${scaledHeight},crop=${targetSize}:${targetSize}:${xOffset}:${yOffset}`;
       } else {
         console.log("Could not determine image dimensions, using default scaling");
-        filterComplex += `scale=800:-1,crop=800:800:0:0`;
+        filterComplex += `scale=800:800,crop=800:800:0:0`;
       }
 
       console.log(`Final filter complex for HEIC: ${filterComplex}`);
@@ -99,7 +99,7 @@ export async function POST(req) {
     } else {
       console.log("Processing non-HEIC image");
       ffmpegCommand = ffmpegCommand
-        .outputOptions(['-vf', `scale=800:-1,crop=800:800:0:0`]);
+        .outputOptions(['-vf', `scale=800:800,crop=800:800:0:0`]);
     }
 
     console.log("Starting FFmpeg conversion");
