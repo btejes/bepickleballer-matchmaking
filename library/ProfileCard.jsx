@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import heic2any from 'heic2any';
 
 const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
   const [image, setImage] = useState(null);
@@ -17,7 +16,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
   }, [profile.profileImage]);
 
   useEffect(() => {
-    if (profile.userId && typeof window !== 'undefined') {
+    if (profile.userId) {
       fetchAverageRating(profile.userId);
     }
   }, [profile.userId]);
@@ -79,27 +78,8 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
       setFadeOut(false);
 
       try {
-        let processedFile = file;
-
-        if (file.type === 'image/heic') {
-          try {
-            processedFile = await heic2any({
-              blob: file,
-              toType: 'image/jpeg',
-            });
-            processedFile = new File([processedFile], file.name.replace(/\.heic$/, '.jpg'), { type: 'image/jpeg' });
-          } catch (error) {
-            console.error('Error converting HEIC to JPEG:', error);
-            setStatusMessage("Error converting HEIC to JPEG");
-            setLoading(false);
-            setIsUploading(false);
-            setFadeOut(false);
-            return;
-          }
-        }
-
         const reader = new FileReader();
-        reader.readAsDataURL(processedFile);
+        reader.readAsDataURL(file);
         reader.onloadend = async () => {
           const base64data = reader.result.split(',')[1];
 
@@ -109,7 +89,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
               'Content-Type': 'application/json',
             },
             credentials: 'include',
-            body: JSON.stringify({ file: { type: processedFile.type, buffer: base64data } }),
+            body: JSON.stringify({ file: { type: file.type, buffer: base64data } }),
           });
 
           const convertResult = await response.json();
@@ -203,13 +183,9 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
             width={320}
             height={320}
             onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
-            onClick={isProfilePage ? () => {
-              if (typeof window !== 'undefined') {
-                document.getElementById('imageUpload').click();
-              }
-            } : null}
+            onClick={isProfilePage ? () => document.getElementById('imageUpload').click() : null}
           />
-          {isProfilePage && typeof window !== 'undefined' && (
+          {isProfilePage && (
             <input
               id="imageUpload"
               type="file"
@@ -224,6 +200,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
         <div>
           <div className="flex justify-between items-center">
             <p className="text-lg font-bold text-black">{profile.firstName}</p>
+            
           </div>
           <div className="flex justify-between mt-2">
             <p className="text-sm font-medium text-black">{profile.gender}</p>
@@ -242,14 +219,17 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
                 {typeof averageRating === 'number' ? averageRating.toFixed(1) : 'N/A'}
               </p>
             </div>
+            
           </div>
           <div className="flex justify-between mt-2">
             <p className="text-sm font-medium text-black">DUPR: {profile.duprRating}</p>
             <p className="text-sm font-medium text-black">{profile.ageRange}</p>
+            
           </div>
           <div className="flex justify-between mt-2">
             <p className="text-sm font-medium text-black">{profile.outdoorIndoor}</p>
             <p className="text-sm font-medium text-black">{profile.skillLevel}</p>
+            
           </div>
           <div className="flex justify-between mt-2">
             <p className="text-sm font-medium text-black">{profile.rightieLeftie}</p>
