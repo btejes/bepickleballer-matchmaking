@@ -27,8 +27,10 @@ export async function POST(req) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
+    console.log("\nfile type:", file.type, "\n");
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
     if (!allowedTypes.includes(file.type)) {
+      console.log("\nfile type:", file.type, "\n");
       return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
     }
 
@@ -44,26 +46,28 @@ export async function POST(req) {
     // Use FFmpeg to convert the image
     await new Promise((resolve, reject) => {
       let ffmpegCommand = ffmpeg(inputPath);
-
-      // Special handling for HEIC images
+      
       if (file.type === 'image/heic') {
-        ffmpegCommand
-          .inputOptions(['-vsync', '0'])  // Helps with color issues
-          .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease', 'format=yuv420p', 'auto-orient'])
-          .outputOptions(['-metadata:s:v', 'rotate=0'])  // Fixes rotation issues
-          .output(outputPath)
-          .on('end', resolve)
-          .on('error', reject)
-          .run();
+        ffmpegCommand = ffmpegCommand
+          .inputOptions([
+            '-vsync', '0',
+            '-colorspace', 'bt709'  // Ensure correct color interpretation
+          ])
+          .outputOptions([
+            '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
+            '-colorspace', 'bt709',  // Maintain color accuracy
+            '-pix_fmt', 'yuvj420p',  // Use full color range
+            '-metadata:s:v:0', 'rotate=0'  // Reset rotation metadata
+          ]);
       } else {
-        // Standard processing for other image types
-        ffmpegCommand
-          .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease'])
-          .output(outputPath)
-          .on('end', resolve)
-          .on('error', reject)
-          .run();
+        ffmpegCommand = ffmpegCommand
+          .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease']);
       }
+      
+      ffmpegCommand.output(outputPath)
+        .on('end', resolve)
+        .on('error', reject)
+        .run();
     });
 
     // Read the converted image
