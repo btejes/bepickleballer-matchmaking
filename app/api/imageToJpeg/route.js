@@ -9,20 +9,29 @@ import { execSync } from 'child_process';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
-async function getImageOrientation(filePath) {
+async function getImageDimensions(filePath) {
   try {
-    const output = execSync(`exiftool -Orientation -n -j "${filePath}"`).toString().trim();
+    const output = execSync(`exiftool -ImageWidth -ImageHeight -j "${filePath}"`).toString().trim();
     const metadata = JSON.parse(output)[0];
-    return metadata.Orientation;
+    return {
+      width: metadata.ImageWidth,
+      height: metadata.ImageHeight
+    };
   } catch (error) {
-    console.error('Error getting image orientation:', error);
+    console.error('Error getting image dimensions:', error);
     return null;
   }
 }
 
 export async function POST(req) {
   try {
-    // ... [Previous authorization code remains unchanged]
+    // Authorization code (unchanged)
+    const jwtToken = cookies().get('token')?.value;
+    if (!jwtToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
+    const userId = decoded._id;
 
     const body = await req.json();
     const { file } = body;
@@ -45,28 +54,21 @@ export async function POST(req) {
 
     await fs.writeFile(inputPath, imageBuffer);
 
-    let orientation = null;
+    let dimensions = null;
     if (file.type === 'image/heic') {
-      orientation = await getImageOrientation(inputPath);
+      dimensions = await getImageDimensions(inputPath);
     }
 
     await new Promise((resolve, reject) => {
       let ffmpegCommand = ffmpeg(inputPath);
       
       if (file.type === 'image/heic') {
-        let rotateFilter = '';
-        if (orientation === 6) {
-          rotateFilter = 'transpose=1,';  // 90 degrees clockwise
-        } else if (orientation === 8) {
-          rotateFilter = 'transpose=2,';  // 90 degrees counter-clockwise
-        } else if (orientation === 3) {
-          rotateFilter = 'rotate=180*PI/180,';  // 180 degrees
-        }
-        // For orientation 1 (normal) or any other value, we don't apply rotation
+        const isVertical = dimensions && dimensions.height > dimensions.width;
+        const scaleFilter = isVertical ? 'scale=800:-1' : 'scale=-1:800';
 
         ffmpegCommand = ffmpegCommand
           .outputOptions([
-            '-vf', `${rotateFilter}scale=800:800:force_original_aspect_ratio=decrease`,
+            '-vf', `${scaleFilter}`,
             '-q:v', '2',
             '-pix_fmt', 'yuvj420p'
           ]);
