@@ -85,10 +85,10 @@ export async function POST(req) {
           console.log("No transpose needed for horizontal image");
         }
 
-        filterComplex += `crop='min(iw,ih)':'min(iw,ih)',scale=800:800`;
+        filterComplex += `scale=800:-1,crop=800:800:0:0`;
       } else {
         console.log("Could not determine image dimensions, using default scaling");
-        filterComplex += `crop='min(iw,ih)':'min(iw,ih)',scale=800:800`;
+        filterComplex += `scale=800:-1,crop=800:800:0:0`;
       }
 
       console.log(`Final filter complex for HEIC: ${filterComplex}`);
@@ -102,7 +102,7 @@ export async function POST(req) {
     } else {
       console.log("Processing non-HEIC image");
       ffmpegCommand = ffmpegCommand
-        .outputOptions(['-vf', `crop='min(iw,ih)':'min(iw,ih)',scale=800:800`]);
+        .outputOptions(['-vf', `scale=800:-1,crop=800:800:0:0`]);
     }
 
     console.log("Starting FFmpeg conversion");
