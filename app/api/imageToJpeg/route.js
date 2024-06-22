@@ -44,7 +44,7 @@ export async function POST(req) {
     // Use FFmpeg to convert the image
     await new Promise((resolve, reject) => {
       ffmpeg(inputPath)
-        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease,format=yuv420p', '-c:v', 'libx264', '-profile:v', 'baseline', '-pix_fmt', 'yuv420p'])
+        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease', '-q:v', '2'])
         .output(outputPath)
         .on('end', resolve)
         .on('error', reject)
