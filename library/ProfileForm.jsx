@@ -142,138 +142,158 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-2 rounded-3xl shadow-md text-black max-w-2xl mx-auto">
-      <div className="flex flex-row">
-        <div className="w-1/2 p-2">
-          <label htmlFor="firstName">First Name</label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={formData.firstName || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          />
-          <label htmlFor="gender">Gender</label>
-          <select
-            id="gender"
-            name="gender"
-            value={formData.gender || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="">Unselected</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
-          <label htmlFor="duprRating">DUPR Rating</label>
-          <input
-            type="number"
-            id="duprRating"
-            name="duprRating"
-            value={formData.duprRating || ''}
-            onChange={handleChange}
-            onKeyPress={(e) => handleKeyPress(e, 'duprRating')}
-            min="2.0"
-            max="8.0"
-            step="0.01"
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          />
-          {errors.duprRating && <span className="text-red-500 text-sm">{errors.duprRating}</span>}
-          <label htmlFor="zipCode">Zip Code</label>
-          <input
-            type="text"
-            id="zipCode"
-            name="zipCode"
-            value={formData.zipCode || ''}
-            onChange={handleChange}
-            onKeyPress={(e) => handleKeyPress(e, 'zipCode')}
-            maxLength="5"
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          />
-          {errors.zipCode && <span className="text-red-500 text-sm">{errors.zipCode}</span>}
-          <label htmlFor="rightieLeftie">Rightie/Leftie</label>
-          <select
-            id="rightieLeftie"
-            name="rightieLeftie"
-            value={formData.rightieLeftie || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="">Unselected</option>
-            <option value="Rightie">Rightie</option>
-            <option value="Leftie">Leftie</option>
-            <option value="Right & Leftie">Both</option>
-          </select>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <div>
+            <label htmlFor="firstName">First Name</label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              value={formData.firstName || ''}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+            />
+          </div>
+          <div>
+            <label htmlFor="gender">Gender</label>
+            <select
+              id="gender"
+              name="gender"
+              value={formData.gender || ''}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+            >
+              <option value="">Unselected</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="duprRating">DUPR Rating</label>
+            <input
+              type="number"
+              id="duprRating"
+              name="duprRating"
+              value={formData.duprRating || ''}
+              onChange={handleChange}
+              onKeyPress={(e) => handleKeyPress(e, 'duprRating')}
+              min="2.0"
+              max="8.0"
+              step="0.01"
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+            />
+            {errors.duprRating && <span className="text-red-500 text-sm">{errors.duprRating}</span>}
+          </div>
+          <div>
+            <label htmlFor="zipCode">Zip Code</label>
+            <input
+              type="text"
+              id="zipCode"
+              name="zipCode"
+              value={formData.zipCode || ''}
+              onChange={handleChange}
+              onKeyPress={(e) => handleKeyPress(e, 'zipCode')}
+              maxLength="5"
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+            />
+            {errors.zipCode && <span className="text-red-500 text-sm">{errors.zipCode}</span>}
+          </div>
+          <div>
+            <label htmlFor="rightieLeftie">Rightie/Leftie</label>
+            <select
+              id="rightieLeftie"
+              name="rightieLeftie"
+              value={formData.rightieLeftie || ''}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+            >
+              <option value="">Unselected</option>
+              <option value="Rightie">Rightie</option>
+              <option value="Leftie">Leftie</option>
+              <option value="Right & Leftie">Both</option>
+            </select>
+          </div>
         </div>
-        <div className="w-1/2 p-2">
-          <label htmlFor="ageRange">Age Range</label>
-          <select
-            id="ageRange"
-            name="ageRange"
-            value={formData.ageRange || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="">Unselected</option>
-            <option value="18-29">18-29</option>
-            <option value="30-39">30-39</option>
-            <option value="40-49">40-49</option>
-            <option value="50-59">50-59</option>
-            <option value="60-69">60-69</option>
-            <option value="70-79">70-79</option>
-            <option value="80-89">80-89</option>
-            <option value="99+">99+</option>
-          </select>
-          <label htmlFor="skillLevel">Skill Level</label>
-          <select
-            id="skillLevel"
-            name="skillLevel"
-            value={formData.skillLevel || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="">Unselected</option>
-            <option value="Beginner">Beginner</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-          </select>
-          <label htmlFor="openForMatches">Open For Matches</label>
-          <select
-            id="openForMatches"
-            name="openForMatches"
-            value={formData.openForMatches || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="">Unselected</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-          <label htmlFor="casualCompetitive">Play Style</label>
-          <select
-            id="casualCompetitive"
-            name="casualCompetitive"
-            value={formData.casualCompetitive || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="">Unselected</option>
-            <option value="casual">Casual</option>
-            <option value="competitive">Competitive</option>
-          </select>
-          <label htmlFor="outdoorIndoor">Indoor/Outdoor</label>
-          <select
-            id="outdoorIndoor"
-            name="outdoorIndoor"
-            value={formData.outdoorIndoor || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
-          >
-            <option value="">Unselected</option>
-            <option value="indoor">Indoor</option>
-            <option value="outdoor">Outdoor</option>
-            <option value="Indoor/Outdoor">Both</option>
-          </select>
+        <div className="space-y-2">
+          <div>
+            <label htmlFor="ageRange">Age Range</label>
+            <select
+              id="ageRange"
+              name="ageRange"
+              value={formData.ageRange || ''}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+            >
+              <option value="">Unselected</option>
+              <option value="18-29">18-29</option>
+              <option value="30-39">30-39</option>
+              <option value="40-49">40-49</option>
+              <option value="50-59">50-59</option>
+              <option value="60-69">60-69</option>
+              <option value="70-79">70-79</option>
+              <option value="80-89">80-89</option>
+              <option value="99+">99+</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="skillLevel">Skill Level</label>
+            <select
+              id="skillLevel"
+              name="skillLevel"
+              value={formData.skillLevel || ''}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+            >
+              <option value="">Unselected</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="openForMatches">Open For Matches</label>
+            <select
+              id="openForMatches"
+              name="openForMatches"
+              value={formData.openForMatches || ''}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+            >
+              <option value="">Unselected</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="casualCompetitive">Play Style</label>
+            <select
+              id="casualCompetitive"
+              name="casualCompetitive"
+              value={formData.casualCompetitive || ''}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+            >
+              <option value="">Unselected</option>
+              <option value="casual">Casual</option>
+              <option value="competitive">Competitive</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="outdoorIndoor">Indoor/Outdoor</label>
+            <select
+              id="outdoorIndoor"
+              name="outdoorIndoor"
+              value={formData.outdoorIndoor || ''}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
+            >
+              <option value="">Unselected</option>
+              <option value="indoor">Indoor</option>
+              <option value="outdoor">Outdoor</option>
+              <option value="Indoor/Outdoor">Both</option>
+            </select>
+          </div>
         </div>
       </div>
 
