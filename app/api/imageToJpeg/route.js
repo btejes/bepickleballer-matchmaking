@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import ffmpeg from 'fluent-ffmpeg';
-import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
 
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+// On Heroku, ffmpeg should be available in the PATH due to the buildpack
+ffmpeg.setFfmpegPath('ffmpeg');
 
 export async function POST(req) {
   try {

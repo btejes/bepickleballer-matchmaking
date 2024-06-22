@@ -34,6 +34,19 @@ const nextConfig = {
   images: {
     domains: ['cdn.pixabay.com', 'bepickleballerbucket.s3.us-west-1.amazonaws.com'],
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Don't attempt to bundle these modules on the client side
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        child_process: false,
+        net: false,
+        tls: false,
+      };
+    }
+    return config;
+  },
 };
 
 export default nextConfig;
