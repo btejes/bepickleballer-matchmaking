@@ -1,15 +1,28 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
+import ffmpeg from 'fluent-ffmpeg';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
-import util from 'util';
-import ffmpeg from 'fluent-ffmpeg';
+import { execSync } from 'child_process';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
-const execPromise = util.promisify(exec);
+// Function to get dimensions of HEIC images using exiftool
+async function getImageDimensions(filePath) {
+  try {
+    const output = execSync(`exiftool -ImageWidth -ImageHeight -j "${filePath}"`).toString().trim();
+    const metadata = JSON.parse(output)[0];
+    return {
+      width: metadata.ImageWidth,
+      height: metadata.ImageHeight
+    };
+  } catch (error) {
+    console.error('Error getting image dimensions:', error);
+    return null;
+  }
+}
 
 // Function to process HEIC images
 async function processHEICImage(file, userId) {
@@ -27,32 +40,30 @@ async function processHEICImage(file, userId) {
   await fs.writeFile(inputPath, imageBuffer);
   console.log("Temporary input file created");
 
-  // Use a filter to automatically rotate the image based on metadata
-  const filterComplex = 'scale=800:800:force_original_aspect_ratio=decrease,autorotate';
-  console.log(`Filter complex for HEIC: ${filterComplex}`);
+  const dimensions = await getImageDimensions(inputPath);
 
   await new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-      .outputOptions([
-        '-filter_complex', filterComplex,
-        '-q:v', '2',
-        '-pix_fmt', 'yuvj420p'
-      ])
-      .output(outputPath)
-      .on('start', (commandLine) => {
-        console.log('FFmpeg process started:', commandLine);
-      })
-      .on('progress', (progress) => {
-        console.log('Processing: ' + progress.percent + '% done');
-      })
-      .on('end', () => {
-        console.log('FFmpeg process completed');
-        resolve();
-      })
-      .on('error', (err) => {
-        console.error('Error during FFmpeg process:', err);
-        reject(err);
-      })
+    let ffmpegCommand = ffmpeg(inputPath);
+    
+    if (dimensions) {
+      const isVertical = dimensions.height > dimensions.width;
+      let filterComplex = isVertical ? 'transpose=1,' : '';
+      filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease,pad=800:800:(ow-iw)/2:(oh-ih)/2';
+
+      ffmpegCommand = ffmpegCommand
+        .outputOptions([
+          '-filter_complex', filterComplex,
+          '-q:v', '2',
+          '-pix_fmt', 'yuvj420p'
+        ]);
+    } else {
+      ffmpegCommand = ffmpegCommand
+        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease,pad=800:800:(ow-iw)/2:(oh-ih)/2']);
+    }
+    
+    ffmpegCommand.output(outputPath)
+      .on('end', resolve)
+      .on('error', reject)
       .run();
   });
 
@@ -68,8 +79,6 @@ async function processHEICImage(file, userId) {
   console.log("HEIC image processing completed successfully");
   return NextResponse.json({ image: base64Image }, { status: 200 });
 }
-
-// ... (rest of the code remains the same)
 
 // Function to process normal images
 async function processNormalImage(file, userId) {
@@ -89,7 +98,7 @@ async function processNormalImage(file, userId) {
 
   await new Promise((resolve, reject) => {
     ffmpeg(inputPath)
-      .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease'])
+      .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease,pad=800:800:(ow-iw)/2:(oh-ih)/2'])
       .output(outputPath)
       .on('start', (commandLine) => {
         console.log('FFmpeg process started:', commandLine);
