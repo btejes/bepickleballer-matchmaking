@@ -5,20 +5,35 @@ import ffmpeg from 'fluent-ffmpeg';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
-import { execSync } from 'child_process';
+import { exec } from 'child_process';
+import util from 'util';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
-// Function to get dimensions and rotation of HEIC images using ffmpeg
+const execPromise = util.promisify(exec);
+
+// Function to get dimensions and orientation of HEIC images using exiftool
 async function getHEICDimensions(filePath) {
   try {
-    const output = execSync(`ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=width,height,rotation -of json "${filePath}"`).toString().trim();
-    const metadata = JSON.parse(output);
-    const stream = metadata.streams[0];
+    const { stdout } = await execPromise(`exiftool -j -ImageWidth -ImageHeight -Orientation "${filePath}"`);
+    const metadata = JSON.parse(stdout)[0];
+    console.log('Extracted metadata:', metadata);
+
+    let width = metadata.ImageWidth;
+    let height = metadata.ImageHeight;
+    const orientation = metadata.Orientation;
+
+    console.log(`Raw dimensions: ${width}x${height}, Orientation: ${orientation}`);
+
+    // Swap width and height if the orientation indicates rotation
+    if (orientation >= 5 && orientation <= 8) {
+      [width, height] = [height, width];
+    }
+
     return {
-      width: stream.width,
-      height: stream.height,
-      rotation: stream.tags && stream.tags.rotation ? parseInt(stream.tags.rotation) : 0
+      width,
+      height,
+      orientation
     };
   } catch (error) {
     console.error('Error getting HEIC image dimensions:', error);
@@ -46,16 +61,18 @@ async function processHEICImage(file, userId) {
   
   let filterComplex = '';
   if (dimensions) {
-    const { width, height, rotation } = dimensions;
-    console.log(`Image dimensions: ${width}x${height}, Rotation: ${rotation}`);
+    const { width, height, orientation } = dimensions;
+    console.log(`Corrected dimensions: ${width}x${height}, Orientation: ${orientation}`);
     
-    // Handle rotation
-    if (rotation === 90 || rotation === 270) {
-      console.log("Applying transpose to correct rotation");
-      filterComplex += `transpose=${rotation === 90 ? '1' : '2'},`;
-    } else if (rotation === 180) {
-      console.log("Applying 180-degree rotation");
-      filterComplex += 'hflip,vflip,';
+    // Handle orientation
+    switch (orientation) {
+      case 2: filterComplex += 'hflip,'; break;
+      case 3: filterComplex += 'rotate=180*PI/180,'; break;
+      case 4: filterComplex += 'vflip,'; break;
+      case 5: filterComplex += 'transpose=1,vflip,'; break;
+      case 6: filterComplex += 'transpose=1,'; break;
+      case 7: filterComplex += 'transpose=2,vflip,'; break;
+      case 8: filterComplex += 'transpose=2,'; break;
     }
   } else {
     console.log("Could not determine image dimensions, proceeding without orientation check");
