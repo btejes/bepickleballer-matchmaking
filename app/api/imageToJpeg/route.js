@@ -43,22 +43,27 @@ export async function POST(req) {
 
     // Use FFmpeg to convert the image
     await new Promise((resolve, reject) => {
-      let ffmpegCommand = ffmpeg(inputPath)
-        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease']);
+      let ffmpegCommand = ffmpeg(inputPath);
 
       // Special handling for HEIC images
       if (file.type === 'image/heic') {
-        ffmpegCommand = ffmpegCommand
+        ffmpegCommand
           .inputOptions(['-vsync', '0'])  // Helps with color issues
-          .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease,in_color_matrix=bt709:out_color_matrix=bt709'])
-          .outputOptions(['-pix_fmt', 'yuvj420p'])  // Ensures correct color format
-          .outputOptions(['-metadata:s:v', 'rotate=0']);  // Fixes rotation issues
+          .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease', 'format=yuv420p', 'auto-orient'])
+          .outputOptions(['-metadata:s:v', 'rotate=0'])  // Fixes rotation issues
+          .output(outputPath)
+          .on('end', resolve)
+          .on('error', reject)
+          .run();
+      } else {
+        // Standard processing for other image types
+        ffmpegCommand
+          .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease'])
+          .output(outputPath)
+          .on('end', resolve)
+          .on('error', reject)
+          .run();
       }
-
-      ffmpegCommand.output(outputPath)
-        .on('end', resolve)
-        .on('error', reject)
-        .run();
     });
 
     // Read the converted image
