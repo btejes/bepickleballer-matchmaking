@@ -142,7 +142,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-4 rounded-3xl shadow-md text-black max-w-2xl mx-auto">
-        <div className="flex">
+        <div className="flex flex-row box-border">
             <div className="w-1/2 p-2 box-border">
                 <label htmlFor="firstName">First Name</label>
                 <input
@@ -361,6 +361,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
             </button>
         </div>
     </form>
+
 
 
 
