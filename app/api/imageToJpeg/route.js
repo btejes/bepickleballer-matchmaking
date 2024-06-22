@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import sharp from 'sharp';
+import ffmpeg from 'fluent-ffmpeg';
+import { Readable } from 'stream';
 
 export async function POST(req) {
   try {
@@ -26,7 +28,14 @@ export async function POST(req) {
       return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
     }
 
-    const imageBuffer = Buffer.from(file.buffer, 'base64');
+    let imageBuffer = Buffer.from(file.buffer, 'base64');
+
+    // Convert HEIC to JPEG using ffmpeg
+    if (file.type === 'image/heic') {
+      imageBuffer = await convertHeicToJpeg(imageBuffer);
+    }
+
+    // Use sharp to process the image
     const jpegBuffer = await sharp(imageBuffer)
       .resize({ width: 800, height: 800 })
       .toFormat('jpeg')
@@ -40,4 +49,18 @@ export async function POST(req) {
     console.error('Error processing the image upload:', error);
     return NextResponse.json({ error: 'Failed to process image' }, { status: 500 });
   }
+}
+
+async function convertHeicToJpeg(inputBuffer) {
+  return new Promise((resolve, reject) => {
+    const input = Readable.from(inputBuffer);
+    const output = [];
+
+    ffmpeg(input)
+      .outputFormat('jpeg')
+      .on('data', (chunk) => output.push(chunk))
+      .on('end', () => resolve(Buffer.concat(output)))
+      .on('error', reject)
+      .run();
+  });
 }
