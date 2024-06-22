@@ -145,7 +145,7 @@ const LocalPlay = () => {
           Local Play:  <strong><big>{capitalizeCity(userProfile.city)}</big></strong>
         </div>
       )}
-      <div className="flex-grow w-full flex flex-col items-center justify-center px-4 space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4">
+      <div className="flex-grow w-full flex flex-col items-center justify-center px-4 space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4 overflow-y-auto">
         {currentMatch ? (
           <div className="flex flex-col items-center justify-center space-y-4 lg:space-y-0 lg:flex-row lg:space-x-4">
             <button
