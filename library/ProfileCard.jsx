@@ -17,7 +17,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
   }, [profile.profileImage]);
 
   useEffect(() => {
-    if (profile.userId) {
+    if (profile.userId && typeof window !== 'undefined') {
       fetchAverageRating(profile.userId);
     }
   }, [profile.userId]);
@@ -40,21 +40,19 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
   }, [statusMessage]);
 
   const fetchAverageRating = async (userId) => {
-    if (typeof window !== 'undefined') {
-      try {
-        const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`, {
-          credentials: 'include',
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setAverageRating(data.averageRating);
-        } else {
-          setAverageRating('N/A');
-        }
-      } catch (error) {
-        console.error('Error fetching average rating:', error);
+    try {
+      const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`, {
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAverageRating(data.averageRating);
+      } else {
         setAverageRating('N/A');
       }
+    } catch (error) {
+      console.error('Error fetching average rating:', error);
+      setAverageRating('N/A');
     }
   };
 
