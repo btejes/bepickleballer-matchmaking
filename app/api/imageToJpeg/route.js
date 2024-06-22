@@ -49,12 +49,11 @@ export async function POST(req) {
       
       if (file.type === 'image/heic') {
         ffmpegCommand = ffmpegCommand
-          .inputOptions(['-ignore_minor_errors'])
           .outputOptions([
             '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
             '-q:v', '2',  // High quality setting
             '-pix_fmt', 'yuvj420p',  // Use full color range
-            '-auto-orient'  // Automatically orient the image based on metadata
+            '-metadata:s:v', 'rotate=0'  // Clear rotation metadata
           ]);
       } else {
         ffmpegCommand = ffmpegCommand
