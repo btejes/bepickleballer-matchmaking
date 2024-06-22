@@ -4,12 +4,12 @@ import { cookies } from 'next/headers';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
-import { exec } from 'child_process';
 import util from 'util';
 import ffmpeg from 'fluent-ffmpeg';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
+const execPromise = util.promisify(exec);
 
 // Function to process HEIC images
 async function processHEICImage(file, userId) {
