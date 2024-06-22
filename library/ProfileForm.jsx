@@ -258,8 +258,8 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
               >
                   <option value="">Unselected</option>
-                  <option value="casual">Casual</option>
-                  <option value="competitive">Competitive</option>
+                  <option value="Casual">Casual</option>
+                  <option value="Competitive">Competitive</option>
               </select>
               <label htmlFor="outdoorIndoor">Indoor/Outdoor</label>
               <select
@@ -270,8 +270,8 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1"
               >
                   <option value="">Unselected</option>
-                  <option value="indoor">Indoor</option>
-                  <option value="outdoor">Outdoor</option>
+                  <option value="Indoor">Indoor</option>
+                  <option value="Outdoor">Outdoor</option>
                   <option value="Indoor/Outdoor">Both</option>
               </select>
           </div>

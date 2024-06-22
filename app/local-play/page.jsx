@@ -281,8 +281,8 @@ const LocalPlay = () => {
           <option value="">
             Preferred Hand
           </option>
-          <option value="Right">Right</option>
-          <option value="Left">Left</option>
+          <option value="Rightie">Rightie</option>
+          <option value="Leftie">Leftie</option>
         </select>
         <select
           name="preferredCourtType"
@@ -295,6 +295,7 @@ const LocalPlay = () => {
           </option>
           <option value="Outdoor">Outdoor</option>
           <option value="Indoor">Indoor</option>
+          <option value="Indoor/Outdoor">OuIndoor/Outdoortdoor</option>
         </select>
         <select
           name="preferredPlayStyle"
