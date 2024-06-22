@@ -74,18 +74,14 @@ export async function POST(req) {
       const dimensions = await getImageDimensions(inputPath);
       
       if (dimensions) {
-        const isVertical = dimensions.height > dimensions.width;
-        console.log(`Image orientation: ${isVertical ? 'Vertical' : 'Horizontal'}`);
-        console.log(`Original dimensions: ${dimensions.width}x${dimensions.height}`);
-        
-        if (isVertical) {
-          console.log("Applying transpose for vertical image");
-          filterComplex = 'transpose=1,';
-        } else {
-          console.log("No transpose needed for horizontal image");
-        }
+        const targetSize = 800;
+        const scaleFactor = Math.max(targetSize / dimensions.width, targetSize / dimensions.height);
+        const scaledWidth = Math.round(dimensions.width * scaleFactor);
+        const scaledHeight = Math.round(dimensions.height * scaleFactor);
+        const xOffset = (scaledWidth - targetSize) / 2;
+        const yOffset = (scaledHeight - targetSize) / 2;
 
-        filterComplex += `scale=800:-1,crop=800:800:0:0`;
+        filterComplex += `scale=${scaledWidth}:${scaledHeight},crop=${targetSize}:${targetSize}:${xOffset}:${yOffset}`;
       } else {
         console.log("Could not determine image dimensions, using default scaling");
         filterComplex += `scale=800:-1,crop=800:800:0:0`;
