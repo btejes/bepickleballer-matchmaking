@@ -45,11 +45,14 @@ export async function POST(req) {
     // Use FFmpeg to convert the image
     await new Promise((resolve, reject) => {
       let ffmpegCommand = ffmpeg(inputPath)
-        .inputOptions(['-i', inputPath])
-        .outputOptions([
-          '-vf', 'autorotate,scale=800:800:force_original_aspect_ratio=decrease',
-          '-max_muxing_queue_size', '9999'
-        ]);
+        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease']);
+      
+      // Special handling for HEIC images
+      if (file.type === 'image/heic') {
+        ffmpegCommand = ffmpegCommand
+          .inputOptions(['-vsync', '0'])  // Helps with color issues
+          .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease,transpose=0']);  // Rotates 90 degrees clockwise
+      }
       
       ffmpegCommand.output(outputPath)
         .on('end', resolve)
