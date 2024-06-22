@@ -203,7 +203,11 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
             width={320}
             height={320}
             onError={(e) => { e.target.src = `${apiBasePath}/blank-profile-picture.svg`; }}
-            onClick={isProfilePage ? () => document.getElementById('imageUpload').click() : null}
+            onClick={isProfilePage ? () => {
+              if (typeof window !== 'undefined') {
+                document.getElementById('imageUpload').click();
+              }
+            } : null}
           />
           {isProfilePage && typeof window !== 'undefined' && (
             <input
