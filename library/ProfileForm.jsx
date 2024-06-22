@@ -295,6 +295,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                   </small>
               </div>
           </div>
+          <br></br>
           <div className="col-span-2 flex justify-left">
               <small className="text-gray-500">
                   Only accepted matches see phone and email below
