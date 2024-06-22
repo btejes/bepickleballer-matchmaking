@@ -26,12 +26,12 @@ export async function POST(req) {
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
-    // console.log("\nfile type:", file.type, "\n");
-    // const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
-    // if (!allowedTypes.includes(file.type)) {
-    //   console.log("\nfile type:", file.type, "\n");
-    //   return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
-    // }
+    console.log("\nfile type:", file.type, "\n");
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
+    if (!allowedTypes.includes(file.type)) {
+      console.log("\nfile type:", file.type, "\n");
+      return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
+    }
 
     const imageBuffer = Buffer.from(file.buffer, 'base64');
 

@@ -57,7 +57,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image.heic'];
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
 
     if (file) {
       if (!allowedTypes.includes(file.type)) {
