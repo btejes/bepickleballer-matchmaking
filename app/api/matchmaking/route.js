@@ -40,7 +40,10 @@ export async function POST(request) {
       ageRange: { $exists: true, $ne: null, $ne: '' },
       skillLevel: { $exists: true, $ne: null, $ne: '' },
       aboutYou: { $exists: true, $ne: null, $ne: '' },
-      openForMatches: { $ne: "no", $ne: '' }
+      openForMatches: { $ne: "no", $ne: '' },
+      rightieLeftie: { $exists: true, $ne: null, $ne: ''},
+      outdoorIndoor: { $exists: true, $ne: null, $ne: ''},
+      casualCompetitive: { $exists: true, $ne: null, $ne: ''}
     };
 
     if (filters.preferredGender) {
