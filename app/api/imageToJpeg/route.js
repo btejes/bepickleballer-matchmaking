@@ -5,21 +5,20 @@ import ffmpeg from 'fluent-ffmpeg';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
+import { execSync } from 'child_process';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
 async function getImageDimensions(filePath) {
   try {
-    return new Promise((resolve, reject) => {
-      ffmpeg.ffprobe(filePath, (err, metadata) => {
-        if (err) {
-          reject(err);
-        } else {
-          const { width, height } = metadata.streams[0];
-          resolve({ width, height });
-        }
-      });
-    });
+    console.log(`Getting dimensions for file: ${filePath}`);
+    const output = execSync(`exiftool -ImageWidth -ImageHeight -j "${filePath}"`).toString().trim();
+    const metadata = JSON.parse(output)[0];
+    console.log(`Image dimensions: ${JSON.stringify(metadata)}`);
+    return {
+      width: metadata.ImageWidth,
+      height: metadata.ImageHeight
+    };
   } catch (error) {
     console.error('Error getting image dimensions:', error);
     return null;
@@ -30,7 +29,7 @@ export async function POST(req) {
   try {
     console.log("Starting image processing...");
 
-    // Authorization code (unchanged)
+    // Authorization code
     const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
       console.log("Unauthorized access attempt");
@@ -75,19 +74,20 @@ export async function POST(req) {
       const dimensions = await getImageDimensions(inputPath);
       
       if (dimensions) {
-        const targetSize = 800;
-        const scaleFactor = Math.max(targetSize / dimensions.width, targetSize / dimensions.height);
-        const scaledWidth = Math.round(dimensions.width * scaleFactor);
-        const scaledHeight = Math.round(dimensions.height * scaleFactor);
-        const xOffset = (scaledWidth - targetSize) / 2;
-        const yOffset = (scaledHeight - targetSize) / 2;
-
-        filterComplex += `scale=${scaledWidth}:${scaledHeight},crop=${targetSize}:${targetSize}:${xOffset}:${yOffset}`;
+        const isVertical = dimensions.height > dimensions.width;
+        console.log(`Image orientation: ${isVertical ? 'Vertical' : 'Horizontal'}`);
+        
+        if (isVertical) {
+          console.log("Applying transpose for vertical image");
+          filterComplex = 'transpose=1,';
+        } else {
+          console.log("No transpose needed for horizontal image");
+        }
       } else {
-        console.log("Could not determine image dimensions, using default scaling");
-        filterComplex += `scale=800:800,crop=800:800:0:0`;
+        console.log("Could not determine image dimensions, proceeding without orientation check");
       }
 
+      filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease';
       console.log(`Final filter complex for HEIC: ${filterComplex}`);
 
       ffmpegCommand = ffmpegCommand
@@ -99,7 +99,7 @@ export async function POST(req) {
     } else {
       console.log("Processing non-HEIC image");
       ffmpegCommand = ffmpegCommand
-        .outputOptions(['-vf', `scale=800:800,crop=800:800:0:0`]);
+        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease']);
     }
 
     console.log("Starting FFmpeg conversion");
