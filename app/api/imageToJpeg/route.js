@@ -26,11 +26,10 @@ export async function POST(req) {
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
-
-    console.log("File info:", { name: file.name, type: file.type, size: file.size });
-
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+    console.log("\nfile type:", file.type, "\n");
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
     if (!allowedTypes.includes(file.type)) {
+      console.log("\nfile type:", file.type, "\n");
       return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
     }
 
@@ -38,7 +37,7 @@ export async function POST(req) {
 
     // Create temporary input and output files
     const tempDir = os.tmpdir();
-    const inputPath = path.join(tempDir, `input_${Date.now()}${path.extname(file.name) || ''}`);
+    const inputPath = path.join(tempDir, `input_${Date.now()}`);
     const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
 
     await fs.writeFile(inputPath, imageBuffer);
@@ -46,20 +45,10 @@ export async function POST(req) {
     // Use FFmpeg to convert the image
     await new Promise((resolve, reject) => {
       ffmpeg(inputPath)
-        .outputOptions([
-          '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
-          '-q:v', '2',
-          '-metadata:s:v', 'rotate=0'
-        ])
+        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease'])
         .output(outputPath)
-        .on('start', (commandLine) => {
-          console.log('FFmpeg command:', commandLine);
-        })
         .on('end', resolve)
-        .on('error', (err) => {
-          console.error('FFmpeg error:', err);
-          reject(err);
-        })
+        .on('error', reject)
         .run();
     });
 
@@ -74,6 +63,6 @@ export async function POST(req) {
     return NextResponse.json({ image: base64Image }, { status: 200 });
   } catch (error) {
     console.error('Error processing the image upload:', error);
-    return NextResponse.json({ error: 'Failed to process image: ' + error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to process image' }, { status: 500 });
   }
 }
