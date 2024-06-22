@@ -5,20 +5,21 @@ import ffmpeg from 'fluent-ffmpeg';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
-import { execSync } from 'child_process';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
 async function getImageDimensions(filePath) {
   try {
-    console.log(`Getting dimensions for file: ${filePath}`);
-    const output = execSync(`exiftool -ImageWidth -ImageHeight -j "${filePath}"`).toString().trim();
-    const metadata = JSON.parse(output)[0];
-    console.log(`Image dimensions: ${JSON.stringify(metadata)}`);
-    return {
-      width: metadata.ImageWidth,
-      height: metadata.ImageHeight
-    };
+    return new Promise((resolve, reject) => {
+      ffmpeg.ffprobe(filePath, (err, metadata) => {
+        if (err) {
+          reject(err);
+        } else {
+          const { width, height } = metadata.streams[0];
+          resolve({ width, height });
+        }
+      });
+    });
   } catch (error) {
     console.error('Error getting image dimensions:', error);
     return null;
