@@ -48,7 +48,7 @@ async function processHEICImage(file, userId) {
     if (dimensions) {
       const isVertical = dimensions.height > dimensions.width;
       let filterComplex = isVertical ? 'transpose=1,' : '';
-      filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease,pad=800:800:(ow-iw)/2:(oh-ih)/2';
+      filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease';
 
       ffmpegCommand = ffmpegCommand
         .outputOptions([
@@ -58,7 +58,7 @@ async function processHEICImage(file, userId) {
         ]);
     } else {
       ffmpegCommand = ffmpegCommand
-        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease,pad=800:800:(ow-iw)/2:(oh-ih)/2']);
+        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease']);
     }
     
     ffmpegCommand.output(outputPath)
@@ -98,7 +98,7 @@ async function processNormalImage(file, userId) {
 
   await new Promise((resolve, reject) => {
     ffmpeg(inputPath)
-      .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease,pad=800:800:(ow-iw)/2:(oh-ih)/2'])
+      .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease'])
       .output(outputPath)
       .on('start', (commandLine) => {
         console.log('FFmpeg process started:', commandLine);
