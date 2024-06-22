@@ -44,20 +44,52 @@ export async function POST(req) {
 
     // Use FFmpeg to convert the image
     await new Promise((resolve, reject) => {
-      let ffmpegCommand = ffmpeg(inputPath)
-        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease']);
+      let ffmpegCommand = ffmpeg(inputPath);
       
-      // Special handling for HEIC images
       if (file.type === 'image/heic') {
-        ffmpegCommand = ffmpegCommand
-          .inputOptions(['-vsync', '0'])  // Helps with color issues
-          .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease,transpose=0']);  // Rotates 90 degrees clockwise
+        // For HEIC images, we'll use a two-step process
+        const tempOutputPath = path.join(tempDir, `temp_output_${Date.now()}.jpg`);
+        
+        // Step 1: Convert HEIC to JPEG without any transformations
+        ffmpegCommand
+          .inputOptions(['-vsync', '0'])
+          .output(tempOutputPath)
+          .on('end', () => {
+            // Step 2: Get the orientation of the converted image and apply appropriate scaling
+            ffmpeg.ffprobe(tempOutputPath, (err, metadata) => {
+              if (err) {
+                reject(err);
+                return;
+              }
+              
+              const width = metadata.streams[0].width;
+              const height = metadata.streams[0].height;
+              const isLandscape = width > height;
+              
+              ffmpeg(tempOutputPath)
+                .outputOptions([
+                  '-vf', `scale=${isLandscape ? '800:-1' : '-1:800'}:force_original_aspect_ratio=decrease`,
+                  '-metadata:s:v', 'rotate=0'
+                ])
+                .output(outputPath)
+                .on('end', () => {
+                  fs.unlink(tempOutputPath).then(resolve).catch(reject);
+                })
+                .on('error', reject)
+                .run();
+            });
+          })
+          .on('error', reject)
+          .run();
+      } else {
+        // For non-HEIC images, use the original processing
+        ffmpegCommand
+          .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease'])
+          .output(outputPath)
+          .on('end', resolve)
+          .on('error', reject)
+          .run();
       }
-      
-      ffmpegCommand.output(outputPath)
-        .on('end', resolve)
-        .on('error', reject)
-        .run();
     });
 
     // Read the converted image
