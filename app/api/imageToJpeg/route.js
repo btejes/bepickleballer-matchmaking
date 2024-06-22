@@ -1,40 +1,52 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import ffmpeg from 'fluent-ffmpeg';
+
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
 import { exec } from 'child_process';
 import util from 'util';
+import ffmpeg from 'fluent-ffmpeg';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
 const execPromise = util.promisify(exec);
 
-// Function to get dimensions and orientation of HEIC images using exiftool
+// Function to get dimensions and rotation of HEIC images using ffprobe
 async function getHEICDimensions(filePath) {
   try {
-    const { stdout } = await execPromise(`exiftool -j -ImageWidth -ImageHeight -Orientation "${filePath}"`);
-    const metadata = JSON.parse(stdout)[0];
+    const { stdout } = await execPromise(`ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=width,height,side_data_list -of json "${filePath}"`);
+    const metadata = JSON.parse(stdout);
     console.log('Extracted metadata:', metadata);
 
-    let width = metadata.ImageWidth;
-    let height = metadata.ImageHeight;
-    const orientation = metadata.Orientation;
+    const stream = metadata.streams[0];
+    let width = stream.width;
+    let height = stream.height;
+    let rotation = 0;
 
-    console.log(`Raw dimensions: ${width}x${height}, Orientation: ${orientation}`);
+    // Check for rotation in side_data_list
+    if (stream.side_data_list && stream.side_data_list.length > 0) {
+      const rotationData = stream.side_data_list.find(data => data.side_data_type === 'Display Matrix');
+      if (rotationData) {
+        // Extract rotation from the display matrix
+        const matrix = rotationData.displaymatrix;
+        if (matrix[0] === 0 && matrix[4] === 0) {
+          rotation = (matrix[1] === 1 && matrix[3] === -1) ? 90 : 270;
+        } else if (matrix[0] === -1 && matrix[4] === -1) {
+          rotation = 180;
+        }
+      }
+    }
 
-    // Swap width and height if the orientation indicates rotation
-    if (orientation >= 5 && orientation <= 8) {
+    console.log(`Raw dimensions: ${width}x${height}, Rotation: ${rotation}`);
+
+    // Swap width and height if rotated 90 or 270 degrees
+    if (rotation === 90 || rotation === 270) {
       [width, height] = [height, width];
     }
 
-    return {
-      width,
-      height,
-      orientation
-    };
+    return { width, height, rotation };
   } catch (error) {
     console.error('Error getting HEIC image dimensions:', error);
     return null;
@@ -61,18 +73,16 @@ async function processHEICImage(file, userId) {
   
   let filterComplex = '';
   if (dimensions) {
-    const { width, height, orientation } = dimensions;
-    console.log(`Corrected dimensions: ${width}x${height}, Orientation: ${orientation}`);
+    const { width, height, rotation } = dimensions;
+    console.log(`Corrected dimensions: ${width}x${height}, Rotation: ${rotation}`);
     
-    // Handle orientation
-    switch (orientation) {
-      case 2: filterComplex += 'hflip,'; break;
-      case 3: filterComplex += 'rotate=180*PI/180,'; break;
-      case 4: filterComplex += 'vflip,'; break;
-      case 5: filterComplex += 'transpose=1,vflip,'; break;
-      case 6: filterComplex += 'transpose=1,'; break;
-      case 7: filterComplex += 'transpose=2,vflip,'; break;
-      case 8: filterComplex += 'transpose=2,'; break;
+    // Handle rotation
+    if (rotation === 90) {
+      filterComplex += 'transpose=1,';
+    } else if (rotation === 180) {
+      filterComplex += 'transpose=2,transpose=2,';
+    } else if (rotation === 270) {
+      filterComplex += 'transpose=2,';
     }
   } else {
     console.log("Could not determine image dimensions, proceeding without orientation check");
