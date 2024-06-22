@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import sharp from 'sharp';
 import ffmpeg from 'fluent-ffmpeg';
-import { Readable } from 'stream';
+import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
+import { promises as fs } from 'fs';
+import os from 'os';
+import path from 'path';
+
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 export async function POST(req) {
   try {
@@ -28,39 +32,36 @@ export async function POST(req) {
       return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
     }
 
-    let imageBuffer = Buffer.from(file.buffer, 'base64');
+    const imageBuffer = Buffer.from(file.buffer, 'base64');
 
-    // Convert HEIC to JPEG using ffmpeg
-    if (file.type === 'image/heic') {
-      imageBuffer = await convertHeicToJpeg(imageBuffer);
-    }
+    // Create temporary input and output files
+    const tempDir = os.tmpdir();
+    const inputPath = path.join(tempDir, `input_${Date.now()}`);
+    const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
 
-    // Use sharp to process the image
-    const jpegBuffer = await sharp(imageBuffer)
-      .resize({ width: 800, height: 800 })
-      .toFormat('jpeg')
-      .jpeg({ quality: 80 })
-      .toBuffer();
+    await fs.writeFile(inputPath, imageBuffer);
 
-    const base64Image = jpegBuffer.toString('base64');
+    // Use FFmpeg to convert the image
+    await new Promise((resolve, reject) => {
+      ffmpeg(inputPath)
+        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease'])
+        .output(outputPath)
+        .on('end', resolve)
+        .on('error', reject)
+        .run();
+    });
+
+    // Read the converted image
+    const convertedImageBuffer = await fs.readFile(outputPath);
+    const base64Image = convertedImageBuffer.toString('base64');
+
+    // Clean up temporary files
+    await fs.unlink(inputPath);
+    await fs.unlink(outputPath);
 
     return NextResponse.json({ image: base64Image }, { status: 200 });
   } catch (error) {
     console.error('Error processing the image upload:', error);
     return NextResponse.json({ error: 'Failed to process image' }, { status: 500 });
   }
-}
-
-async function convertHeicToJpeg(inputBuffer) {
-  return new Promise((resolve, reject) => {
-    const input = Readable.from(inputBuffer);
-    const output = [];
-
-    ffmpeg(input)
-      .outputFormat('jpeg')
-      .on('data', (chunk) => output.push(chunk))
-      .on('end', () => resolve(Buffer.concat(output)))
-      .on('error', reject)
-      .run();
-  });
 }
