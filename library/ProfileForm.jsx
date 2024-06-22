@@ -350,7 +350,7 @@ const ProfileForm = ({ profile, onProfileChange, onProfileSave, isUploading }) =
                 disabled={!isFormReady || isSaving || isUploading}
                 style={{
                     width: '50%',
-                    backgroundColor: !isFormReady || isSaving or isUploading ? 'grey' : 'blue',
+                    backgroundColor: !isFormReady || isSaving || isUploading ? 'grey' : 'blue',
                     color: 'white',
                     padding: '10px',
                     borderRadius: '25px',
