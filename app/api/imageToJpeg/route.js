@@ -1,27 +1,20 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import ffmpeg from 'fluent-ffmpeg';
+import heic2any from 'heic2any';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
-import { execSync } from 'child_process';
 
-ffmpeg.setFfmpegPath('ffmpeg');
-
-// Function to get dimensions of HEIC images using exiftool
-async function getImageDimensions(filePath) {
-  try {
-    const output = execSync(`exiftool -ImageWidth -ImageHeight -j "${filePath}"`).toString().trim();
-    const metadata = JSON.parse(output)[0];
-    return {
-      width: metadata.ImageWidth,
-      height: metadata.ImageHeight
-    };
-  } catch (error) {
-    console.error('Error getting image dimensions:', error);
-    return null;
-  }
+// Function to convert HEIC to JPG using heic2any
+async function convertHeicToJpg(imageBuffer) {
+  const blob = new Blob([imageBuffer], { type: 'image/heic' });
+  const resultBlob = await heic2any({
+    blob: blob,
+    toType: 'image/jpeg',
+  });
+  const arrayBuffer = await resultBlob.arrayBuffer();
+  return Buffer.from(arrayBuffer);
 }
 
 // Function to process HEIC images
@@ -31,52 +24,12 @@ async function processHEICImage(file, userId) {
   const imageBuffer = Buffer.from(file.buffer, 'base64');
   console.log(`Image buffer size: ${imageBuffer.length} bytes`);
 
-  const tempDir = os.tmpdir();
-  const inputPath = path.join(tempDir, `input_${Date.now()}.heic`);
-  const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
-  console.log(`Input path: ${inputPath}`);
-  console.log(`Output path: ${outputPath}`);
-
-  await fs.writeFile(inputPath, imageBuffer);
-  console.log("Temporary input file created");
-
-  const dimensions = await getImageDimensions(inputPath);
-
-  await new Promise((resolve, reject) => {
-    let ffmpegCommand = ffmpeg(inputPath);
-    
-    if (dimensions) {
-      const isVertical = dimensions.height > dimensions.width;
-      let filterComplex = isVertical ? 'transpose=1,' : '';
-      filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease';
-
-      ffmpegCommand = ffmpegCommand
-        .outputOptions([
-          '-filter_complex', filterComplex,
-          '-q:v', '2',
-          '-pix_fmt', 'yuvj420p'
-        ]);
-    } else {
-      ffmpegCommand = ffmpegCommand
-        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease']);
-    }
-    
-    ffmpegCommand.output(outputPath)
-      .on('end', resolve)
-      .on('error', reject)
-      .run();
-  });
-
-  console.log("Reading converted image");
-  const convertedImageBuffer = await fs.readFile(outputPath);
-  const base64Image = convertedImageBuffer.toString('base64');
+  const convertedImageBuffer = await convertHeicToJpg(imageBuffer);
   console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
 
-  console.log("Cleaning up temporary files");
-  await fs.unlink(inputPath);
-  await fs.unlink(outputPath);
-
+  const base64Image = convertedImageBuffer.toString('base64');
   console.log("HEIC image processing completed successfully");
+
   return NextResponse.json({ image: base64Image }, { status: 200 });
 }
 
