@@ -29,6 +29,7 @@ export async function POST(req) {
 
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
     if (!allowedTypes.includes(file.type)) {
+      console.log("\nfile type:", file.type, "\mn");
       return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
     }
 
