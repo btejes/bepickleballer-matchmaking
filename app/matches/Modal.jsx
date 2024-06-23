@@ -20,15 +20,19 @@ const Modal = ({ match, onClose, onUnmatch }) => {
       console.log(`Parsed match creation time: ${matchCreationTime}`);
       console.log(`Current time: ${currentTime}`);
 
-      const elapsedTime = currentTime - matchCreationTime;
-      const elapsedTimeInMinutes = elapsedTime / (1000 * 60);
+      if (!isNaN(matchCreationTime)) {
+        const elapsedTime = currentTime - matchCreationTime;
+        const elapsedTimeInMinutes = elapsedTime / (1000 * 60);
 
-      console.log(`Elapsed time in minutes: ${elapsedTimeInMinutes}`);
+        console.log(`Elapsed time in minutes: ${elapsedTimeInMinutes}`);
 
-      if (elapsedTimeInMinutes >= ratingMinimumMinutes) {
-        setCanRate(true);
+        if (elapsedTimeInMinutes >= ratingMinimumMinutes) {
+          setCanRate(true);
+        } else {
+          setCanRate(false);
+        }
       } else {
-        setCanRate(false);
+        console.error('Invalid date:', match.createdAt);
       }
     };
 

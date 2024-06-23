@@ -39,7 +39,8 @@ export const GET = async (req) => {
           matchId: entry._id, // Include match ID
           loggedInUserId: decoded._id, // Include logged-in user ID for reference
           user1Id: entry.user1Id,
-          user2Id: entry.user2Id
+          user2Id: entry.user2Id,
+          createdAt: entry.createdAt // Include the createdAt field
         };
       })
     );
