@@ -15,6 +15,7 @@ const execPromise = promisify(exec);
 
 async function getHEICDimensions(filePath) {
   try {
+    console.log(`Running ffprobe on file: ${filePath}`);
     const { stdout } = await execPromise(`ffprobe -v quiet -print_format json -show_format -show_streams "${filePath}"`);
     const metadata = JSON.parse(stdout);
 
