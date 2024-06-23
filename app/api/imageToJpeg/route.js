@@ -1,49 +1,10 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import ffmpeg from 'fluent-ffmpeg';
+import sharp from 'sharp';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
-
-ffmpeg.setFfmpegPath('ffmpeg');
-
-import { promisify } from 'util';
-import { exec } from 'child_process';
-
-const execPromise = promisify(exec);
-
-async function getHEICDimensions(filePath) {
-  try {
-    console.log(`Running ffprobe on file: ${filePath}`);
-    const { stdout } = await execPromise(`ffprobe -v quiet -print_format json -show_format -show_streams "${filePath}"`);
-    const metadata = JSON.parse(stdout);
-
-    // Print out the entire metadata for debugging
-    console.log('ffprobe metadata:', JSON.stringify(metadata, null, 2));
-
-    // Find the video stream with the largest dimensions
-    const videoStreams = metadata.streams.filter(stream => stream.codec_type === 'video');
-    if (videoStreams.length === 0) {
-      throw new Error('No video streams found in HEIC file');
-    }
-    const mainStream = videoStreams.reduce((largest, current) => {
-      const largestArea = largest.width * largest.height;
-      const currentArea = current.width * current.height;
-      return currentArea > largestArea ? current : largest;
-    });
-
-    console.log(`HEIC Dimensions: ${mainStream.width}x${mainStream.height}`);
-    return {
-      width: mainStream.width,
-      height: mainStream.height,
-      rotation: mainStream.tags && mainStream.tags.rotate ? parseInt(mainStream.tags.rotate) : 0
-    };
-  } catch (error) {
-    console.error('Error getting HEIC dimensions:', error);
-    throw error;
-  }
-}
 
 async function processHEICImage(file, userId) {
   console.log("Processing HEIC image");
@@ -61,53 +22,20 @@ async function processHEICImage(file, userId) {
     await fs.writeFile(inputPath, imageBuffer);
     console.log("Temporary input file created");
 
-    const { width, height, rotation } = await getHEICDimensions(inputPath);
-    console.log(`Image dimensions: ${width}x${height}, Rotation: ${rotation} degrees`);
+    const metadata = await sharp(inputPath).metadata();
+    console.log('Image metadata:', metadata);
 
-    const isVertical = height > width;
+    const rotated = metadata.orientation >= 5 && metadata.orientation <= 8;
 
-    await new Promise((resolve, reject) => {
-      let ffmpegCommand = ffmpeg(inputPath)
-        .inputOptions(['-c:v', 'hevc'])
-        .outputOptions([
-          '-qscale:v', '2',
-          '-pix_fmt', 'yuvj420p'  // Preserve full color range
-        ]);
+    await sharp(inputPath)
+      .rotate() // Automatically rotate based on EXIF data
+      .resize(800, 800, {
+        fit: sharp.fit.inside,
+        withoutEnlargement: true,
+      })
+      .toFile(outputPath);
 
-      // Handle rotation
-      if (isVertical && rotation === 0) {
-        ffmpegCommand = ffmpegCommand.videoFilters('transpose=1');  // Rotate 90 degrees clockwise
-      } else if (rotation === 90) {
-        ffmpegCommand = ffmpegCommand.videoFilters('transpose=2');  // Rotate 90 degrees counterclockwise
-      } else if (rotation === 180) {
-        ffmpegCommand = ffmpegCommand.videoFilters('transpose=2,transpose=2');  // Rotate 180 degrees
-      } else if (rotation === 270) {
-        ffmpegCommand = ffmpegCommand.videoFilters('transpose=1');  // Rotate 90 degrees clockwise
-      }
-
-      // Apply scaling
-      ffmpegCommand = ffmpegCommand.videoFilters('scale=800:800:force_original_aspect_ratio=decrease');
-
-      ffmpegCommand
-        .output(outputPath)
-        .on('start', (commandLine) => {
-          console.log('FFmpeg process started:', commandLine);
-        })
-        .on('progress', (progress) => {
-          console.log('Processing: ' + progress.percent + '% done');
-        })
-        .on('end', () => {
-          console.log('HEIC to JPEG conversion completed');
-          resolve();
-        })
-        .on('error', (err, stdout, stderr) => {
-          console.error('FFmpeg error:', err);
-          console.error('FFmpeg stdout:', stdout);
-          console.error('FFmpeg stderr:', stderr);
-          reject(err);
-        })
-        .run();
-    });
+    console.log("HEIC to JPEG conversion completed");
 
     console.log("Reading converted image");
     const convertedImageBuffer = await fs.readFile(outputPath);
@@ -141,30 +69,12 @@ async function processNormalImage(file, userId) {
   await fs.writeFile(inputPath, imageBuffer);
   console.log("Temporary input file created");
 
-  await new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-      .outputOptions([
-        '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
-        '-pix_fmt', 'yuvj420p',
-        '-vf', 'colorlevels=rimin=0:gimin=0:bimin=0'
-      ])
-      .output(outputPath)
-      .on('start', (commandLine) => {
-        console.log('FFmpeg process started:', commandLine);
-      })
-      .on('progress', (progress) => {
-        console.log('Processing: ' + progress.percent + '% done');
-      })
-      .on('end', () => {
-        console.log('FFmpeg process completed');
-        resolve();
-      })
-      .on('error', (err) => {
-        console.error('Error during FFmpeg process:', err);
-        reject(err);
-      })
-      .run();
-  });
+  await sharp(inputPath)
+    .resize(800, 800, {
+      fit: sharp.fit.inside,
+      withoutEnlargement: true,
+    })
+    .toFile(outputPath);
 
   console.log("Reading converted image");
   const convertedImageBuffer = await fs.readFile(outputPath);
@@ -202,19 +112,20 @@ export async function POST(req) {
     }
 
     console.log(`File type: ${file.type}`);
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/heic'];
+
     if (!allowedTypes.includes(file.type)) {
-      console.log(`Unsupported file type: ${file.type}`);
-      return NextResponse.json({ error: `${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC` }, { status: 400 });
+      console.log("Unsupported file type");
+      return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 });
     }
 
     if (file.type === 'image/heic') {
-      return await processHEICImage(file, userId);
+      return processHEICImage(file, userId);
     } else {
-      return await processNormalImage(file, userId);
+      return processNormalImage(file, userId);
     }
   } catch (error) {
-    console.error('Error processing the image upload:', error);
-    return NextResponse.json({ error: 'Failed to process image' }, { status: 500 });
+    console.error('Error during image processing:', error);
+    return NextResponse.json({ error: 'Failed to process image', details: error.message }, { status: 500 });
   }
 }
