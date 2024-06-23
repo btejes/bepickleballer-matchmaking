@@ -47,7 +47,6 @@ async function processHEICImage(file, userId) {
         .outputOptions([
           '-qscale:v', '2',  // High quality
           '-vf', 'scale=800:-1',  // Scale width to 800, maintain aspect ratio
-          '-auto-orient',  // Automatically rotate based on metadata
         ])
         .output(outputPath)
         .on('start', (commandLine) => {
