@@ -5,10 +5,12 @@ import ffmpeg from 'fluent-ffmpeg';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
-
+import decode from 'heic-decode';
 
 
 ffmpeg.setFfmpegPath('ffmpeg');
+
+
 
 
 
