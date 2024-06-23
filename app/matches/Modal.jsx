@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProfileCard from '@/library/ProfileCard';
 import RatingModal from './RatingModal';
 import ConfirmationDialog from './ConfirmationDialog';
@@ -7,7 +7,28 @@ const Modal = ({ match, onClose, onUnmatch }) => {
   const [showRating, setShowRating] = useState(false);
   const [existingRating, setExistingRating] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [canRate, setCanRate] = useState(false);
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  const ratingMinimumMinutes = process.env.NEXT_PUBLIC_RATING_MINIMUM_MINUTES || 1440; // Default to 1440 minutes (24 hours) if not set
+
+  useEffect(() => {
+    const checkElapsedTime = () => {
+      const matchCreationTime = new Date(match.createdAt);
+      const currentTime = new Date();
+      const elapsedTime = currentTime - matchCreationTime;
+      const elapsedTimeInMinutes = elapsedTime / (1000 * 60);
+
+      console.log(`Elapsed time in minutes: ${elapsedTimeInMinutes}`);
+
+      if (elapsedTimeInMinutes >= ratingMinimumMinutes) {
+        setCanRate(true);
+      } else {
+        setCanRate(false);
+      }
+    };
+
+    checkElapsedTime();
+  }, [match.createdAt, ratingMinimumMinutes]);
 
   const handleUnmatchClick = () => {
     setShowConfirmation(true);
@@ -84,9 +105,11 @@ const Modal = ({ match, onClose, onUnmatch }) => {
                 <button className="bg-red-500 text-white py-2 px-4 rounded" onClick={handleUnmatchClick}>
                   Unmatch
                 </button>
-                <button className="bg-blue-500 text-white py-2 px-4 rounded" onClick={handleRateClick}>
-                  Rate
-                </button>
+                {canRate && (
+                  <button className="bg-blue-500 text-white py-2 px-4 rounded" onClick={handleRateClick}>
+                    Rate
+                  </button>
+                )}
               </div>
             </div>
           </>
