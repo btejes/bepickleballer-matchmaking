@@ -73,9 +73,10 @@ const LoginEmailForm = () => {
               Get Magic Link
             </button>
           </form>
+          <p className="mt-6 text-center text-black">
+            Need to Signup? <a href="https://bepickleballer.com/matchmaking/" className="text-blue-500 hover:underline">Click Here</a>
+          </p>
         </>
-
-        
       )}
       {/* Footer with Privacy Policy and Terms of Service */}
       <div className="mt-6 text-center text-black">
