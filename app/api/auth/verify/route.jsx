@@ -49,19 +49,18 @@ export async function GET(request) {
   user.lastVerifiedLogin = new Date();
   await user.save();
 
-  // Redirect user to the Find Match with the JWT set in a secure, HttpOnly cookie
-  console.log("\nAbout to route to Find Match from auth verify api\n");
-  console.log("\nAttempting to redirect to this path: ", `${process.env.BASE_URL}${apiBasePath}/findmatch`, "\n");
-  const response = NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/findmatch`);
+  // Set the JWT cookie
+  const response = NextResponse.next();
   response.cookies.set('token', jwtToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'None', // Important for cross-site access
-    path: '/matchmaking',
+    path: '/',
     domain: 'bepickleballer.com'  // Ensure cookie is available across all subdomains
   });
 
-  console.log("\nReturning response from auth verify api: ", response, "\n");
+  console.log("\nJWT cookie set. Redirecting to Find Match\n");
 
-  return response;
+  // Use 302 redirect
+  return NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/findmatch`, 302);
 }
