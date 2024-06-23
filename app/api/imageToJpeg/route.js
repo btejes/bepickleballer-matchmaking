@@ -18,10 +18,8 @@ async function processHEICImage(file, userId) {
   const tempDir = os.tmpdir();
   const inputPath = path.join(tempDir, `input_${Date.now()}.heic`);
   const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
-  const finalOutputPath = path.join(tempDir, `final_output_${Date.now()}.jpg`);
   console.log(`Input path: ${inputPath}`);
   console.log(`Output path: ${outputPath}`);
-  console.log(`Final output path: ${finalOutputPath}`);
 
   await fs.writeFile(inputPath, imageBuffer);
   console.log("Temporary input file created");
@@ -62,30 +60,29 @@ async function processHEICImage(file, userId) {
 
   console.log("HEIC to JPEG conversion completed");
 
-  // Read the converted image and make it square
+  // Read the converted image and resize it
   const image = sharp(outputPath).withMetadata(); // Preserve metadata
   const { width, height } = await image.metadata();
-  const size = Math.min(width, height);
 
   await image
     .resize({
-      width: 800,
-      height: 800,
-      fit: sharp.fit.cover,
-      position: sharp.strategy.entropy
+      width: Math.min(width, 800),
+      height: Math.min(height, 800),
+      fit: sharp.fit.inside,
+      withoutEnlargement: true
     })
-    .toFile(finalOutputPath);
+    .toBuffer()
+    .then(data => fs.writeFile(outputPath, data));
 
-  console.log("Image resized to square dimensions");
+  console.log("Image resized to fit within 800x800 dimensions");
 
   console.log("Reading converted image");
-  const convertedImageBuffer = await fs.readFile(finalOutputPath);
+  const convertedImageBuffer = await fs.readFile(outputPath);
   const base64Image = convertedImageBuffer.toString('base64');
   console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
 
   await fs.unlink(inputPath);
   await fs.unlink(outputPath);
-  await fs.unlink(finalOutputPath);
 
   console.log("HEIC image processing completed successfully");
   return NextResponse.json({ image: base64Image }, { status: 200 });
@@ -111,8 +108,8 @@ async function processNormalImage(file, userId) {
     .resize({
       width: 800,
       height: 800,
-      fit: sharp.fit.cover,
-      position: sharp.strategy.entropy
+      fit: sharp.fit.inside,
+      withoutEnlargement: true
     })
     .toFile(outputPath);
 
