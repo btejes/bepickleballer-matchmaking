@@ -45,6 +45,19 @@ async function processHEICImage(file, userId) {
 
     console.log("HEIC to JPEG conversion completed");
 
+    // Read the converted image and make it square
+    const image = sharp(outputPath);
+    const { width, height } = await image.metadata();
+    const size = Math.min(width, height);
+
+    await image
+      .resize(size, size, {
+        fit: sharp.fit.cover,
+      })
+      .toFile(outputPath);
+
+    console.log("Image resized to square dimensions");
+
     console.log("Reading converted image");
     const convertedImageBuffer = await fs.readFile(outputPath);
     const base64Image = convertedImageBuffer.toString('base64');
