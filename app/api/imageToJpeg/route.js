@@ -18,6 +18,9 @@ async function getHEICDimensions(filePath) {
     const { stdout } = await execPromise(`ffprobe -v quiet -print_format json -show_format -show_streams "${filePath}"`);
     const metadata = JSON.parse(stdout);
 
+    // Print out the entire metadata for debugging
+    console.log('ffprobe metadata:', JSON.stringify(metadata, null, 2));
+
     // Find the video stream with the largest dimensions
     const videoStreams = metadata.streams.filter(stream => stream.codec_type === 'video');
     if (videoStreams.length === 0) {
