@@ -54,13 +54,15 @@ async function processHEICImage(file, userId) {
         .outputOptions([
           '-filter_complex', filterComplex,
           '-q:v', '2',
-          '-pix_fmt', 'yuvj420p'
+          '-pix_fmt', 'yuvj420p',
+          '-vf', 'colorlevels=rimin=0:gimin=0:bimin=0'
         ]);
     } else {
       ffmpegCommand = ffmpegCommand
         .outputOptions([
           '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
-          '-pix_fmt', 'yuvj420p'
+          '-pix_fmt', 'yuvj420p',
+          '-vf', 'colorlevels=rimin=0:gimin=0:bimin=0'
         ]);
     }
     
@@ -103,7 +105,8 @@ async function processNormalImage(file, userId) {
     ffmpeg(inputPath)
       .outputOptions([
         '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
-        '-pix_fmt', 'yuvj420p'
+        '-pix_fmt', 'yuvj420p',
+        '-vf', 'colorlevels=rimin=0:gimin=0:bimin=0'
       ])
       .output(outputPath)
       .on('start', (commandLine) => {
