@@ -1,11 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import connectToDatabase from '@/library/connectToDatabase';
 import Token from '@/library/Token';
 import User from '@/library/User';
 import Profile from '@/library/Profile';
 const jwt = require('jsonwebtoken');
 
-// Define the API route for verifying a magic login link
 export async function GET(request) {
   await connectToDatabase();
 
@@ -50,17 +49,11 @@ export async function GET(request) {
   await user.save();
 
   // Set the JWT cookie
-  const response = NextResponse.next();
-  response.cookies.set('token', jwtToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'None', // Important for cross-site access
-    path: '/',
-    domain: 'bepickleballer.com'  // Ensure cookie is available across all subdomains
-  });
+  const headers = new Headers(request.headers);
+  headers.set('Set-Cookie', `token=${jwtToken}; Path=/; HttpOnly; Secure; SameSite=None; Domain=bepickleballer.com`);
 
-  console.log("\nJWT cookie set. Redirecting to Find Match\n");
+  console.log("\nJWT cookie set. Redirecting to home page\n");
 
-  // Use 302 redirect
-  return NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/findmatch`, 302);
+  // Use 302 redirect to the home page
+  return NextResponse.redirect(new URL('/', request.url), { headers });
 }
