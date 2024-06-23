@@ -6,11 +6,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 const VerifyAuth = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const NEXT_PUBLIC_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH;
 
     useEffect(() => {
         const verifyAuth = async () => {
             try {
-                const response = await fetch(`/api/auth/verify?${searchParams.toString()}`, {
+                const response = await fetch(`${NEXT_PUBLIC_BASE_PATH}/api/auth/verify?${searchParams.toString()}`, {
                     method: 'GET',
                     credentials: 'include', // Ensure cookies are included
                 });
