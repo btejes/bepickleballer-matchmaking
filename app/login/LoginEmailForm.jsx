@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-const EmailForm = () => {
+const LoginEmailForm = () => {
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
   const [timeLeft, setTimeLeft] = useState(900); // 15 minutes countdown
@@ -22,10 +22,10 @@ const EmailForm = () => {
       if (response.ok) {
         setEmailSent(true);
       } else {
-        console.error("Error sending signup link. Response not OK.");
+        console.error("Error sending login link. Response not OK.");
       }
     } catch (error) {
-      console.error("Error sending signup link.", error);
+      console.error("Error sending login link.", error);
     }
   };
 
@@ -44,15 +44,15 @@ const EmailForm = () => {
         <div className="text-center">
           <h2 className="text-3xl font-bold mb-4 text-center text-black">Check Email For Your Magic Link!</h2>
           <p className="mt-4 text-center text-black">
-            A secure signup link has been sent to <big><strong>{email}</strong></big> <br></br> Click the link in the email to sign up to Matchmaking.
+            A secure login link has been sent to <big><strong>{email}</strong></big> <br></br> Click the link in the email to login in to Matchmaking.
           </p>
         </div>
       ) : (
         <>
           <br></br>
-          <h2 className="text-3xl font-bold mb-4 text-center text-black">Sign Up</h2>
+          <h2 className="text-3xl font-bold mb-4 text-center text-black">Login</h2>
           <p className="mb-6 text-center text-black">
-            Enter your email to get a secure signup link. This magic link signs you up without needing a password!
+            Enter your email to get a secure login link. This magic link logs you in without needing a password!
           </p>
           <form onSubmit={handleSubmit} className="flex flex-col items-center">
             <div className="mb-4 w-full">
@@ -80,7 +80,7 @@ const EmailForm = () => {
       {/* Footer with Privacy Policy and Terms of Service */}
       <div className="mt-6 text-center text-black">
         <p className="text-xs">
-          By clicking &quot;Get Magic Link&quot; and signing up, you agree to Be Pickle Baller&apos;s 
+          By clicking &quot;Get Magic Link&quot; and logging in, you agree to Be Pickle Baller&apos;s 
           <a href="https://bepickleballer.com/terms-of-service/" className="text-blue-500 hover:underline"> Terms of Service </a> 
           and that you have read our 
           <a href="https://bepickleballer.com/privacy-policy/" className="text-blue-500 hover:underline"> Privacy Policy</a>.
@@ -90,4 +90,4 @@ const EmailForm = () => {
   );
 };
 
-export default EmailForm;
+export default LoginEmailForm;

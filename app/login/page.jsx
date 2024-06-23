@@ -1,7 +1,7 @@
-import EmailForm from "./login/EmailForm";
+import LoginEmailForm from "./login/LoginEmailForm";
 import NavbarBasicLogo from "@/components/NavbarLogin";
 
-const SignUpPage = () => {
+const LoginPage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <NavbarBasicLogo />
@@ -10,11 +10,11 @@ const SignUpPage = () => {
           Find Your Perfect Pickle “Baller” Partner
         </h1>
         <div className="p-6 bg-white max-w-md w-full bg-box rounded-lg shadow-md mt-4">
-          <EmailForm />
+          <LoginEmailForm />
         </div>
       </div>
     </div>
   );
 };
 
-export default SignUpPage;
+export default LoginPage;
