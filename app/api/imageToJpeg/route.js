@@ -6,12 +6,9 @@ import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
 import decode from 'heic-decode';
-
+import { Readable } from 'stream';
 
 ffmpeg.setFfmpegPath('ffmpeg');
-
-
-
 
 
 async function processHEICImage(file, userId) {
@@ -20,61 +17,46 @@ async function processHEICImage(file, userId) {
   const imageBuffer = Buffer.from(file.buffer, 'base64');
   console.log(`Image buffer size: ${imageBuffer.length} bytes`);
 
-  const tempDir = os.tmpdir();
-  const inputPath = path.join(tempDir, `input_${Date.now()}.heic`);
-  const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
-  console.log(`Input path: ${inputPath}`);
-  console.log(`Output path: ${outputPath}`);
-
   try {
     // Get HEIC dimensions using heic-decode
-    const { width, height } = await decode({ buffer: imageBuffer });
-    console.log(`HEIC Dimensions: ${width}x${height}`);
-
-    await fs.writeFile(inputPath, imageBuffer);
-    console.log("Temporary input file created");
+    let width, height;
+    try {
+      const result = await decode({ buffer: imageBuffer });
+      width = result.width;
+      height = result.height;
+      console.log(`HEIC Dimensions: ${width}x${height}`);
+    } catch (decodeError) {
+      console.error('Error decoding HEIC:', decodeError);
+      throw new Error('Failed to decode HEIC image');
+    }
 
     const isVertical = height > width;
 
-    await new Promise((resolve, reject) => {
-      let ffmpegCommand = ffmpeg(inputPath)
-        .inputOptions(['-c:v', 'hevc'])
+    // Create a readable stream from the buffer
+    const readableStream = new Readable();
+    readableStream.push(imageBuffer);
+    readableStream.push(null);
+
+    // Process the image using FFmpeg
+    const outputBuffer = await new Promise((resolve, reject) => {
+      const chunks = [];
+      let ffmpegCommand = ffmpeg(readableStream)
+        .inputFormat('heic')
         .outputOptions([
           '-qscale:v', '2',
-          '-pix_fmt', 'yuvj420p'  // Preserve full color range
-        ]);
+          '-pix_fmt', 'yuvj420p',  // Preserve full color range
+          '-vf', `scale=${isVertical ? '800:-1' : '-1:800'}:force_original_aspect_ratio=decrease`
+        ])
+        .toFormat('jpeg')
+        .on('error', reject)
+        .on('end', () => resolve(Buffer.concat(chunks)))
+        .on('data', chunk => chunks.push(chunk));
 
-      // Apply scaling
-      ffmpegCommand = ffmpegCommand.videoFilters(`scale=${isVertical ? '800:-1' : '-1:800'}:force_original_aspect_ratio=decrease`);
-
-      ffmpegCommand
-        .output(outputPath)
-        .on('start', (commandLine) => {
-          console.log('FFmpeg process started:', commandLine);
-        })
-        .on('progress', (progress) => {
-          console.log('Processing: ' + progress.percent + '% done');
-        })
-        .on('end', () => {
-          console.log('HEIC to JPEG conversion completed');
-          resolve();
-        })
-        .on('error', (err, stdout, stderr) => {
-          console.error('FFmpeg error:', err);
-          console.error('FFmpeg stdout:', stdout);
-          console.error('FFmpeg stderr:', stderr);
-          reject(err);
-        })
-        .run();
+      ffmpegCommand.pipe();
     });
 
-    console.log("Reading converted image");
-    const convertedImageBuffer = await fs.readFile(outputPath);
-    const base64Image = convertedImageBuffer.toString('base64');
-    console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
-
-    await fs.unlink(inputPath);
-    await fs.unlink(outputPath);
+    console.log(`Converted image size: ${outputBuffer.length} bytes`);
+    const base64Image = outputBuffer.toString('base64');
 
     console.log("HEIC image processing completed successfully");
     return NextResponse.json({ image: base64Image }, { status: 200 });
