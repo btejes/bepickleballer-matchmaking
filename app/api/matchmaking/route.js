@@ -91,6 +91,10 @@ export async function POST(request) {
       });
 
       if (existingEntry) {
+        if (existingEntry.user1Decision === 'no' || existingEntry.user2Decision === 'no') {
+          // Skip if either user has said "no"
+          continue;
+        }
         // Check if the logged-in user is user1
         if (existingEntry.user1Id.equals(decoded._id)) {
           if (existingEntry.user1Decision === 'pending' && existingEntry.user2Decision === 'yes') {
@@ -106,9 +110,6 @@ export async function POST(request) {
             existingEntry.user2Decision === 'yes'
           ) {
             // Both users have said "yes", skip these matches
-            continue;
-          } else if (existingEntry.user2Decision === 'no') {
-            // Skip if the other user has said "no"
             continue;
           } else {
             randomMatches.push(match);
@@ -129,9 +130,6 @@ export async function POST(request) {
             existingEntry.user2Decision === 'yes'
           ) {
             // Both users have said "yes", skip these matches
-            continue;
-          } else if (existingEntry.user1Decision === 'no') {
-            // Skip if the other user has said "no"
             continue;
           } else {
             randomMatches.push(match);
