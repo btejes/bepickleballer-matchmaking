@@ -24,13 +24,36 @@ async function processHEICImage(file, userId) {
     await fs.writeFile(inputPath, imageBuffer);
     console.log("Temporary input file created");
 
+    // First, get the rotation metadata
+    const rotationData = await new Promise((resolve, reject) => {
+      ffmpeg.ffprobe(inputPath, (err, metadata) => {
+        if (err) reject(err);
+        else {
+          const rotation = metadata.streams[0].tags && metadata.streams[0].tags.rotate
+            ? parseInt(metadata.streams[0].tags.rotate)
+            : 0;
+          resolve(rotation);
+        }
+      });
+    });
+
+    console.log(`Image rotation: ${rotationData} degrees`);
+
+    // Now process the image
     await new Promise((resolve, reject) => {
-      ffmpeg(inputPath)
+      let ffmpegCommand = ffmpeg(inputPath)
         .inputOptions(['-c:v', 'hevc'])
-        .outputOptions([
-          '-qscale:v', '2',
-          '-vf', 'autorotate,scale=800:800:force_original_aspect_ratio=decrease'
-        ])
+        .outputOptions(['-qscale:v', '2']);
+
+      // Apply rotation if needed
+      if (rotationData) {
+        ffmpegCommand = ffmpegCommand.videoFilters(`transpose=${rotationData === 90 ? 1 : rotationData === 270 ? 2 : 0}`);
+      }
+
+      // Apply scaling
+      ffmpegCommand = ffmpegCommand.videoFilters('scale=800:800:force_original_aspect_ratio=decrease');
+
+      ffmpegCommand
         .output(outputPath)
         .on('start', (commandLine) => {
           console.log('FFmpeg process started:', commandLine);
