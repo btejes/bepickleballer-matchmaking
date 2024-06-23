@@ -5,25 +5,17 @@ import ffmpeg from 'fluent-ffmpeg';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
-import exifParser from 'exif-parser';
+import { decode } from 'heic-decode';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
 
 
-
 async function getHEICDimensions(buffer) {
   try {
-    const parser = exifParser.create(buffer);
-    const result = parser.parse();
-    const width = result.imageSize.width;
-    const height = result.imageSize.height;
+    const { width, height } = await decode({ buffer });
     console.log(`HEIC Dimensions: ${width}x${height}`);
-    if (width && height) {
-      return { width, height };
-    } else {
-      throw new Error('Unable to determine HEIC dimensions');
-    }
+    return { width, height };
   } catch (error) {
     console.error('Error getting HEIC dimensions:', error);
     throw error;
