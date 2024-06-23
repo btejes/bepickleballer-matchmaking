@@ -5,6 +5,7 @@ import sharp from 'sharp';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
+import { exec } from 'child_process';
 
 async function processHEICImage(file, userId) {
   console.log("Processing HEIC image");
@@ -25,15 +26,16 @@ async function processHEICImage(file, userId) {
     const metadata = await sharp(inputPath).metadata();
     console.log('Image metadata:', metadata);
 
-    const rotated = metadata.orientation >= 5 && metadata.orientation <= 8;
-
-    await sharp(inputPath)
-      .rotate() // Automatically rotate based on EXIF data
-      .resize(800, 800, {
-        fit: sharp.fit.inside,
-        withoutEnlargement: true,
-      })
-      .toFile(outputPath);
+    await new Promise((resolve, reject) => {
+      exec(`ffmpeg -i ${inputPath} -vf "scale=800:-1" ${outputPath}`, (error, stdout, stderr) => {
+        if (error) {
+          console.error('Error during HEIC to JPEG conversion:', stderr);
+          return reject(new Error('Failed to convert HEIC to JPEG'));
+        }
+        console.log('FFmpeg conversion stdout:', stdout);
+        resolve();
+      });
+    });
 
     console.log("HEIC to JPEG conversion completed");
 
