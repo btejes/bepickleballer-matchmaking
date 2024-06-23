@@ -36,7 +36,8 @@ export async function POST(request) {
 
   try {
     const baseUrl = process.env.BASE_URL;
-    const verifyUrl = `${baseUrl}/redirect?token=${token}`;
+    const NEXT_PUBLIC_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH;
+    const verifyUrl = `${baseUrl}${NEXT_PUBLIC_BASE_PATH}/redirect?token=${token}`;
 
     // Send the email
     await sendLoginEmail(lowercasedEmail, verifyUrl);
