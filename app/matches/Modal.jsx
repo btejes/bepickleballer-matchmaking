@@ -21,7 +21,7 @@ const Modal = ({ match, onClose, onUnmatch }) => {
       console.log(`Current time: ${currentTime}`);
 
       if (!isNaN(matchCreationTime)) {
-        const elapsedTime = currentTime - matchCreationTime;
+        const elapsedTime = currentTime.getTime() - matchCreationTime.getTime();
         const elapsedTimeInMinutes = elapsedTime / (1000 * 60);
 
         console.log(`Elapsed time in minutes: ${elapsedTimeInMinutes}`);
