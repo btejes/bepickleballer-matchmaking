@@ -5,11 +5,8 @@ import ffmpeg from 'fluent-ffmpeg';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
-import decode from 'heic-decode';
-import { Readable } from 'stream';
 
 ffmpeg.setFfmpegPath('ffmpeg');
-
 
 async function processHEICImage(file, userId) {
   console.log("Processing HEIC image");
@@ -17,46 +14,83 @@ async function processHEICImage(file, userId) {
   const imageBuffer = Buffer.from(file.buffer, 'base64');
   console.log(`Image buffer size: ${imageBuffer.length} bytes`);
 
+  const tempDir = os.tmpdir();
+  const inputPath = path.join(tempDir, `input_${Date.now()}.heic`);
+  const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
+  console.log(`Input path: ${inputPath}`);
+  console.log(`Output path: ${outputPath}`);
+
   try {
-    // Get HEIC dimensions using heic-decode
-    let width, height;
-    try {
-      const result = await decode({ buffer: imageBuffer });
-      width = result.width;
-      height = result.height;
-      console.log(`HEIC Dimensions: ${width}x${height}`);
-    } catch (decodeError) {
-      console.error('Error decoding HEIC:', decodeError);
-      throw new Error('Failed to decode HEIC image');
-    }
+    await fs.writeFile(inputPath, imageBuffer);
+    console.log("Temporary input file created");
+
+    // Get image metadata
+    const metadata = await new Promise((resolve, reject) => {
+      ffmpeg.ffprobe(inputPath, (err, metadata) => {
+        if (err) reject(err);
+        else resolve(metadata);
+      });
+    });
+
+    const stream = metadata.streams.find(s => s.codec_type === 'video');
+    const width = stream.width;
+    const height = stream.height;
+    const rotation = stream.tags && stream.tags.rotate ? parseInt(stream.tags.rotate) : 0;
+
+    console.log(`Image dimensions: ${width}x${height}, Rotation: ${rotation} degrees`);
 
     const isVertical = height > width;
 
-    // Create a readable stream from the buffer
-    const readableStream = new Readable();
-    readableStream.push(imageBuffer);
-    readableStream.push(null);
-
-    // Process the image using FFmpeg
-    const outputBuffer = await new Promise((resolve, reject) => {
-      const chunks = [];
-      let ffmpegCommand = ffmpeg(readableStream)
-        .inputFormat('heic')
+    await new Promise((resolve, reject) => {
+      let ffmpegCommand = ffmpeg(inputPath)
+        .inputOptions(['-c:v', 'hevc'])
         .outputOptions([
           '-qscale:v', '2',
-          '-pix_fmt', 'yuvj420p',  // Preserve full color range
-          '-vf', `scale=${isVertical ? '800:-1' : '-1:800'}:force_original_aspect_ratio=decrease`
-        ])
-        .toFormat('jpeg')
-        .on('error', reject)
-        .on('end', () => resolve(Buffer.concat(chunks)))
-        .on('data', chunk => chunks.push(chunk));
+          '-pix_fmt', 'yuvj420p'  // Preserve full color range
+        ]);
 
-      ffmpegCommand.pipe();
+      // Handle rotation
+      if (isVertical && rotation === 0) {
+        ffmpegCommand = ffmpegCommand.videoFilters('transpose=1');  // Rotate 90 degrees clockwise
+      } else if (rotation === 90) {
+        ffmpegCommand = ffmpegCommand.videoFilters('transpose=2');  // Rotate 90 degrees counterclockwise
+      } else if (rotation === 180) {
+        ffmpegCommand = ffmpegCommand.videoFilters('transpose=2,transpose=2');  // Rotate 180 degrees
+      } else if (rotation === 270) {
+        ffmpegCommand = ffmpegCommand.videoFilters('transpose=1');  // Rotate 90 degrees clockwise
+      }
+
+      // Apply scaling
+      ffmpegCommand = ffmpegCommand.videoFilters('scale=800:800:force_original_aspect_ratio=decrease');
+
+      ffmpegCommand
+        .output(outputPath)
+        .on('start', (commandLine) => {
+          console.log('FFmpeg process started:', commandLine);
+        })
+        .on('progress', (progress) => {
+          console.log('Processing: ' + progress.percent + '% done');
+        })
+        .on('end', () => {
+          console.log('HEIC to JPEG conversion completed');
+          resolve();
+        })
+        .on('error', (err, stdout, stderr) => {
+          console.error('FFmpeg error:', err);
+          console.error('FFmpeg stdout:', stdout);
+          console.error('FFmpeg stderr:', stderr);
+          reject(err);
+        })
+        .run();
     });
 
-    console.log(`Converted image size: ${outputBuffer.length} bytes`);
-    const base64Image = outputBuffer.toString('base64');
+    console.log("Reading converted image");
+    const convertedImageBuffer = await fs.readFile(outputPath);
+    const base64Image = convertedImageBuffer.toString('base64');
+    console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
+
+    await fs.unlink(inputPath);
+    await fs.unlink(outputPath);
 
     console.log("HEIC image processing completed successfully");
     return NextResponse.json({ image: base64Image }, { status: 200 });
