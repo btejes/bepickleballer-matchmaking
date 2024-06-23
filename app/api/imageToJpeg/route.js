@@ -8,19 +8,25 @@ import path from 'path';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
-async function getImageDimensions(filePath) {
-  return new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(filePath, (err, metadata) => {
-      if (err) {
-        console.error('Error getting image dimensions:', err);
-        reject(err);
-      } else {
-        const { width, height } = metadata.streams[0];
-        console.log(`Image dimensions: ${width}x${height}`);
-        resolve({ width, height });
-      }
-    });
-  });
+import { promisify } from 'util';
+import { exec } from 'child_process';
+
+const execPromise = promisify(exec);
+
+async function getHEICDimensions(filePath) {
+  try {
+    const { stdout } = await execPromise(`ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=width,height,nb_read_packets -of csv=p=0 "${filePath}"`);
+    const [width, height, packets] = stdout.trim().split(',').map(Number);
+    console.log(`HEIC Dimensions: ${width}x${height}, Packets: ${packets}`);
+    if (width && height && packets > 0) {
+      return { width, height };
+    } else {
+      throw new Error('Unable to determine HEIC dimensions');
+    }
+  } catch (error) {
+    console.error('Error getting HEIC dimensions:', error);
+    throw error;
+  }
 }
 
 async function processHEICImage(file, userId) {
@@ -39,15 +45,22 @@ async function processHEICImage(file, userId) {
     await fs.writeFile(inputPath, imageBuffer);
     console.log("Temporary input file created");
 
+    // Get accurate HEIC dimensions
+    const dimensions = await getHEICDimensions(inputPath);
+    const isVertical = dimensions.height > dimensions.width;
+    console.log(`HEIC dimensions: ${dimensions.width}x${dimensions.height}, Vertical: ${isVertical}`);
+
     await new Promise((resolve, reject) => {
-      ffmpeg(inputPath)
-        .inputOptions([
-          '-c:v', 'hevc',  // Explicitly specify HEVC decoder
-        ])
-        .outputOptions([
-          '-qscale:v', '2',  // High quality
-          '-vf', 'scale=800:-1',  // Scale width to 800, maintain aspect ratio
-        ])
+      let ffmpegCommand = ffmpeg(inputPath)
+        .inputOptions(['-c:v', 'hevc'])
+        .outputOptions(['-qscale:v', '2'])
+        .videoFilters([
+          'format=yuv420p',
+          `scale=${isVertical ? '800:-1' : '-1:800'}`,
+          isVertical ? 'transpose=1' : 'null'
+        ]);
+
+      ffmpegCommand
         .output(outputPath)
         .on('start', (commandLine) => {
           console.log('FFmpeg process started:', commandLine);
