@@ -7,38 +7,10 @@ import os from 'os';
 import path from 'path';
 
 
-import { promisify } from 'util';
-import { exec } from 'child_process';
-
-const execPromise = promisify(exec);
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
 
-async function getHEICDimensions(filePath) {
-  try {
-    const { stdout } = await execPromise(`ffprobe -v quiet -print_format json -show_format -show_streams "${filePath}"`);
-    const metadata = JSON.parse(stdout);
-    
-    // Find the video stream with the largest dimensions
-    const videoStreams = metadata.streams.filter(stream => stream.codec_type === 'video');
-    const mainStream = videoStreams.reduce((largest, current) => {
-      const largestArea = largest.width * largest.height;
-      const currentArea = current.width * current.height;
-      return currentArea > largestArea ? current : largest;
-    });
-
-    console.log(`HEIC Dimensions: ${mainStream.width}x${mainStream.height}`);
-    return {
-      width: mainStream.width,
-      height: mainStream.height,
-      rotation: mainStream.tags && mainStream.tags.rotate ? parseInt(mainStream.tags.rotate) : 0
-    };
-  } catch (error) {
-    console.error('Error getting HEIC dimensions:', error);
-    throw error;
-  }
-}
 
 async function processHEICImage(file, userId) {
   console.log("Processing HEIC image");
@@ -53,11 +25,12 @@ async function processHEICImage(file, userId) {
   console.log(`Output path: ${outputPath}`);
 
   try {
+    // Get HEIC dimensions using heic-decode
+    const { width, height } = await decode({ buffer: imageBuffer });
+    console.log(`HEIC Dimensions: ${width}x${height}`);
+
     await fs.writeFile(inputPath, imageBuffer);
     console.log("Temporary input file created");
-
-    const { width, height, rotation } = await getHEICDimensions(inputPath);
-    console.log(`Image dimensions: ${width}x${height}, Rotation: ${rotation} degrees`);
 
     const isVertical = height > width;
 
@@ -69,19 +42,8 @@ async function processHEICImage(file, userId) {
           '-pix_fmt', 'yuvj420p'  // Preserve full color range
         ]);
 
-      // Handle rotation
-      if (isVertical && rotation === 0) {
-        ffmpegCommand = ffmpegCommand.videoFilters('transpose=1');  // Rotate 90 degrees clockwise
-      } else if (rotation === 90) {
-        ffmpegCommand = ffmpegCommand.videoFilters('transpose=2');  // Rotate 90 degrees counterclockwise
-      } else if (rotation === 180) {
-        ffmpegCommand = ffmpegCommand.videoFilters('transpose=2,transpose=2');  // Rotate 180 degrees
-      } else if (rotation === 270) {
-        ffmpegCommand = ffmpegCommand.videoFilters('transpose=1');  // Rotate 90 degrees clockwise
-      }
-
       // Apply scaling
-      ffmpegCommand = ffmpegCommand.videoFilters('scale=800:800:force_original_aspect_ratio=decrease');
+      ffmpegCommand = ffmpegCommand.videoFilters(`scale=${isVertical ? '800:-1' : '-1:800'}:force_original_aspect_ratio=decrease`);
 
       ffmpegCommand
         .output(outputPath)
