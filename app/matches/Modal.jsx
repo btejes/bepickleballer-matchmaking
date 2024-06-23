@@ -15,6 +15,11 @@ const Modal = ({ match, onClose, onUnmatch }) => {
     const checkElapsedTime = () => {
       const matchCreationTime = new Date(match.createdAt);
       const currentTime = new Date();
+
+      console.log(`Match creation time: ${match.createdAt}`);
+      console.log(`Parsed match creation time: ${matchCreationTime}`);
+      console.log(`Current time: ${currentTime}`);
+
       const elapsedTime = currentTime - matchCreationTime;
       const elapsedTimeInMinutes = elapsedTime / (1000 * 60);
 
