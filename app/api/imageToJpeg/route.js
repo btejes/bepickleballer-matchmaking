@@ -60,8 +60,8 @@ async function processHEICImage(file, userId) {
 
   console.log("HEIC to JPEG conversion completed");
 
-  // Read the converted image and resize it
-  const image = sharp(outputPath).withMetadata(); // Preserve metadata
+  // Read the converted image and resize it to fit within 800x800 dimensions
+  const image = sharp(outputPath).withMetadata();
   const { width, height } = await image.metadata();
 
   await image
@@ -71,8 +71,7 @@ async function processHEICImage(file, userId) {
       fit: sharp.fit.inside,
       withoutEnlargement: true
     })
-    .toBuffer()
-    .then(data => fs.writeFile(outputPath, data));
+    .toFile(outputPath);
 
   console.log("Image resized to fit within 800x800 dimensions");
 
