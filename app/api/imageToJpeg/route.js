@@ -28,6 +28,7 @@ async function processHEICImage(file, userId) {
 
     let rotateOption = '';
     if (metadata.height > metadata.width) {
+      console.log("\nVertical .heic found!\n");
       rotateOption = '-vf "transpose=1"'; // Rotate 90 degrees clockwise for vertical images
     }
 
