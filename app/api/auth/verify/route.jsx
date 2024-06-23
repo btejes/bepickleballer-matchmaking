@@ -58,7 +58,7 @@ export async function GET(request) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'None', // Important for cross-site access
-    path: '/',
+    path: '/matchmaking',
     domain: 'bepickleballer.com'  // Ensure cookie is available across all subdomains
   });
 
