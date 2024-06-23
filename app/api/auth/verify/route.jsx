@@ -5,6 +5,9 @@ import User from '@/library/User';
 import Profile from '@/library/Profile';
 const jwt = require('jsonwebtoken');
 
+// Helper function to add delay
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 // Define the API route for verifying a magic login link
 export async function GET(request) {
   await connectToDatabase();
@@ -49,10 +52,8 @@ export async function GET(request) {
   user.lastVerifiedLogin = new Date();
   await user.save();
 
-  // Redirect user to the Find Match with the JWT set in a secure, HttpOnly cookie
-  console.log("\nAbout to route to Find Match from auth verify api\n");
-  console.log("\nAttempting to redirect to this path: ", `${process.env.BASE_URL}${apiBasePath}/findmatch`, "\n");
-  const response = NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/findmatch`);
+  // Set the JWT cookie
+  const response = NextResponse.next();
   response.cookies.set('token', jwtToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -61,7 +62,12 @@ export async function GET(request) {
     domain: 'bepickleballer.com'  // Ensure cookie is available across all subdomains
   });
 
-  console.log("\nReturning response from auth verify api: ", response, "\n");
+  console.log("\nJWT cookie set. Adding delay before redirect...\n");
 
-  return response;
+  // Add a delay before the redirect
+  await delay(1000);
+
+  console.log("\nRedirecting to Find Match from auth verify api\n");
+  console.log("\nAttempting to redirect to this path: ", `${process.env.BASE_URL}${apiBasePath}/findmatch`, "\n");
+  return NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/findmatch`);
 }
