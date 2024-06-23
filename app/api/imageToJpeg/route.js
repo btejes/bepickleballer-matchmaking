@@ -35,7 +35,7 @@ async function processHEICImage(file, userId) {
     }
 
     await new Promise((resolve, reject) => {
-      exec(`ffmpeg -i ${inputPath} -vf "${filterOption}" -pix_fmt yuv420p -colorspace bt709 ${outputPath}`, (error, stdout, stderr) => {
+      exec(`ffmpeg -i ${inputPath} -vf "${filterOption}" -pix_fmt yuvj420p ${outputPath}`, (error, stdout, stderr) => {
         if (error) {
           console.error('Error during HEIC to JPEG conversion:', stderr);
           return reject(new Error('Failed to convert HEIC to JPEG'));
