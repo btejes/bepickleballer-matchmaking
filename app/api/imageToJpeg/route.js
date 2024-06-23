@@ -68,9 +68,11 @@ async function processHEICImage(file, userId) {
   const size = Math.min(width, height);
 
   await image
-    .resize(800, 800, {
-      fit: sharp.fit.inside,
-      withoutEnlargement: true,
+    .resize({
+      width: 800,
+      height: 800,
+      fit: sharp.fit.cover,
+      position: sharp.strategy.entropy
     })
     .toFile(finalOutputPath);
 
@@ -106,9 +108,11 @@ async function processNormalImage(file, userId) {
   console.log("Temporary input file created");
 
   await sharp(inputPath)
-    .resize(800, 800, {
-      fit: sharp.fit.inside,
-      withoutEnlargement: true,
+    .resize({
+      width: 800,
+      height: 800,
+      fit: sharp.fit.cover,
+      position: sharp.strategy.entropy
     })
     .toFile(outputPath);
 
