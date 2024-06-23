@@ -31,65 +31,39 @@ async function processHEICImage(file, userId) {
 
   const tempDir = os.tmpdir();
   const inputPath = path.join(tempDir, `input_${Date.now()}.heic`);
-  const pngPath = path.join(tempDir, `intermediate_${Date.now()}.png`);
   const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
   console.log(`Input path: ${inputPath}`);
-  console.log(`PNG path: ${pngPath}`);
   console.log(`Output path: ${outputPath}`);
 
   try {
     await fs.writeFile(inputPath, imageBuffer);
     console.log("Temporary input file created");
 
-    const dimensions = await getImageDimensions(inputPath);
-    const isVertical = dimensions.height > dimensions.width;
-
-    // Step 1: Convert HEIC to PNG
     await new Promise((resolve, reject) => {
       ffmpeg(inputPath)
-        .outputOptions(['-vf', 'format=rgba'])
-        .output(pngPath)
-        .on('start', (commandLine) => {
-          console.log('FFmpeg process started (HEIC to PNG):', commandLine);
-        })
-        .on('progress', (progress) => {
-          console.log('Processing (HEIC to PNG): ' + progress.percent + '% done');
-        })
-        .on('end', () => {
-          console.log('HEIC to PNG conversion completed');
-          resolve();
-        })
-        .on('error', (err) => {
-          console.error('FFmpeg error (HEIC to PNG):', err);
-          reject(err);
-        })
-        .run();
-    });
-
-    // Step 2: Convert PNG to JPEG
-    await new Promise((resolve, reject) => {
-      let filterComplex = isVertical ? 'transpose=1,' : '';
-      filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease';
-
-      ffmpeg(pngPath)
+        .inputOptions([
+          '-c:v', 'hevc',  // Explicitly specify HEVC decoder
+        ])
         .outputOptions([
-          '-filter_complex', filterComplex,
-          '-q:v', '2',
-          '-pix_fmt', 'yuv420p'
+          '-qscale:v', '2',  // High quality
+          '-vf', 'scale=800:-1',  // Scale width to 800, maintain aspect ratio
+          '-auto-orient',  // Automatically rotate based on metadata
         ])
         .output(outputPath)
         .on('start', (commandLine) => {
-          console.log('FFmpeg process started (PNG to JPEG):', commandLine);
+          console.log('FFmpeg process started:', commandLine);
         })
         .on('progress', (progress) => {
-          console.log('Processing (PNG to JPEG): ' + progress.percent + '% done');
+          console.log('Processing: ' + progress.percent + '% done');
         })
         .on('end', () => {
-          console.log('PNG to JPEG conversion completed');
+          console.log('HEIC to JPEG conversion completed');
           resolve();
         })
-        .on('error', (err) => {
-          console.error('FFmpeg error (PNG to JPEG):', err);
+        .on('error', (err, stdout, stderr) => {
+          console.error('FFmpeg error:', err);
+          console.error('FFmpeg stdout:', stdout);
+          console.error('FFmpeg stderr:', stderr);
           reject(err);
         })
         .run();
@@ -101,14 +75,13 @@ async function processHEICImage(file, userId) {
     console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
 
     await fs.unlink(inputPath);
-    await fs.unlink(pngPath);
     await fs.unlink(outputPath);
 
     console.log("HEIC image processing completed successfully");
     return NextResponse.json({ image: base64Image }, { status: 200 });
   } catch (error) {
     console.error('Error during HEIC processing:', error);
-    return NextResponse.json({ error: 'Failed to process HEIC image' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to process HEIC image', details: error.message }, { status: 500 });
   }
 }
 
