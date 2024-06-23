@@ -26,19 +26,21 @@ async function processHEICImage(file, userId) {
     const metadata = await sharp(inputPath).metadata();
     console.log('Image metadata:', metadata);
 
-    let rotateImage = false;
+    let rotateOption = '';
     if (metadata.height > metadata.width) {
-      rotateImage = true;
+      rotateOption = '-vf "transpose=1"'; // Rotate 90 degrees clockwise for vertical images
     }
 
-    if (rotateImage) {
-      await sharp(inputPath)
-        .rotate(90) // Rotate 90 degrees clockwise for vertical images
-        .toFile(outputPath);
-    } else {
-      await sharp(inputPath)
-        .toFile(outputPath);
-    }
+    await new Promise((resolve, reject) => {
+      exec(`ffmpeg -i ${inputPath} ${rotateOption} -vf "scale=800:-1" ${outputPath}`, (error, stdout, stderr) => {
+        if (error) {
+          console.error('Error during HEIC to JPEG conversion:', stderr);
+          return reject(new Error('Failed to convert HEIC to JPEG'));
+        }
+        console.log('FFmpeg conversion stdout:', stdout);
+        resolve();
+      });
+    });
 
     console.log("HEIC to JPEG conversion completed");
 
