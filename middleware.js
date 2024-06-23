@@ -20,8 +20,7 @@ export async function middleware(request) {
 
   if (!token) {
     console.log('No JWT Token found. Redirecting to root.');
-    // return NextResponse.redirect(new URL('/matchmaking', request.url));
-    return NextResponse.next();
+    return NextResponse.redirect(new URL('/matchmaking', request.url));
   }
 
   try {
@@ -33,7 +32,7 @@ export async function middleware(request) {
     return response;
   } catch (error) {
     console.log('JWT Verification Error:', error);
-    // return NextResponse.redirect(new URL('/matchmaking', request.url));
+    return NextResponse.redirect(new URL('/matchmaking', request.url));
   }
 
   const response = NextResponse.next();
