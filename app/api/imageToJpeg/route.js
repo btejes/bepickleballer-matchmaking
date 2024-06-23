@@ -32,8 +32,10 @@ async function processHEICImage(file, userId) {
 
   const tempDir = os.tmpdir();
   const inputPath = path.join(tempDir, `input_${Date.now()}.heic`);
+  const pngPath = path.join(tempDir, `intermediate_${Date.now()}.png`);
   const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
   console.log(`Input path: ${inputPath}`);
+  console.log(`PNG path: ${pngPath}`);
   console.log(`Output path: ${outputPath}`);
 
   await fs.writeFile(inputPath, imageBuffer);
@@ -41,8 +43,21 @@ async function processHEICImage(file, userId) {
 
   const dimensions = await getImageDimensions(inputPath);
 
+  // Step 1: Convert HEIC to PNG
   await new Promise((resolve, reject) => {
-    let ffmpegCommand = ffmpeg(inputPath);
+    ffmpeg(inputPath)
+      .outputOptions(['-vf', 'format=rgb24'])
+      .output(pngPath)
+      .on('end', resolve)
+      .on('error', reject)
+      .run();
+  });
+
+  console.log("HEIC to PNG conversion completed");
+
+  // Step 2: Convert PNG to JPEG
+  await new Promise((resolve, reject) => {
+    let ffmpegCommand = ffmpeg(pngPath);
     
     if (dimensions) {
       const isVertical = dimensions.height > dimensions.width;
@@ -53,15 +68,14 @@ async function processHEICImage(file, userId) {
         .outputOptions([
           '-filter_complex', filterComplex,
           '-q:v', '2',
-          '-pix_fmt', 'yuv420p',
-          '-vf', 'format=yuv420p'
+          '-pix_fmt', 'yuv420p'
         ]);
     } else {
       ffmpegCommand = ffmpegCommand
         .outputOptions([
           '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
-          '-pix_fmt', 'yuv420p',
-          '-vf', 'format=yuv420p'
+          '-q:v', '2',
+          '-pix_fmt', 'yuv420p'
         ]);
     }
     
@@ -71,6 +85,8 @@ async function processHEICImage(file, userId) {
       .run();
   });
 
+  console.log("PNG to JPEG conversion completed");
+
   console.log("Reading converted image");
   const convertedImageBuffer = await fs.readFile(outputPath);
   const base64Image = convertedImageBuffer.toString('base64');
@@ -78,6 +94,7 @@ async function processHEICImage(file, userId) {
 
   console.log("Cleaning up temporary files");
   await fs.unlink(inputPath);
+  await fs.unlink(pngPath);
   await fs.unlink(outputPath);
 
   console.log("HEIC image processing completed successfully");
