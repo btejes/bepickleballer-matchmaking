@@ -55,5 +55,5 @@ export async function GET(request) {
   console.log("\nJWT cookie set. Redirecting to home page\n");
 
   // Use 302 redirect to the home page
-  return NextResponse.redirect(new URL('/', request.url), { headers });
+  return NextResponse.redirect(new URL('/findmatch', '${process.env.BASE_URL}${apiBasePath}'), { headers });
 }
