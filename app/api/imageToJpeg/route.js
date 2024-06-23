@@ -58,7 +58,10 @@ async function processHEICImage(file, userId) {
         ]);
     } else {
       ffmpegCommand = ffmpegCommand
-        .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease']);
+        .outputOptions([
+          '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
+          '-pix_fmt', 'yuvj420p'
+        ]);
     }
     
     ffmpegCommand.output(outputPath)
@@ -98,7 +101,10 @@ async function processNormalImage(file, userId) {
 
   await new Promise((resolve, reject) => {
     ffmpeg(inputPath)
-      .outputOptions(['-vf', 'scale=800:800:force_original_aspect_ratio=decrease'])
+      .outputOptions([
+        '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
+        '-pix_fmt', 'yuvj420p'
+      ])
       .output(outputPath)
       .on('start', (commandLine) => {
         console.log('FFmpeg process started:', commandLine);
