@@ -8,6 +8,36 @@ import path from 'path';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
+import { promisify } from 'util';
+import { exec } from 'child_process';
+
+const execPromise = promisify(exec);
+
+async function getHEICDimensions(filePath) {
+  try {
+    const { stdout } = await execPromise(`ffprobe -v quiet -print_format json -show_format -show_streams "${filePath}"`);
+    const metadata = JSON.parse(stdout);
+    
+    // Find the video stream with the largest dimensions
+    const videoStreams = metadata.streams.filter(stream => stream.codec_type === 'video');
+    const mainStream = videoStreams.reduce((largest, current) => {
+      const largestArea = largest.width * largest.height;
+      const currentArea = current.width * current.height;
+      return currentArea > largestArea ? current : largest;
+    });
+
+    console.log(`HEIC Dimensions: ${mainStream.width}x${mainStream.height}`);
+    return {
+      width: mainStream.width,
+      height: mainStream.height,
+      rotation: mainStream.tags && mainStream.tags.rotate ? parseInt(mainStream.tags.rotate) : 0
+    };
+  } catch (error) {
+    console.error('Error getting HEIC dimensions:', error);
+    throw error;
+  }
+}
+
 async function processHEICImage(file, userId) {
   console.log("Processing HEIC image");
 
@@ -24,19 +54,7 @@ async function processHEICImage(file, userId) {
     await fs.writeFile(inputPath, imageBuffer);
     console.log("Temporary input file created");
 
-    // Get image metadata
-    const metadata = await new Promise((resolve, reject) => {
-      ffmpeg.ffprobe(inputPath, (err, metadata) => {
-        if (err) reject(err);
-        else resolve(metadata);
-      });
-    });
-
-    const stream = metadata.streams.find(s => s.codec_type === 'video');
-    const width = stream.width;
-    const height = stream.height;
-    const rotation = stream.tags && stream.tags.rotate ? parseInt(stream.tags.rotate) : 0;
-
+    const { width, height, rotation } = await getHEICDimensions(inputPath);
     console.log(`Image dimensions: ${width}x${height}, Rotation: ${rotation} degrees`);
 
     const isVertical = height > width;
