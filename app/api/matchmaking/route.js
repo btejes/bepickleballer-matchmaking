@@ -163,12 +163,6 @@ export async function POST(request) {
   }
 }
 
-
-
-
-
-
-
 export async function PUT(request) {
   await connectToDatabase();
   console.log("Connected to database for PUT request.");
@@ -216,13 +210,16 @@ export async function PUT(request) {
 
     if (matchmakingEntry.user1Decision === 'yes' && matchmakingEntry.user2Decision === 'yes') {
       matchmakingEntry.matchStatus = 'matched';
+      await matchmakingEntry.save();
+      console.log("Matchmaking entry saved as matched.");
+      return NextResponse.json({ matchStatus: 'matched', matchmakingEntry }, { status: 200 });
     } else if (matchmakingEntry.user1Decision === 'no' || matchmakingEntry.user2Decision === 'no') {
       matchmakingEntry.matchStatus = 'rejected';
     }
 
     await matchmakingEntry.save();
     console.log("Matchmaking entry saved.");
-    return NextResponse.json(matchmakingEntry, { status: 200 });
+    return NextResponse.json({ matchStatus: matchmakingEntry.matchStatus, matchmakingEntry }, { status: 200 });
   } catch (error) {
     console.error('Internal Server Error in PUT:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
