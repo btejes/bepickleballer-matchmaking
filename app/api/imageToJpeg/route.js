@@ -24,30 +24,40 @@ async function processHEICImage(file, userId) {
     await fs.writeFile(inputPath, imageBuffer);
     console.log("Temporary input file created");
 
-    // First, get the rotation metadata
-    const rotationData = await new Promise((resolve, reject) => {
+    // Get image metadata
+    const metadata = await new Promise((resolve, reject) => {
       ffmpeg.ffprobe(inputPath, (err, metadata) => {
         if (err) reject(err);
-        else {
-          const rotation = metadata.streams[0].tags && metadata.streams[0].tags.rotate
-            ? parseInt(metadata.streams[0].tags.rotate)
-            : 0;
-          resolve(rotation);
-        }
+        else resolve(metadata);
       });
     });
 
-    console.log(`Image rotation: ${rotationData} degrees`);
+    const stream = metadata.streams.find(s => s.codec_type === 'video');
+    const width = stream.width;
+    const height = stream.height;
+    const rotation = stream.tags && stream.tags.rotate ? parseInt(stream.tags.rotate) : 0;
 
-    // Now process the image
+    console.log(`Image dimensions: ${width}x${height}, Rotation: ${rotation} degrees`);
+
+    const isVertical = height > width;
+
     await new Promise((resolve, reject) => {
       let ffmpegCommand = ffmpeg(inputPath)
         .inputOptions(['-c:v', 'hevc'])
-        .outputOptions(['-qscale:v', '2']);
+        .outputOptions([
+          '-qscale:v', '2',
+          '-pix_fmt', 'yuvj420p'  // Preserve full color range
+        ]);
 
-      // Apply rotation if needed
-      if (rotationData) {
-        ffmpegCommand = ffmpegCommand.videoFilters(`transpose=${rotationData === 90 ? 1 : rotationData === 270 ? 2 : 0}`);
+      // Handle rotation
+      if (isVertical && rotation === 0) {
+        ffmpegCommand = ffmpegCommand.videoFilters('transpose=1');  // Rotate 90 degrees clockwise
+      } else if (rotation === 90) {
+        ffmpegCommand = ffmpegCommand.videoFilters('transpose=2');  // Rotate 90 degrees counterclockwise
+      } else if (rotation === 180) {
+        ffmpegCommand = ffmpegCommand.videoFilters('transpose=2,transpose=2');  // Rotate 180 degrees
+      } else if (rotation === 270) {
+        ffmpegCommand = ffmpegCommand.videoFilters('transpose=1');  // Rotate 90 degrees clockwise
       }
 
       // Apply scaling
