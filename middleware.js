@@ -21,6 +21,7 @@ export async function middleware(request) {
   if (!token) {
     console.log('No JWT Token found. Redirecting to root.');
     // return NextResponse.redirect(new URL('/matchmaking', request.url));
+    return NextResponse.next();
   }
 
   try {
