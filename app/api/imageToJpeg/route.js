@@ -26,14 +26,14 @@ async function processHEICImage(file, userId) {
     const metadata = await sharp(inputPath).metadata();
     console.log('Image metadata:', metadata);
 
-    let rotateOption = '';
+    let filterOption = 'scale=800:-1';
     if (metadata.height > metadata.width) {
       console.log("\nVertical .heic found!\n");
-      rotateOption = '-vf "transpose=1"'; // Rotate 90 degrees clockwise for vertical images
+      filterOption = 'transpose=1,scale=800:-1'; // Rotate 90 degrees clockwise and scale for vertical images
     }
 
     await new Promise((resolve, reject) => {
-      exec(`ffmpeg -i ${inputPath} ${rotateOption} -vf "scale=800:-1" ${outputPath}`, (error, stdout, stderr) => {
+      exec(`ffmpeg -i ${inputPath} -vf "${filterOption}" ${outputPath}`, (error, stdout, stderr) => {
         if (error) {
           console.error('Error during HEIC to JPEG conversion:', stderr);
           return reject(new Error('Failed to convert HEIC to JPEG'));
