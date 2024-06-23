@@ -31,52 +31,84 @@ async function processHEICImage(file, userId) {
 
   const tempDir = os.tmpdir();
   const inputPath = path.join(tempDir, `input_${Date.now()}.heic`);
+  const pngPath = path.join(tempDir, `intermediate_${Date.now()}.png`);
   const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
   console.log(`Input path: ${inputPath}`);
+  console.log(`PNG path: ${pngPath}`);
   console.log(`Output path: ${outputPath}`);
 
-  await fs.writeFile(inputPath, imageBuffer);
-  console.log("Temporary input file created");
-
   try {
+    await fs.writeFile(inputPath, imageBuffer);
+    console.log("Temporary input file created");
+
     const dimensions = await getImageDimensions(inputPath);
     const isVertical = dimensions.height > dimensions.width;
 
+    // Step 1: Convert HEIC to PNG
     await new Promise((resolve, reject) => {
-      let ffmpegCommand = ffmpeg(inputPath);
-      
+      ffmpeg(inputPath)
+        .outputOptions(['-vf', 'format=rgba'])
+        .output(pngPath)
+        .on('start', (commandLine) => {
+          console.log('FFmpeg process started (HEIC to PNG):', commandLine);
+        })
+        .on('progress', (progress) => {
+          console.log('Processing (HEIC to PNG): ' + progress.percent + '% done');
+        })
+        .on('end', () => {
+          console.log('HEIC to PNG conversion completed');
+          resolve();
+        })
+        .on('error', (err) => {
+          console.error('FFmpeg error (HEIC to PNG):', err);
+          reject(err);
+        })
+        .run();
+    });
+
+    // Step 2: Convert PNG to JPEG
+    await new Promise((resolve, reject) => {
       let filterComplex = isVertical ? 'transpose=1,' : '';
       filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease';
 
-      ffmpegCommand
+      ffmpeg(pngPath)
         .outputOptions([
           '-filter_complex', filterComplex,
           '-q:v', '2',
           '-pix_fmt', 'yuv420p'
         ])
         .output(outputPath)
-        .on('end', resolve)
+        .on('start', (commandLine) => {
+          console.log('FFmpeg process started (PNG to JPEG):', commandLine);
+        })
+        .on('progress', (progress) => {
+          console.log('Processing (PNG to JPEG): ' + progress.percent + '% done');
+        })
+        .on('end', () => {
+          console.log('PNG to JPEG conversion completed');
+          resolve();
+        })
         .on('error', (err) => {
-          console.error('FFmpeg error:', err);
+          console.error('FFmpeg error (PNG to JPEG):', err);
           reject(err);
         })
         .run();
     });
 
-    console.log("HEIC to JPEG conversion completed");
-
+    console.log("Reading converted image");
     const convertedImageBuffer = await fs.readFile(outputPath);
     const base64Image = convertedImageBuffer.toString('base64');
     console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
 
     await fs.unlink(inputPath);
+    await fs.unlink(pngPath);
     await fs.unlink(outputPath);
 
     console.log("HEIC image processing completed successfully");
     return NextResponse.json({ image: base64Image }, { status: 200 });
   } catch (error) {
     console.error('Error during HEIC processing:', error);
-    throw error;
+    return NextResponse.json({ error: 'Failed to process HEIC image' }, { status: 500 });
   }
 }
 
