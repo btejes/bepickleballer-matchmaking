@@ -24,7 +24,6 @@ async function getImageDimensions(filePath) {
   }
 }
 
-// Function to process HEIC images
 async function processHEICImage(file, userId) {
   console.log("Processing HEIC image");
 
@@ -54,15 +53,15 @@ async function processHEICImage(file, userId) {
         .outputOptions([
           '-filter_complex', filterComplex,
           '-q:v', '2',
-          '-pix_fmt', 'yuvj420p',
-          '-vf', 'colorlevels=rimin=0:gimin=0:bimin=0'
+          '-pix_fmt', 'yuv420p',
+          '-vf', 'format=yuv420p'
         ]);
     } else {
       ffmpegCommand = ffmpegCommand
         .outputOptions([
           '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
-          '-pix_fmt', 'yuvj420p',
-          '-vf', 'colorlevels=rimin=0:gimin=0:bimin=0'
+          '-pix_fmt', 'yuv420p',
+          '-vf', 'format=yuv420p'
         ]);
     }
     
