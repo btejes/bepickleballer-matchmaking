@@ -14,7 +14,6 @@ export async function GET(request) {
   const tokenDoc = await Token.findOne({ token });
   const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   
-
   if (!tokenDoc || tokenDoc.expires < Date.now()) {
     console.log("\nExpired token or no token doc found routing to login\n");
     return NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}`);
@@ -52,13 +51,13 @@ export async function GET(request) {
 
   // Redirect user to the Find Match with the JWT set in a secure, HttpOnly cookie
   console.log("\nAbout to route to Find Match from auth verify api\n");
-  console.log("\nAteemtping to redirect to this path: ", `${process.env.BASE_URL}${apiBasePath}/findmatch`, "\n");
+  console.log("\nAttempting to redirect to this path: ", `${process.env.BASE_URL}${apiBasePath}/findmatch`, "\n");
   const response = NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}/findmatch`);
   response.cookies.set('token', jwtToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'None', // Important for cross-site access
-    path: '/matchmaking',
+    path: '/',
     domain: 'bepickleballer.com'  // Ensure cookie is available across all subdomains
   });
 
