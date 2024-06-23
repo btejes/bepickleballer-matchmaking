@@ -66,8 +66,8 @@ async function processHEICImage(file, userId) {
 
   await image
     .resize({
-      width: Math.min(width, 800),
-      height: Math.min(height, 800),
+      width: 800,
+      height: 800,
       fit: sharp.fit.inside,
       withoutEnlargement: true
     })
