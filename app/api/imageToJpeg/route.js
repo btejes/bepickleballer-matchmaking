@@ -5,20 +5,21 @@ import ffmpeg from 'fluent-ffmpeg';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
+import exifParser from 'exif-parser';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
-import { promisify } from 'util';
-import { exec } from 'child_process';
 
-const execPromise = promisify(exec);
 
-async function getHEICDimensions(filePath) {
+
+async function getHEICDimensions(buffer) {
   try {
-    const { stdout } = await execPromise(`ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=width,height,nb_read_packets -of csv=p=0 "${filePath}"`);
-    const [width, height, packets] = stdout.trim().split(',').map(Number);
-    console.log(`HEIC Dimensions: ${width}x${height}, Packets: ${packets}`);
-    if (width && height && packets > 0) {
+    const parser = exifParser.create(buffer);
+    const result = parser.parse();
+    const width = result.imageSize.width;
+    const height = result.imageSize.height;
+    console.log(`HEIC Dimensions: ${width}x${height}`);
+    if (width && height) {
       return { width, height };
     } else {
       throw new Error('Unable to determine HEIC dimensions');
@@ -42,13 +43,13 @@ async function processHEICImage(file, userId) {
   console.log(`Output path: ${outputPath}`);
 
   try {
-    await fs.writeFile(inputPath, imageBuffer);
-    console.log("Temporary input file created");
-
-    // Get accurate HEIC dimensions
-    const dimensions = await getHEICDimensions(inputPath);
+    // Get accurate HEIC dimensions directly from the buffer
+    const dimensions = await getHEICDimensions(imageBuffer);
     const isVertical = dimensions.height > dimensions.width;
     console.log(`HEIC dimensions: ${dimensions.width}x${dimensions.height}, Vertical: ${isVertical}`);
+
+    await fs.writeFile(inputPath, imageBuffer);
+    console.log("Temporary input file created");
 
     await new Promise((resolve, reject) => {
       let ffmpegCommand = ffmpeg(inputPath)
