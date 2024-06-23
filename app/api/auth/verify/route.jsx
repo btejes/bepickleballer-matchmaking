@@ -11,7 +11,6 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get('token');
   const tokenDoc = await Token.findOne({ token });
-  const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   
   if (!tokenDoc || tokenDoc.expires < Date.now()) {
     console.log("\nExpired token or no token doc found routing to login\n");
@@ -49,11 +48,16 @@ export async function GET(request) {
   await user.save();
 
   // Set the JWT cookie
-  const headers = new Headers(request.headers);
-  headers.set('Set-Cookie', `token=${jwtToken}; Path=/; HttpOnly; Secure; SameSite=None; Domain=bepickleballer.com`);
+  const response = new NextResponse(JSON.stringify({ message: "Success" }), { status: 200 });
+  response.cookies.set('token', jwtToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'None',
+    path: '/',
+    domain: 'bepickleballer.com'
+  });
 
-  console.log("\nJWT cookie set. Redirecting to Find Match page\n");
+  console.log("\nJWT cookie set. Returning success response\n");
 
-  // Use 302 redirect to the Find Match page
-  return NextResponse.redirect(new URL('/matchmaking/findmatch', `${process.env.BASE_URL}`), { headers });
+  return response;
 }
