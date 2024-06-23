@@ -55,5 +55,5 @@ export async function GET(request) {
   console.log("\nJWT cookie set. Redirecting to Find Match page\n");
 
   // Use 302 redirect to the Find Match page
-  return NextResponse.redirect(new URL('/matchmaking/findmatch', request.url), { headers });
+  return NextResponse.redirect(new URL('/matchmaking/findmatch', `${process.env.BASE_URL}`), { headers });
 }
