@@ -5,23 +5,22 @@ import ffmpeg from 'fluent-ffmpeg';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
-import { execSync } from 'child_process';
 
 ffmpeg.setFfmpegPath('ffmpeg');
 
-// Function to get dimensions of HEIC images using exiftool
 async function getImageDimensions(filePath) {
-  try {
-    const output = execSync(`exiftool -ImageWidth -ImageHeight -j "${filePath}"`).toString().trim();
-    const metadata = JSON.parse(output)[0];
-    return {
-      width: metadata.ImageWidth,
-      height: metadata.ImageHeight
-    };
-  } catch (error) {
-    console.error('Error getting image dimensions:', error);
-    return null;
-  }
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(filePath, (err, metadata) => {
+      if (err) {
+        console.error('Error getting image dimensions:', err);
+        reject(err);
+      } else {
+        const { width, height } = metadata.streams[0];
+        console.log(`Image dimensions: ${width}x${height}`);
+        resolve({ width, height });
+      }
+    });
+  });
 }
 
 async function processHEICImage(file, userId) {
@@ -32,73 +31,53 @@ async function processHEICImage(file, userId) {
 
   const tempDir = os.tmpdir();
   const inputPath = path.join(tempDir, `input_${Date.now()}.heic`);
-  const pngPath = path.join(tempDir, `intermediate_${Date.now()}.png`);
   const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
   console.log(`Input path: ${inputPath}`);
-  console.log(`PNG path: ${pngPath}`);
   console.log(`Output path: ${outputPath}`);
 
   await fs.writeFile(inputPath, imageBuffer);
   console.log("Temporary input file created");
 
-  const dimensions = await getImageDimensions(inputPath);
+  try {
+    const dimensions = await getImageDimensions(inputPath);
+    const isVertical = dimensions.height > dimensions.width;
 
-  // Step 1: Convert HEIC to PNG
-  await new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-      .outputOptions(['-vf', 'format=rgb24'])
-      .output(pngPath)
-      .on('end', resolve)
-      .on('error', reject)
-      .run();
-  });
-
-  console.log("HEIC to PNG conversion completed");
-
-  // Step 2: Convert PNG to JPEG
-  await new Promise((resolve, reject) => {
-    let ffmpegCommand = ffmpeg(pngPath);
-    
-    if (dimensions) {
-      const isVertical = dimensions.height > dimensions.width;
+    await new Promise((resolve, reject) => {
+      let ffmpegCommand = ffmpeg(inputPath);
+      
       let filterComplex = isVertical ? 'transpose=1,' : '';
       filterComplex += 'scale=800:800:force_original_aspect_ratio=decrease';
 
-      ffmpegCommand = ffmpegCommand
+      ffmpegCommand
         .outputOptions([
           '-filter_complex', filterComplex,
           '-q:v', '2',
           '-pix_fmt', 'yuv420p'
-        ]);
-    } else {
-      ffmpegCommand = ffmpegCommand
-        .outputOptions([
-          '-vf', 'scale=800:800:force_original_aspect_ratio=decrease',
-          '-q:v', '2',
-          '-pix_fmt', 'yuv420p'
-        ]);
-    }
-    
-    ffmpegCommand.output(outputPath)
-      .on('end', resolve)
-      .on('error', reject)
-      .run();
-  });
+        ])
+        .output(outputPath)
+        .on('end', resolve)
+        .on('error', (err) => {
+          console.error('FFmpeg error:', err);
+          reject(err);
+        })
+        .run();
+    });
 
-  console.log("PNG to JPEG conversion completed");
+    console.log("HEIC to JPEG conversion completed");
 
-  console.log("Reading converted image");
-  const convertedImageBuffer = await fs.readFile(outputPath);
-  const base64Image = convertedImageBuffer.toString('base64');
-  console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
+    const convertedImageBuffer = await fs.readFile(outputPath);
+    const base64Image = convertedImageBuffer.toString('base64');
+    console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
 
-  console.log("Cleaning up temporary files");
-  await fs.unlink(inputPath);
-  await fs.unlink(pngPath);
-  await fs.unlink(outputPath);
+    await fs.unlink(inputPath);
+    await fs.unlink(outputPath);
 
-  console.log("HEIC image processing completed successfully");
-  return NextResponse.json({ image: base64Image }, { status: 200 });
+    console.log("HEIC image processing completed successfully");
+    return NextResponse.json({ image: base64Image }, { status: 200 });
+  } catch (error) {
+    console.error('Error during HEIC processing:', error);
+    throw error;
+  }
 }
 
 // Function to process normal images
