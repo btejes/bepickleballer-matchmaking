@@ -1,4 +1,4 @@
-import LoginEmailForm from "./login/LoginEmailForm";
+import LoginEmailForm from "./LoginEmailForm";
 import NavbarBasicLogo from "@/components/NavbarLogin";
 
 const LoginPage = () => {
