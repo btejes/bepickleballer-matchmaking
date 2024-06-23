@@ -52,8 +52,8 @@ export async function GET(request) {
   const headers = new Headers(request.headers);
   headers.set('Set-Cookie', `token=${jwtToken}; Path=/; HttpOnly; Secure; SameSite=None; Domain=bepickleballer.com`);
 
-  console.log("\nJWT cookie set. Redirecting to home page\n");
+  console.log("\nJWT cookie set. Redirecting to Find Match page\n");
 
-  // Use 302 redirect to the home page
-  return NextResponse.redirect(new URL('/findmatch', '${process.env.BASE_URL}${apiBasePath}'), { headers });
+  // Use 302 redirect to the Find Match page
+  return NextResponse.redirect(new URL('/matchmaking/findmatch', request.url), { headers });
 }
