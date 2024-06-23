@@ -136,7 +136,7 @@ export async function POST(req) {
     }
 
     console.log(`File type: ${file.type}`);
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/heic'];
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
 
     if (!allowedTypes.includes(file.type)) {
       console.log("Unsupported file type");
