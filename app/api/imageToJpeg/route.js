@@ -16,8 +16,10 @@ async function processHEICImage(file, userId) {
   const tempDir = os.tmpdir();
   const inputPath = path.join(tempDir, `input_${Date.now()}.heic`);
   const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
+  const finalOutputPath = path.join(tempDir, `final_output_${Date.now()}.jpg`);
   console.log(`Input path: ${inputPath}`);
   console.log(`Output path: ${outputPath}`);
+  console.log(`Final output path: ${finalOutputPath}`);
 
   try {
     await fs.writeFile(inputPath, imageBuffer);
@@ -54,17 +56,18 @@ async function processHEICImage(file, userId) {
       .resize(size, size, {
         fit: sharp.fit.cover,
       })
-      .toFile(outputPath);
+      .toFile(finalOutputPath);
 
     console.log("Image resized to square dimensions");
 
     console.log("Reading converted image");
-    const convertedImageBuffer = await fs.readFile(outputPath);
+    const convertedImageBuffer = await fs.readFile(finalOutputPath);
     const base64Image = convertedImageBuffer.toString('base64');
     console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
 
     await fs.unlink(inputPath);
     await fs.unlink(outputPath);
+    await fs.unlink(finalOutputPath);
 
     console.log("HEIC image processing completed successfully");
     return NextResponse.json({ image: base64Image }, { status: 200 });
