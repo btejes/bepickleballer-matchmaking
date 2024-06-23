@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import ffmpeg from 'fluent-ffmpeg';
 import sharp from 'sharp';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
-
-ffmpeg.setFfmpegPath('ffmpeg');
+import { exec } from 'child_process';
 
 async function processHEICImage(file, userId) {
   console.log("Processing HEIC image");
@@ -18,73 +16,65 @@ async function processHEICImage(file, userId) {
   const tempDir = os.tmpdir();
   const inputPath = path.join(tempDir, `input_${Date.now()}.heic`);
   const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
+  const finalOutputPath = path.join(tempDir, `final_output_${Date.now()}.jpg`);
   console.log(`Input path: ${inputPath}`);
   console.log(`Output path: ${outputPath}`);
+  console.log(`Final output path: ${finalOutputPath}`);
 
-  await fs.writeFile(inputPath, imageBuffer);
-  console.log("Temporary input file created");
+  try {
+    await fs.writeFile(inputPath, imageBuffer);
+    console.log("Temporary input file created");
 
-  const metadata = await sharp(inputPath).metadata();
-  console.log('Image metadata:', metadata);
+    const metadata = await sharp(inputPath).metadata();
+    console.log('Image metadata:', metadata);
 
-  let filterComplex = 'scale=800:-1';
-  if (metadata.height > metadata.width) {
-    console.log("\nVertical .heic found!\n");
-    filterComplex = 'transpose=1,' + filterComplex; // Rotate 90 degrees clockwise and scale for vertical images
-  }
+    let filterOption = 'scale=800:-1';
+    if (metadata.height > metadata.width) {
+      console.log("\nVertical .heic found!\n");
+      filterOption = 'transpose=1,scale=800:-1'; // Rotate 90 degrees clockwise and scale for vertical images
+    }
 
-  await new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-      .outputOptions([
-        '-filter_complex', filterComplex,
-        '-q:v', '2',
-        '-pix_fmt', 'yuvj420p'
-      ])
-      .output(outputPath)
-      .on('start', (commandLine) => {
-        console.log('FFmpeg process started:', commandLine);
-      })
-      .on('progress', (progress) => {
-        console.log('Processing: ' + progress.percent + '% done');
-      })
-      .on('end', () => {
-        console.log('FFmpeg process completed');
+    await new Promise((resolve, reject) => {
+      exec(`ffmpeg -i ${inputPath} -vf "${filterOption}" -pix_fmt yuv420p -colorspace bt709 ${outputPath}`, (error, stdout, stderr) => {
+        if (error) {
+          console.error('Error during HEIC to JPEG conversion:', stderr);
+          return reject(new Error('Failed to convert HEIC to JPEG'));
+        }
+        console.log('FFmpeg conversion stdout:', stdout);
         resolve();
+      });
+    });
+
+    console.log("HEIC to JPEG conversion completed");
+
+    // Read the converted image and make it square
+    const image = sharp(outputPath).withMetadata(); // Preserve metadata
+    const { width, height } = await image.metadata();
+    const size = Math.min(width, height);
+
+    await image
+      .resize(size, size, {
+        fit: sharp.fit.cover,
       })
-      .on('error', (err) => {
-        console.error('Error during FFmpeg process:', err);
-        reject(err);
-      })
-      .run();
-  });
+      .toFile(finalOutputPath);
 
-  console.log("HEIC to JPEG conversion completed");
+    console.log("Image resized to square dimensions");
 
-  // Read the converted image and resize it to fit within 800x800 dimensions
-  const image = sharp(outputPath).withMetadata();
-  const { width, height } = await image.metadata();
+    console.log("Reading converted image");
+    const convertedImageBuffer = await fs.readFile(finalOutputPath);
+    const base64Image = convertedImageBuffer.toString('base64');
+    console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
 
-  await image
-    .resize({
-      width: 800,
-      height: 800,
-      fit: sharp.fit.inside,
-      withoutEnlargement: true
-    })
-    .toFile(outputPath);
+    await fs.unlink(inputPath);
+    await fs.unlink(outputPath);
+    await fs.unlink(finalOutputPath);
 
-  console.log("Image resized to fit within 800x800 dimensions");
-
-  console.log("Reading converted image");
-  const convertedImageBuffer = await fs.readFile(outputPath);
-  const base64Image = convertedImageBuffer.toString('base64');
-  console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
-
-  await fs.unlink(inputPath);
-  await fs.unlink(outputPath);
-
-  console.log("HEIC image processing completed successfully");
-  return NextResponse.json({ image: base64Image }, { status: 200 });
+    console.log("HEIC image processing completed successfully");
+    return NextResponse.json({ image: base64Image }, { status: 200 });
+  } catch (error) {
+    console.error('Error during HEIC processing:', error);
+    return NextResponse.json({ error: 'Failed to process HEIC image', details: error.message }, { status: 500 });
+  }
 }
 
 // Function to process normal images
@@ -104,11 +94,9 @@ async function processNormalImage(file, userId) {
   console.log("Temporary input file created");
 
   await sharp(inputPath)
-    .resize({
-      width: 800,
-      height: 800,
+    .resize(800, 800, {
       fit: sharp.fit.inside,
-      withoutEnlargement: true
+      withoutEnlargement: true,
     })
     .toFile(outputPath);
 
