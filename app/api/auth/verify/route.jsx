@@ -33,7 +33,7 @@ export async function GET(request) {
   }
 
   // Create a JSON Web Token for the user, storing the user's ID
-  const jwtToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
+  const jwtToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
   console.log("\njwtToken: ", jwtToken, "\n");
 
   // Delete the token after verification
