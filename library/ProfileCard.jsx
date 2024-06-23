@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import heic2jpg from 'heic2jpg';
 
 const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
   const [image, setImage] = useState(null);
@@ -55,6 +56,16 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
     }
   };
 
+  const convertHeicToJpg = async (file) => {
+    try {
+      const result = await heic2jpg({ blob: file, quality: 0.8 });
+      return new File([result], file.name.replace(/\.heic$/i, '.jpg'), { type: 'image/jpeg' });
+    } catch (error) {
+      console.error('Error converting HEIC to JPG:', error);
+      throw error;
+    }
+  };
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
@@ -78,8 +89,14 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
       setFadeOut(false);
 
       try {
+        let processedFile = file;
+        if (file.type === 'image/heic') {
+          setStatusMessage("Converting HEIC to JPG");
+          processedFile = await convertHeicToJpg(file);
+        }
+
         const reader = new FileReader();
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(processedFile);
         reader.onloadend = async () => {
           const base64data = reader.result.split(',')[1];
 
@@ -89,7 +106,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
               'Content-Type': 'application/json',
             },
             credentials: 'include',
-            body: JSON.stringify({ file: { type: file.type, buffer: base64data } }),
+            body: JSON.stringify({ file: { type: processedFile.type, buffer: base64data } }),
           });
 
           const convertResult = await response.json();
