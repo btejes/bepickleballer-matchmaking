@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-const RedirectPage = () => {
+const VerifyAuth = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -34,6 +34,14 @@ const RedirectPage = () => {
         <div>
             <p>Verifying authentication, please wait...</p>
         </div>
+    );
+};
+
+const RedirectPage = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <VerifyAuth />
+        </Suspense>
     );
 };
 
