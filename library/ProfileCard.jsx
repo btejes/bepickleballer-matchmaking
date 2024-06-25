@@ -57,11 +57,11 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
 
     if (file) {
       if (!allowedTypes.includes(file.type)) {
-        setStatusMessage(`${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP`);
+        setStatusMessage(`${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC`);
         setFadeOut(false);
         return;
       }
