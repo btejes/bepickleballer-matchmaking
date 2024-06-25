@@ -5,7 +5,7 @@ import sharp from 'sharp';
 import { promises as fs } from 'fs';
 import os from 'os';
 import path from 'path';
-import { exec } from 'child_process';
+
 
 
 import { ApiClient, ConvertImageApi } from 'cloudmersive-convert-api-client';

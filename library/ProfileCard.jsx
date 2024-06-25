@@ -57,16 +57,16 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic'];
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
     if (file) {
       if (!allowedTypes.includes(file.type)) {
-        setStatusMessage(`${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP, HEIC`);
+        setStatusMessage(`${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP`);
         setFadeOut(false);
         return;
       }
-
-      if (file.size > 5 * 1024 * 1024) {
+  
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
         setStatusMessage("File size should not exceed 5MB");
         setFadeOut(false);
         return;
@@ -189,6 +189,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
             <input
               id="imageUpload"
               type="file"
+              accept="image/jpeg, image/png, image/webp, image/jpg"
               onChange={handleImageUpload}
               className="hidden"
             />
