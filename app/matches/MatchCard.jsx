@@ -7,12 +7,12 @@ const MatchCard = ({ match, onClick }) => {
   const [imgSrc, setImgSrc] = useState(match.profileImage || defaultImgSrc);
 
   useEffect(() => {
-    console.log("Match profile image URL:", match.profileImage);
-    console.log("Using image source:", imgSrc);
+    // console.log("Match profile image URL:", match.profileImage);
+    // console.log("Using image source:", imgSrc);
   }, [imgSrc, match.profileImage]);
 
   const handleError = () => {
-    console.log("Image failed to load, using fallback image.");
+    // console.log("Image failed to load, using fallback image.");
     setImgSrc(defaultImgSrc);
   };
 

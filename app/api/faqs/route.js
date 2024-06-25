@@ -7,13 +7,13 @@ import mongoose from 'mongoose';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  console.log("\nEntered api/faqs/route.js file \n");
-  console.log('BASE_URL:', process.env.BASE_URL);
-  console.log('MONGODB_URI:', process.env.MONGODB_URI);
+  // console.log("\nEntered api/faqs/route.js file \n");
+  // console.log('BASE_URL:', process.env.BASE_URL);
+  // console.log('MONGODB_URI:', process.env.MONGODB_URI);
 
   try {
     await connectToDatabase();
-    console.log('Database connected successfully.');
+    // console.log('Database connected successfully.');
 
     const db = mongoose.connection.db;
     const faqsCollection = db.collection('faqs');

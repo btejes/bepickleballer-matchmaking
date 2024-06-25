@@ -45,7 +45,7 @@ export const GET = async (req) => {
       })
     );
 
-    console.log('Matched profiles with additional data:', matchedProfiles); // Debug log
+    // console.log('Matched profiles with additional data:', matchedProfiles); // Debug log
 
     return noCacheResponse(matchedProfiles, { status: 200 });
   } catch (error) {

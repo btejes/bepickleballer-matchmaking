@@ -16,18 +16,18 @@ const s3Client = new S3Client({
 
 export async function POST() {
   try {
-    console.log('POST request received');
+    // console.log('POST request received');
     const jwtToken = cookies().get('token')?.value;
-    console.log('JWT token:', jwtToken);
+    // console.log('JWT token:', jwtToken);
 
     if (!jwtToken) {
-      console.log('No JWT token found');
+      // console.log('No JWT token found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const userId = decoded._id;
-    console.log('Token verified. User ID:', userId);
+    // console.log('Token verified. User ID:', userId);
 
     await connectToDatabase();
 
@@ -51,7 +51,7 @@ export async function POST() {
       });
 
       await Promise.all(deletePromises);
-      console.log("Deleted old images");
+      // console.log("Deleted old images");
     }
 
     const putObjectCommand = new PutObjectCommand({
@@ -60,13 +60,13 @@ export async function POST() {
       ContentType: 'image/jpeg',
     });
 
-    console.log('PutObjectCommand created:', putObjectCommand);
+    // console.log('PutObjectCommand created:', putObjectCommand);
 
     const signedUrl = await getSignedUrl(s3Client, putObjectCommand, {
       expiresIn: 60,
     });
 
-    console.log('Signed URL generated:', signedUrl);
+    // console.log('Signed URL generated:', signedUrl);
 
     return NextResponse.json({ url: signedUrl }, { status: 200 });
   } catch (error) {

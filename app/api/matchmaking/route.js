@@ -9,27 +9,27 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
   await connectToDatabase();
-  console.log("Connected to database.");
+  // console.log("Connected to database.");
 
   try {
     const jwtToken = cookies().get('token')?.value;
-    console.log("JWT Token:", jwtToken);
+    // console.log("JWT Token:", jwtToken);
     if (!jwtToken) {
-      console.log("No JWT Token found.");
+      // console.log("No JWT Token found.");
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
-    console.log("Token Verified:", decoded);
+    // console.log("Token Verified:", decoded);
     const currentUserProfile = await Profile.findOne({ userId: decoded._id });
 
     if (!currentUserProfile) {
-      console.log("Profile not found for user:", decoded._id);
+      // console.log("Profile not found for user:", decoded._id);
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }
 
     const filters = await request.json();
-    console.log("Filters received:", filters);
+    // console.log("Filters received:", filters);
 
     const query = {
       city: currentUserProfile.city,  // Ensures city requirement
@@ -75,7 +75,7 @@ export async function POST(request) {
       query.casualCompetitive = filters.preferredPlayStyle;
     }
 
-    console.log("Query built:", query);
+    // console.log("Query built:", query);
 
     const potentialMatches = await Profile.find(query);
 
@@ -140,8 +140,8 @@ export async function POST(request) {
       }
     }
 
-    console.log("Pending matches found:", pendingMatches.length);
-    console.log("Random matches found:", randomMatches.length);
+    // console.log("Pending matches found:", pendingMatches.length);
+    // console.log("Random matches found:", randomMatches.length);
 
     if (pendingMatches.length > 0) {
       // Always return the first pending match until the user interacts with it
@@ -163,19 +163,19 @@ export async function POST(request) {
 
 export async function PUT(request) {
   await connectToDatabase();
-  console.log("Connected to database for PUT request.");
+  // console.log("Connected to database for PUT request.");
 
   try {
     const jwtToken = cookies().get('token')?.value;
-    console.log("JWT Token for PUT:", jwtToken);
+    // console.log("JWT Token for PUT:", jwtToken);
     if (!jwtToken) {
-      console.log("No JWT Token found for PUT.");
+      // console.log("No JWT Token found for PUT.");
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const { potentialMatchId, userDecision } = await request.json();
-    console.log("Decoded token for PUT:", decoded, "Potential Match ID:", potentialMatchId, "User Decision:", userDecision);
+    // console.log("Decoded token for PUT:", decoded, "Potential Match ID:", potentialMatchId, "User Decision:", userDecision);
 
     let matchmakingEntry = await Matchmaking.findOne({
       $or: [
@@ -194,7 +194,7 @@ export async function PUT(request) {
         user2DecisionTimestamp: null,
         matchStatus: 'pending',
       });
-      console.log("New matchmaking entry created:", matchmakingEntry);
+      // console.log("New matchmaking entry created:", matchmakingEntry);
     } else {
       if (matchmakingEntry.user1Id.equals(decoded._id)) {
         matchmakingEntry.user1Decision = userDecision;
@@ -203,20 +203,20 @@ export async function PUT(request) {
         matchmakingEntry.user2Decision = userDecision;
         matchmakingEntry.user2DecisionTimestamp = new Date();
       }
-      console.log("Updated existing matchmaking entry:", matchmakingEntry);
+      // console.log("Updated existing matchmaking entry:", matchmakingEntry);
     }
 
     if (matchmakingEntry.user1Decision === 'yes' && matchmakingEntry.user2Decision === 'yes') {
       matchmakingEntry.matchStatus = 'matched';
       await matchmakingEntry.save();
-      console.log("Matchmaking entry saved as matched.");
+      // console.log("Matchmaking entry saved as matched.");
       return NextResponse.json({ matchStatus: 'matched', matchmakingEntry }, { status: 200 });
     } else if (matchmakingEntry.user1Decision === 'no' || matchmakingEntry.user2Decision === 'no') {
       matchmakingEntry.matchStatus = 'rejected';
     }
 
     await matchmakingEntry.save();
-    console.log("Matchmaking entry saved.");
+    // console.log("Matchmaking entry saved.");
     return NextResponse.json({ matchStatus: matchmakingEntry.matchStatus, matchmakingEntry }, { status: 200 });
   } catch (error) {
     console.error('Internal Server Error in PUT:', error);

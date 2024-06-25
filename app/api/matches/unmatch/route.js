@@ -17,7 +17,7 @@ export const POST = async (req) => {
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const { matchId } = await req.json();
 
-    console.log('Request Body:', { matchId });
+    // console.log('Request Body:', { matchId });
 
     if (!decoded._id) {
       return NextResponse.json({ error: 'User ID not found from token' }, { status: 401 });

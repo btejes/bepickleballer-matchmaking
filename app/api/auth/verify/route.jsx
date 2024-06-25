@@ -13,32 +13,32 @@ export async function GET(request) {
   const tokenDoc = await Token.findOne({ token });
   
   if (!tokenDoc || tokenDoc.expires < Date.now()) {
-    console.log("\nExpired token or no token doc found routing to login\n");
+    // console.log("\nExpired token or no token doc found routing to login\n");
     return NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}`);
   }
 
   // Retrieve the user's ID based on the email in the token
   const user = await User.findOne({ email: tokenDoc.email });
   if (!user) {
-    console.log("\nNo user found routing to login\n");
+    // console.log("\nNo user found routing to login\n");
     return NextResponse.redirect(`${process.env.BASE_URL}${apiBasePath}`);
   }
 
   // Check if a profile exists for this user, and create one if it does not exist
   let profile = await Profile.findOne({ userId: user._id });
   if (!profile) {
-    console.log(`Profile not found for user ${tokenDoc.email}. Creating default profile.`);
+    // console.log(`Profile not found for user ${tokenDoc.email}. Creating default profile.`);
     profile = new Profile({ userId: user._id });
     await profile.save();
   }
 
   // Create a JSON Web Token for the user, storing the user's ID
   const jwtToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-  console.log("\njwtToken: ", jwtToken, "\n");
+  // console.log("\njwtToken: ", jwtToken, "\n");
 
   // Delete the token after verification
   await Token.deleteOne({ token });
-  console.log("\nOld auth token deleted from token collection DB\n");
+  // console.log("\nOld auth token deleted from token collection DB\n");
 
   // Update the user's emailVerified and lastVerifiedLogin fields
   if (!user.emailVerified) {
@@ -57,7 +57,7 @@ export async function GET(request) {
     domain: 'bepickleballer.com'
   });
 
-  console.log("\nJWT cookie set. Returning success response\n");
+  // console.log("\nJWT cookie set. Returning success response\n");
 
   return response;
 }

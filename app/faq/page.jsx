@@ -12,7 +12,7 @@ async function FaqPage() {
   let faqs = [];
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   try {
-    console.log("\nFetching api faqs!\n");
+    // console.log("\nFetching api faqs!\n");
     const res = await fetch(`${process.env.BASE_URL}${basePath}/api/faqs`, {
       method: 'GET',
       headers: {

@@ -8,19 +8,19 @@ import path from 'path';
 
 // Function to process normal images
 async function processNormalImage(file, userId) {
-  console.log("Processing normal image");
+  // console.log("Processing normal image");
 
   const imageBuffer = Buffer.from(file.buffer, 'base64');
-  console.log(`Image buffer size: ${imageBuffer.length} bytes`);
+  // console.log(`Image buffer size: ${imageBuffer.length} bytes`);
 
   const tempDir = os.tmpdir();
   const inputPath = path.join(tempDir, `input_${Date.now()}`);
   const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
-  console.log(`Input path: ${inputPath}`);
-  console.log(`Output path: ${outputPath}`);
+  // console.log(`Input path: ${inputPath}`);
+  // console.log(`Output path: ${outputPath}`);
 
   await fs.writeFile(inputPath, imageBuffer);
-  console.log("Temporary input file created");
+  // console.log("Temporary input file created");
 
   try {
     // Resize and crop the image to a centered 800x800 square
@@ -32,16 +32,16 @@ async function processNormalImage(file, userId) {
       })
       .toFile(outputPath);
 
-    console.log("Reading converted image");
+    // console.log("Reading converted image");
     const convertedImageBuffer = await fs.readFile(outputPath);
     const base64Image = convertedImageBuffer.toString('base64');
-    console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
+    // console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
 
-    console.log("Cleaning up temporary files");
+    // console.log("Cleaning up temporary files");
     await fs.unlink(inputPath);
     await fs.unlink(outputPath);
 
-    console.log("Normal image processing completed successfully");
+    // console.log("Normal image processing completed successfully");
     return NextResponse.json({ image: base64Image }, { status: 200 });
   } catch (error) {
     console.error('Error processing image:', error);
@@ -54,31 +54,31 @@ async function processNormalImage(file, userId) {
 
 export async function POST(req) {
   try {
-    console.log("Starting image processing...");
+    // console.log("Starting image processing...");
 
     // Authorization code
     const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
-      console.log("Unauthorized access attempt");
+      // console.log("Unauthorized access attempt");
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const userId = decoded._id;
-    console.log(`Processing request for user: ${userId}`);
+    // console.log(`Processing request for user: ${userId}`);
 
     const body = await req.json();
     const { file } = body;
 
     if (!file) {
-      console.log("No file uploaded");
+      // console.log("No file uploaded");
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    console.log(`File type: ${file.type}`);
+    // console.log(`File type: ${file.type}`);
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
     if (!allowedTypes.includes(file.type)) {
-      console.log("Unsupported file type");
+      // console.log("Unsupported file type");
       return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 });
     }
 

@@ -11,22 +11,22 @@ export async function POST(request) {
   const { email } = await request.json();
   const lowercasedEmail = email.toLowerCase();
 
-  console.log(`Received request to send magic link to ${lowercasedEmail}`);
+  // console.log(`Received request to send magic link to ${lowercasedEmail}`);
 
   // Check if user exists, if not, create one
   let user = await User.findOne({ email: lowercasedEmail });
   if (!user) {
-    console.log(`User not found. Creating new user for ${lowercasedEmail}`);
+    // console.log(`User not found. Creating new user for ${lowercasedEmail}`);
     user = new User({ email: lowercasedEmail, emailVerified: false, lastVerifiedLogin: "" });
     await user.save();
   } else {
-    console.log(`User found for ${lowercasedEmail}`);
+    // console.log(`User found for ${lowercasedEmail}`);
   }
 
   // Check if a valid token exists for this email
   let tokenEntry = await Token.findOne({ email: lowercasedEmail });
   if (tokenEntry && tokenEntry.expires > new Date()) {
-    console.log(`Token for ${lowercasedEmail} is still valid. Not sending email.`);
+    // console.log(`Token for ${lowercasedEmail} is still valid. Not sending email.`);
     return NextResponse.json({ message: 'A valid login link has already been sent. Please check your email.' });
   }
 
@@ -41,17 +41,17 @@ export async function POST(request) {
 
     // Send the email
     await sendLoginEmail(lowercasedEmail, verifyUrl);
-    console.log(`Sent login email to ${lowercasedEmail} with link ${verifyUrl}`);
+    // console.log(`Sent login email to ${lowercasedEmail} with link ${verifyUrl}`);
 
     // Save the new token after email is sent
     if (tokenEntry) {
       tokenEntry.token = token;
       tokenEntry.expires = expires;
       await tokenEntry.save();
-      console.log(`Updated token for ${lowercasedEmail}`);
+      // console.log(`Updated token for ${lowercasedEmail}`);
     } else {
       await Token.create({ email: lowercasedEmail, token, expires });
-      console.log(`Created new token for ${lowercasedEmail}`);
+      // console.log(`Created new token for ${lowercasedEmail}`);
     }
 
     return NextResponse.json({ message: 'Check your email for the secure login link.' });

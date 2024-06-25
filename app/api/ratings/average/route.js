@@ -19,7 +19,7 @@ export async function GET(request) {
   try {
     const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
-      console.log("\nNo jwt found in average rating api\n");
+      // console.log("\nNo jwt found in average rating api\n");
       return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: cacheControlHeaders,
@@ -29,7 +29,7 @@ export async function GET(request) {
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const rateeUserId = decoded._id;
 
-    console.log("\nrateeUserId inside average route", rateeUserId, "\n");
+    // console.log("\nrateeUserId inside average route", rateeUserId, "\n");
 
     if (!rateeUserId) {
       throw new Error('Invalid rateeUserId');

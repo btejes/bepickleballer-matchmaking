@@ -26,7 +26,7 @@ const MatchesPage = () => {
         throw new Error('Failed to fetch matches');
       }
       const data = await response.json();
-      console.log('Fetched matches:', data); // Debug log
+      // console.log('Fetched matches:', data); // Debug log
       setMatches(data);
       setError(null);
     } catch (error) {
@@ -37,23 +37,23 @@ const MatchesPage = () => {
   }, [basePath]);
 
   useEffect(() => {
-    console.log('\nUSE EFFECT CALLED\n');
+    // console.log('\nUSE EFFECT CALLED\n');
     fetchMatches();
   }, [fetchMatches]);
 
   const handleMatchClick = (match) => {
-    console.log('Match clicked:', match); // Debug log
+    // console.log('Match clicked:', match); // Debug log
     setSelectedMatch(match);
   };
 
   const handleModalClose = () => {
-    console.log('Modal closed'); // Debug log
+    // console.log('Modal closed'); // Debug log
     setSelectedMatch(null);
     setShowRatingModal(false);
   };
 
   const handleUnmatch = (matchId) => {
-    console.log('Removing match from state:', matchId); // Debug log
+    // console.log('Removing match from state:', matchId); // Debug log
     setMatches((prevMatches) => prevMatches.filter(match => match.matchId !== matchId));
   };
 

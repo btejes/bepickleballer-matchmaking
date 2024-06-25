@@ -19,7 +19,7 @@ export async function GET() {
   try {
     const jwtToken = cookies().get('token')?.value;
     if (!jwtToken) {
-      console.log("\nNo jwt found in profile api\n");
+      // console.log("\nNo jwt found in profile api\n");
       return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: cacheControlHeaders,
@@ -29,7 +29,7 @@ export async function GET() {
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const profile = await Profile.findOne({ userId: decoded._id });
 
-    console.log("\nProfile Found: ", profile, "\n");
+    // console.log("\nProfile Found: ", profile, "\n");
     if (!profile) {
       return new NextResponse(JSON.stringify({ error: 'Profile not found' }), {
         status: 404,

@@ -20,29 +20,29 @@ export const segmentConfig = {
 };
 
 export async function POST(req) {
-  console.log('POST request received');
+  // console.log('POST request received');
 
   try {
     const jwtToken = cookies().get('token')?.value;
-    console.log('JWT token:', jwtToken);
+    // console.log('JWT token:', jwtToken);
 
     if (!jwtToken) {
-      console.log('No JWT token found');
+      // console.log('No JWT token found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const userId = decoded._id;
-    console.log('Token verified. User ID:', userId);
+    // console.log('Token verified. User ID:', userId);
 
     // Ensure the upload directory exists
     const uploadDir = path.join(process.cwd(), 'tmp');
     await fs.mkdir(uploadDir, { recursive: true });
-    console.log('Upload directory ensured:', uploadDir);
+    // console.log('Upload directory ensured:', uploadDir);
 
     // Create Busboy instance
     const bb = new busboy({ headers: req.headers });
-    console.log('Busboy instance created');
+    // console.log('Busboy instance created');
 
 
     return 42;
@@ -51,11 +51,11 @@ export async function POST(req) {
 
     bb.on('file', (name, file, info) => {
       const { filename, encoding, mimeType } = info;
-      console.log('File event received');
-      console.log(`Fieldname: ${name}`);
-      console.log(`Filename: ${filename}`);
-      console.log(`Encoding: ${encoding}`);
-      console.log(`Mimetype: ${mimeType}`);
+      // console.log('File event received');
+      // console.log(`Fieldname: ${name}`);
+      // console.log(`Filename: ${filename}`);
+      // console.log(`Encoding: ${encoding}`);
+      // console.log(`Mimetype: ${mimeType}`);
 
       filePath = path.join(uploadDir, filename);
       const writeStream = fs.createWriteStream(filePath);
@@ -63,7 +63,7 @@ export async function POST(req) {
 
       const filePromise = new Promise((resolve, reject) => {
         file.on('end', () => {
-          console.log('File upload completed');
+          // console.log('File upload completed');
           resolve();
         });
         file.on('error', (error) => {
@@ -76,17 +76,17 @@ export async function POST(req) {
     });
 
     bb.on('field', (name, value, info) => {
-      console.log(`Field event received: ${name}=${value}`);
+      // console.log(`Field event received: ${name}=${value}`);
     });
 
     bb.on('close', async () => {
-      console.log('Busboy finish event triggered');
+      // console.log('Busboy finish event triggered');
       try {
         await Promise.all(fileWritePromises);
-        console.log('All files processed');
+        // console.log('All files processed');
 
         const fileStream = await fs.readFile(filePath);
-        console.log('File read successfully from temp path:', filePath);
+        // console.log('File read successfully from temp path:', filePath);
 
         // For now, return the file details for debugging purposes
         return NextResponse.json({ filePath }, { status: 200 });
