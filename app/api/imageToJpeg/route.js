@@ -28,7 +28,7 @@ async function processNormalImage(file, userId) {
       .rotate() // This will rotate the image according to EXIF data
       .resize(800, 800, {
         fit: sharp.fit.cover, // This will ensure the image covers the 800x800 area, cropping as necessary
-        position: sharp.strategy.entropy // This focuses on the "interesting" parts of the image
+        position: 'center' // Ensure the image is centered
       })
       .toFile(outputPath);
 
