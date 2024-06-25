@@ -1,44 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 
 const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(profile.profileImage || null);
   const [averageRating, setAverageRating] = useState(null);
   const [statusMessage, setStatusMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
   const apiBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
-  useEffect(() => {
-    if (profile.profileImage) {
-      setImage(profile.profileImage);
-    }
-  }, [profile.profileImage]);
-
-  useEffect(() => {
-    if (profile.userId) {
-      fetchAverageRating(profile.userId);
-    }
-  }, [profile.userId]);
-
-  useEffect(() => {
-    if (statusMessage && !statusMessage.startsWith("Uploading") && statusMessage !== "Saving file") {
-      setFadeOut(false);
-      const timer1 = setTimeout(() => {
-        setFadeOut(true);
-      }, 3000);
-      const timer2 = setTimeout(() => {
-        setStatusMessage('');
-        setFadeOut(false);
-      }, 4000);
-      return () => {
-        clearTimeout(timer1);
-        clearTimeout(timer2);
-      };
-    }
-  }, [statusMessage]);
-
-  const fetchAverageRating = async (userId) => {
+  const fetchAverageRating = useCallback(async (userId) => {
     try {
       const response = await fetch(`${apiBasePath}/api/ratings/average?rateeUserId=${userId}`, {
         credentials: 'include',
@@ -53,7 +24,28 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
       console.error('Error fetching average rating:', error);
       setAverageRating('N/A');
     }
-  };
+  }, [apiBasePath]);
+
+  useEffect(() => {
+    if (profile.userId) {
+      fetchAverageRating(profile.userId);
+    }
+  }, [profile.userId, fetchAverageRating]);
+
+  useEffect(() => {
+    if (statusMessage && !statusMessage.startsWith("Uploading") && statusMessage !== "Saving file") {
+      setFadeOut(false);
+      const timer1 = setTimeout(() => setFadeOut(true), 3000);
+      const timer2 = setTimeout(() => {
+        setStatusMessage('');
+        setFadeOut(false);
+      }, 4000);
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
+    }
+  }, [statusMessage]);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -65,7 +57,7 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
         setFadeOut(false);
         return;
       }
-  
+
       if (file.size > 5 * 1024 * 1024) { // 5MB limit
         setStatusMessage("File size should not exceed 5MB");
         setFadeOut(false);
@@ -201,7 +193,6 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
         <div>
           <div className="flex justify-between items-center">
             <p className="text-lg font-bold text-black">{profile.firstName}</p>
-            
           </div>
           <div className="flex justify-between mt-2">
             <p className="text-sm font-medium text-black">{profile.gender}</p>
@@ -220,17 +211,14 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
                 {typeof averageRating === 'number' ? averageRating.toFixed(1) : 'N/A'}
               </p>
             </div>
-            
           </div>
           <div className="flex justify-between mt-2">
             <p className="text-sm font-medium text-black">DUPR: {profile.duprRating}</p>
             <p className="text-sm font-medium text-black">{profile.ageRange}</p>
-            
           </div>
           <div className="flex justify-between mt-2">
             <p className="text-sm font-medium text-black">{profile.outdoorIndoor}</p>
             <p className="text-sm font-medium text-black">{profile.skillLevel}</p>
-            
           </div>
           <div className="flex justify-between mt-2">
             <p className="text-sm font-medium text-black">{profile.rightieLeftie}</p>
