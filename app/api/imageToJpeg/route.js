@@ -7,75 +7,44 @@ import os from 'os';
 import path from 'path';
 import { exec } from 'child_process';
 
+
+import { ApiClient, ConvertImageApi } from 'cloudmersive-convert-api-client';
+
+// Configure API client with environment variable for the API key
+const apiClient = new ApiClient();
+apiClient.setApiKey(process.env.CLOUDMERSIVE_API_KEY); // Ensure your API key is correctly set in your environment variables
+
+const convertApi = new ConvertImageApi(apiClient);
+
 async function processHEICImage(file, userId) {
   console.log("Processing HEIC image");
 
   const imageBuffer = Buffer.from(file.buffer, 'base64');
   console.log(`Image buffer size: ${imageBuffer.length} bytes`);
 
-  const tempDir = os.tmpdir();
-  const inputPath = path.join(tempDir, `input_${Date.now()}.heic`);
-  const outputPath = path.join(tempDir, `output_${Date.now()}.jpg`);
-  const finalOutputPath = path.join(tempDir, `final_output_${Date.now()}.jpg`);
-  console.log(`Input path: ${inputPath}`);
-  console.log(`Output path: ${outputPath}`);
-  console.log(`Final output path: ${finalOutputPath}`);
-
   try {
-    await fs.writeFile(inputPath, imageBuffer);
-    console.log("Temporary input file created");
+    console.log("Starting conversion with Cloudmersive API");
 
-    const metadata = await sharp(inputPath).metadata();
-    console.log('Image metadata:', metadata);
+    const callback = function (error, data, response) {
+      if (error) {
+        console.error('Error during HEIC to JPEG conversion with Cloudmersive:', error);
+        return NextResponse.json({ error: 'Failed to convert HEIC to JPEG', details: error.message }, { status: 500 });
+      } else {
+        const convertedImageBuffer = Buffer.from(data, 'binary'); // Adjust according to the response format
+        const base64Image = convertedImageBuffer.toString('base64');
+        console.log("HEIC to JPEG conversion completed successfully");
+        return NextResponse.json({ image: base64Image }, { status: 200 });
+      }
+    };
 
-    let filterOption = 'scale=800:-1';
-    if (metadata.height > metadata.width) {
-      console.log("\nVertical .heic found!\n");
-      filterOption = 'transpose=1,scale=800:-1'; // Rotate 90 degrees clockwise and scale for vertical images
-    }
-
-    await new Promise((resolve, reject) => {
-      exec(`ffmpeg -i ${inputPath} -vf "${filterOption}" -pix_fmt yuvj420p ${outputPath}`, (error, stdout, stderr) => {
-        if (error) {
-          console.error('Error during HEIC to JPEG conversion:', stderr);
-          return reject(new Error('Failed to convert HEIC to JPEG'));
-        }
-        console.log('FFmpeg conversion stdout:', stdout);
-        resolve();
-      });
-    });
-
-    console.log("HEIC to JPEG conversion completed");
-
-    // Read the converted image and make it square
-    const image = sharp(outputPath).withMetadata(); // Preserve metadata
-    const { width, height } = await image.metadata();
-    const size = Math.min(width, height);
-
-    await image
-      .resize(size, size, {
-        fit: sharp.fit.cover,
-      })
-      .toFile(finalOutputPath);
-
-    console.log("Image resized to square dimensions");
-
-    console.log("Reading converted image");
-    const convertedImageBuffer = await fs.readFile(finalOutputPath);
-    const base64Image = convertedImageBuffer.toString('base64');
-    console.log(`Converted image size: ${convertedImageBuffer.length} bytes`);
-
-    await fs.unlink(inputPath);
-    await fs.unlink(outputPath);
-    await fs.unlink(finalOutputPath);
-
-    console.log("HEIC image processing completed successfully");
-    return NextResponse.json({ image: base64Image }, { status: 200 });
+    // Call Cloudmersive API to convert the image from HEIC to JPEG
+    convertApi.convertImageImageFormatConvert('HEIC', 'JPG', imageBuffer, callback);
   } catch (error) {
     console.error('Error during HEIC processing:', error);
     return NextResponse.json({ error: 'Failed to process HEIC image', details: error.message }, { status: 500 });
   }
 }
+
 
 // Function to process normal images
 async function processNormalImage(file, userId) {
