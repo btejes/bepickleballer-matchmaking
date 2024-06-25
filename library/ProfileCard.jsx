@@ -56,121 +56,121 @@ const ProfileCard = ({ profile, isProfilePage, setIsUploading }) => {
   };
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-  
-    if (file) {
-      if (!allowedTypes.includes(file.type)) {
-        setStatusMessage(`${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP`);
-        setFadeOut(false);
-        return;
-      }
-  
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        setStatusMessage("File size should not exceed 5MB");
-        setFadeOut(false);
-        return;
-      }
-  
-      setStatusMessage("Uploading file");
-      setLoading(true);
-      setIsUploading(true);
+  const file = e.target.files[0];
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+  if (file) {
+    if (!allowedTypes.includes(file.type)) {
+      setStatusMessage(`${file.type} not accepted. Please submit one of the following: JPEG, JPG, PNG, WEBP`);
       setFadeOut(false);
-  
-      try {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = async () => {
-          const base64data = reader.result.split(',')[1];
-  
-          const response = await fetch(`${apiBasePath}/api/imageToJpeg`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({ file: { type: file.type, buffer: base64data } }),
-          });
-  
-          const convertResult = await response.json();
-  
-          if (convertResult.error) {
-            setStatusMessage(convertResult.error);
-            setLoading(false);
-            setIsUploading(false);
-            setFadeOut(false);
-            return;
-          }
-  
-          const convertedImage = convertResult.image;
-  
-          // Get a signed URL for uploading the image
-          const signedUrlResponse = await fetch(`${apiBasePath}/api/getSignedUrl`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-          });
-  
-          const signedUrlResult = await signedUrlResponse.json();
-  
-          if (signedUrlResult.error) {
-            setStatusMessage("Failed to get signed URL");
-            setLoading(false);
-            setIsUploading(false);
-            setFadeOut(false);
-            return;
-          }
-  
-          const url = signedUrlResult.url;
-  
-          // Upload the converted image to S3
-          const uploadResponse = await fetch(url, {
-            method: "PUT",
-            body: Buffer.from(convertedImage, 'base64'),
-            headers: {
-              "Content-Type": 'image/jpeg',
-            },
-          });
-  
-          if (!uploadResponse.ok) {
-            throw new Error('Failed to upload file');
-          }
-  
-          const imageUrl = url.split('?')[0];
-  
-          // Update the profile with the new image URL
-          const profileResponse = await fetch(`${apiBasePath}/api/profile`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({ profileImage: imageUrl }),
-          });
-  
-          if (!profileResponse.ok) {
-            console.error('Error updating profile image:', await profileResponse.json());
-          }
-  
-          // Only update the image state once all network requests are successful
-          profile.profileImage = imageUrl;
-          setImage(imageUrl);
-  
-          setStatusMessage("Finished");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      setStatusMessage("File size should not exceed 5MB");
+      setFadeOut(false);
+      return;
+    }
+
+    setStatusMessage("Uploading file");
+    setLoading(true);
+    setIsUploading(true);
+    setFadeOut(false);
+
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = async () => {
+        const base64data = reader.result.split(',')[1];
+
+        const response = await fetch(`${apiBasePath}/api/imageToJpeg`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ file: { type: file.type, buffer: base64data } }),
+        });
+
+        const convertResult = await response.json();
+
+        if (convertResult.error) {
+          setStatusMessage(convertResult.error);
           setLoading(false);
           setIsUploading(false);
-        };
-      } catch (error) {
-        console.error('Error uploading image:', error);
-        setStatusMessage("Error uploading image");
+          setFadeOut(false);
+          return;
+        }
+
+        const convertedImage = convertResult.image;
+
+        // Get a signed URL for uploading the image
+        const signedUrlResponse = await fetch(`${apiBasePath}/api/getSignedUrl`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+
+        const signedUrlResult = await signedUrlResponse.json();
+
+        if (signedUrlResult.error) {
+          setStatusMessage("Failed to get signed URL");
+          setLoading(false);
+          setIsUploading(false);
+          setFadeOut(false);
+          return;
+        }
+
+        const url = signedUrlResult.url;
+
+        // Upload the converted image to S3
+        const uploadResponse = await fetch(url, {
+          method: "PUT",
+          body: Buffer.from(convertedImage, 'base64'),
+          headers: {
+            "Content-Type": 'image/jpeg',
+          },
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload file');
+        }
+
+        const imageUrl = url.split('?')[0];
+
+        // Update the profile with the new image URL
+        const profileResponse = await fetch(`${apiBasePath}/api/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ profileImage: imageUrl }),
+        });
+
+        if (!profileResponse.ok) {
+          console.error('Error updating profile image:', await profileResponse.json());
+        }
+
+        // Only update the image state once all network requests are successful
+        profile.profileImage = imageUrl;
+        setImage(imageUrl);
+
+        setStatusMessage("Finished");
         setLoading(false);
         setIsUploading(false);
-      }
+      };
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setStatusMessage("Error uploading image");
+      setLoading(false);
+      setIsUploading(false);
     }
-  };
-  
+  }
+};
+
 
   return (
     <div className="max-w-xs bg-white rounded-3xl shadow-md mx-auto overflow-hidden">
